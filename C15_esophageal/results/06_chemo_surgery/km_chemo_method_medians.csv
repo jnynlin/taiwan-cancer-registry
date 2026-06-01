@@ -1,0 +1,4 @@
+﻿Group,n,Events,Median OS (mo)
+Single agent,33,31,6.8
+Multi-agent,700,602,13.4
+Multi-agent + other,75,65,17.0

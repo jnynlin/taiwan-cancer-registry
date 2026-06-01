@@ -1,0 +1,6 @@
+﻿Group,n,Events,Median OS (mo)
+Surgery only,540,333,29.7
+Neoadjuvant RT → surgery,631,568,11.4
+Neoadjuvant CCRT → surgery,329,315,6.3
+Surgery → adjuvant RT,197,129,28.9
+Surgery → adjuvant CCRT,24,17,29.6

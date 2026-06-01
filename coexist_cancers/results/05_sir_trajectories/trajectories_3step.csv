@@ -1,0 +1,12 @@
+﻿step1,step2,step3,n
+Tongue,Gum,Mouth NOS,6
+Mouth NOS,Tongue,Gum,4
+Palate,Hypopharynx,Esophagus,4
+Lip,Mouth NOS,Tongue,3
+Tongue,Gum,Palate,3
+Mouth NOS,Tongue,Palate,3
+Tongue,Pyriform sinus,Esophagus,3
+Palate,Tongue,Gum,3
+Tongue,Lip,Gum,3
+Tonsil,Hypopharynx,Esophagus,3
+Gum,Lip,Mouth NOS,3
