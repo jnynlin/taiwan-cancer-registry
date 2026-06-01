@@ -1,0 +1,30 @@
+# Raw registry data (sensitive / large)
+data/raw/
+data/processed/
+data/*.csv
+data/*.xlsx
+data/*.xls
+
+# Large intermediate outputs
+results/04_deep_learning/*.npy
+results/04_deep_learning/c15_final_annotated.csv
+coexist_cancers/results/*.pkl
+coexist_cancers/data/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+.ipynb_checkpoints/
+
+# LaTeX build artifacts
+*.aux
+*.log
+*.out
+*.synctex.gz
+*.toc
+*.fls
+*.fdb_latexmk
+
+# OS
+.DS_Store
