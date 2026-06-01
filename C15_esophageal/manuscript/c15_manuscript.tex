@@ -92,9 +92,9 @@ Independent prognostic determinants of surgical and systemic treatment
 quality in Asian registry populations remain incompletely characterised.
 \textbf{Methods:} We analysed 2,367 consecutive esophageal cancer
 (ICD-10 C15) cases from the Taiwan Cancer Registry (2006--2020). Kaplan-Meier
-and multivariable Cox proportional hazards regression (apparent C-index
-0.705; bootstrap out-of-bag C-index 0.703, 95\,\%\,CI 0.687--0.720,
-$B = 1000$) quantified independent
+and multivariable Cox proportional hazards regression (MICE primary analysis:
+apparent C-index 0.670; bootstrap out-of-bag C-index 0.666, 95\,\%\,CI
+0.647--0.683, $B = 500$) quantified independent
 predictors of overall survival (OS). Unsupervised deep learning ---
 a mean-squared-error autoencoder, UMAP, and $k$-means clustering ($k = 3$)
 --- identified novel patient subtypes.
@@ -103,12 +103,12 @@ a predominantly male cohort (94.5\,\%, median age 57 years); with 1,832
 deaths (77.4\,\%) and median OS of 13.4 months. Using MICE-imputed AJCC
 stage as the primary analysis (C-index 0.670), R0 resection margin was
 the single robust independent modifiable prognostic determinant
-(HR 0.63, 95\,\%\,CI 0.55--0.73, $p < 0.001$). CCRT was not
-independently significant under MICE imputation (HR 0.97, $p = 0.569$),
-consistent with the unadjusted Kaplan-Meier result ($p = 0.58$); a
-sensitivity analysis with zero-coded stage yielded HR 0.76 ($p < 0.001$),
-likely artefactual due to stage misclassification. Radical
-esophagectomy (HR 0.61) also conferred significant independent benefit.
+(HR 0.63, 95\,\%\,CI 0.55--0.73, $p < 0.001$). CCRT findings were method-sensitive: non-significant under MICE
+(HR 0.97, $p = 0.569$; consistent with unadjusted KM $p = 0.58$) but
+significant in a complete-case analysis restricted to staged patients
+(HR 0.72, $p < 0.001$); the $>$25\,\% divergence precludes a
+definitive registry-based conclusion. Radical esophagectomy (HR 0.61)
+conferred significant independent benefit.
 Deep learning identified three subtypes --- mainstream SCC ($n = 2{,}026$),
 adenocarcinoma-enriched ($n = 153$), and cervical/upper-esophagus
 ($n = 185$) --- corresponding closely to known histological and anatomical
@@ -116,8 +116,9 @@ subgroups (OS log-rank $p = 0.009$), with no incremental OS predictive
 value beyond histology and subsite coding ($\Delta$C-index $= -0.001$).
 \textbf{Conclusions:} R0 resection margin attainment is the primary
 robust modifiable prognostic determinant in esophageal cancer. CCRT
-benefit is sensitive to stage imputation method and was non-significant
-under MICE; this uncertainty warrants prospective clarification.
+estimates are method-sensitive (MICE: HR 0.97 NS; complete-case staged
+patients: HR 0.72, $p < 0.001$); the $>$25\,\% divergence warrants
+prospective clarification with complete staging.
 
 \vspace{0.5em}
 \noindent\textbf{Keywords:} esophageal cancer; squamous cell carcinoma;
@@ -265,9 +266,11 @@ Stage I reference, $n = 2{,}364$) is also reported.
 
 The concordance (C-) index was computed from the fitted MICE model; a
 bootstrap out-of-bag 95\,\% confidence interval was derived from $B =
-1000$ resamples. Hazard ratios (HRs) with 95\,\% confidence intervals
-(CI) are reported. Reference categories were: Stage I, no surgery, R1/R2
-margin, no CCRT, and single-agent or no chemotherapy.
+500$ resamples applied to the MICE-imputed dataset (imputed stage values
+held fixed; patient resampling only). Hazard ratios (HRs) with 95\,\%
+confidence intervals (CI) are reported. Reference categories were:
+Stage I, no surgery, R1/R2 margin, no CCRT, and single-agent or no
+chemotherapy.
 
 \subsection{Unsupervised deep learning patient subtyping}
 A symmetric autoencoder was trained on a standardised, median-imputed
@@ -373,6 +376,22 @@ patients to the Stage I reference, inflating the apparent stage-adjusted
 CCRT effect. The convergence of the MICE result ($p = 0.569$) with the
 unadjusted KM ($p = 0.58$) suggests the zero-coded CCRT HR was driven
 by stage misclassification rather than a true treatment effect.
+
+A complete-case sensitivity analysis restricted to the 1,757 patients
+with recorded AJCC stage (C-index 0.724) yielded consistent estimates
+for R0 margin (HR 0.59, 95\,\% CI 0.51--0.69, $p < 0.001$) and all
+surgical predictors. However, CCRT remained independently significant
+in this subset (HR 0.72, 95\,\% CI 0.63--0.81, $p < 0.001$),
+diverging from the MICE estimate by more than 25\,\%. This discrepancy
+arises because the complete-case analysis excludes the 609 stage-unknown
+patients: per MICE imputation, 73\,\% of these patients fall into
+Stage~III or IV, and their worse prognosis is largely independent of
+CCRT receipt. Their exclusion removes a confounded group and inflates
+the apparent CCRT effect within the stage-known subset. Given this
+divergence, definitive conclusions about CCRT efficacy in this registry
+cohort cannot be drawn; the MICE estimate is the primary reported result
+and prospective data are required for clarification.
+
 Advanced stage (III and IV vs I) and increasing age were adverse
 prognostic factors.
 
@@ -476,13 +495,29 @@ at Stage III--IV (imputed distribution: I\,=\,327, II\,=\,329,
 III\,=\,889, IV\,=\,822), absorbing this variance into the stage
 coefficients and returning a non-significant CCRT estimate.
 
-This finding does not imply CCRT lacks biological efficacy in esophageal
-cancer --- the CROSS trial demonstrated clear benefit in resectable disease
-\cite{vanHagen2012}. Rather, it illustrates a well-recognised limitation
-of registry-based CCRT analyses: confounding by indication and stage
-misclassification can produce spurious adjusted HRs. The MICE result
-should be interpreted as the more credible estimate in this registry
-dataset.
+However, the CCRT finding is not straightforward. A complete-case
+analysis restricted to the 1,757 patients with recorded stage yielded
+CCRT HR 0.72 (95\,\% CI 0.63--0.81, $p < 0.001$), diverging from the
+MICE estimate by more than 25\,\%. This discrepancy reflects two
+competing sources of bias: (1) stage-misclassification bias in the
+zero-coded and complete-case analyses, where the 609 stage-unknown
+patients are excluded or misassigned; and (2) potential
+over-adjustment in the MICE model if imputed stage absorbs CCRT-related
+variance. The complete-case analysis avoids imputation assumptions but
+excludes patients who may have been systematically undertreated.
+Together, these results indicate that CCRT benefit in this registry is
+method-sensitive and cannot be definitively characterised from registry
+data alone.
+
+This uncertainty does not contradict the biological evidence for CCRT
+benefit --- the CROSS trial demonstrated clear benefit in resectable
+disease \cite{vanHagen2012}. Rather, it illustrates the well-recognised
+limitation of registry-based CCRT analyses: confounding by indication,
+stage incompleteness, and differential treatment allocation across
+the study period can produce markedly different adjusted HRs depending
+on how missing stage is handled. Prospective real-world data with
+complete staging are required to resolve this question in Taiwanese
+patients.
 
 Cumulative cycle data were available in only 5.3\,\% of patients,
 precluding robust dose-response analysis. The absence of drug-level data
@@ -535,10 +570,12 @@ Second, AJCC stage was unknown in 609 patients (25.7\,\%). The primary
 analysis now uses MICE (sklearn \texttt{IterativeImputer}, Extra Trees
 estimator, 10 iterations) with nine clinical predictors. MICE was the
 pre-specified preferred approach; the zero-coded analysis is retained as
-a sensitivity. The divergence in the CCRT estimate between MICE
-(HR 0.97, NS) and zero-coded (HR 0.76, $p < 0.001$) confirms that the
-zero-coded approach introduced misclassification bias into the CCRT
-coefficient.
+a sensitivity. Three CCRT estimates are now reported: MICE
+(HR 0.97, $p = 0.569$), zero-coded (HR 0.76, $p < 0.001$), and
+complete-case restricted to staged patients (HR 0.72, $p < 0.001$).
+The $>$25\,\% divergence between MICE and the other two estimates
+prevents a definitive registry-based conclusion on CCRT benefit; this
+uncertainty is acknowledged throughout (see §4.2).
 
 Third, mixed AJCC staging editions (6th and 7th) across the 15-year study
 period introduce potential stage migration and may affect the stage HRs
@@ -589,11 +626,13 @@ independent modifiable prognostic determinant of overall survival
 (HR 0.63, $p < 0.001$, consistent across all imputation approaches).
 Surgical quality --- reflected by R0 status and the extent of lymph node
 dissection --- deserves emphasis equal to the decision to operate. CCRT
-benefit was non-significant under the primary MICE imputation analysis
-(HR 0.97, $p = 0.569$), converging with the unadjusted Kaplan-Meier
-result; the previously reported zero-coded HR (0.76, $p < 0.001$) was
-likely artefactual due to stage misclassification bias and should not be
-used to guide treatment allocation.
+findings are method-sensitive: CCRT was non-significant under MICE
+imputation (HR 0.97, $p = 0.569$, converging with unadjusted KM
+$p = 0.58$), whereas a complete-case analysis restricted to staged
+patients yielded HR 0.72 ($p < 0.001$). The $>$25\,\% divergence
+between these two estimates reflects differential handling of the 609
+stage-unknown patients and precludes definitive conclusions; prospective
+data with complete staging are required.
 
 Unsupervised deep learning recovers three patient subtypes consistent with
 known histological and anatomical subgroups; incremental Cox analysis
@@ -824,10 +863,11 @@ esophageal cancer: a nationwide analysis.
 \begin{table}[H]
   \centering
   \caption{Multivariable Cox proportional hazards model results
-    ($n = 2{,}364$; apparent C-index 0.705; bootstrap out-of-bag
-    C-index 0.703, 95\,\%\,CI 0.687--0.720, $B = 1000$).
-    Stage-unknown patients ($n = 609$) coded zero on all stage
-    indicators (grouped with Stage~I reference).}
+    (MICE primary analysis; $n = 2{,}364$; apparent C-index 0.670;
+    bootstrap out-of-bag C-index 0.666, 95\,\%\,CI 0.647--0.683,
+    $B = 500$). AJCC stage imputed via MICE; zero-coded sensitivity
+    analysis (stage-unknown grouped with Stage~I): apparent C-index
+    0.705, OOB C-index 0.703 (0.687--0.720).}
   \label{tab:cox}
   \begin{tabular}{lrrl}
     \toprule
@@ -849,9 +889,11 @@ esophageal cancer: a nationwide analysis.
       (sklearn IterativeImputer, Extra Trees, 10 iterations).
       Reference categories: Stage I; no surgery; R1/R2 margin; no CCRT;
       single-agent or no chemotherapy. Ridge penaliser = 0.1.
-      $^\ddagger$CCRT HR 0.76 ($p < 0.001$) in zero-coded stage sensitivity
-      analysis; the MICE estimate ($p = 0.569$) is the pre-specified
-      primary result.}
+      $^\ddagger$Three CCRT estimates: MICE (primary) HR 0.97
+      ($p = 0.569$); zero-coded HR 0.76 ($p < 0.001$); complete-case
+      staged patients HR 0.72 ($p < 0.001$). The $>$25\,\% divergence
+      between MICE and the other two estimates reflects differential
+      handling of the 609 stage-unknown patients; see §4.2.}
   \end{tabular}
 \end{table}
 
