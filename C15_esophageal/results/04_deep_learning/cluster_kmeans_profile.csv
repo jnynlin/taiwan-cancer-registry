@@ -1,0 +1,4 @@
+﻿cluster,n,mean_age,mean_male,mean_subsite_Esophagus NOS,mean_subsite_Abdominal esophagus,mean_subsite_Overlapping esophagus,mean_subsite_Thoracic esophagus (upper),mean_subsite_Thoracic esophagus (lower),mean_subsite_Cervical esophagus,mean_hist_SCC,mean_hist_Adenocarcinoma,median_os_months
+0,153,59.085,0.902,0.144,0.196,0.529,0.026,0.092,0.013,0.013,0.353,13.3
+1,2029,57.64,0.949,0.146,0.318,0.376,0.0,0.16,0.0,0.949,0.0,13.3
+2,185,57.865,0.935,0.4,0.07,0.027,0.097,0.038,0.368,0.508,0.0,15.6

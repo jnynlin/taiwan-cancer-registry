@@ -4,20 +4,30 @@ data/processed/
 data/*.csv
 data/*.xlsx
 data/*.xls
+C15_esophageal/data/
 
-# Large intermediate outputs
-results/04_deep_learning/*.npy
-results/04_deep_learning/c15_final_annotated.csv
-coexist_cancers/results/*.pkl
-coexist_cancers/data/
+# Large intermediate binary outputs
+**/*.npy
+**/latent_representations.npy
+**/umap_embedding.npy
+**/ae_losses.npy
+**/latent_z_all.npy
+**/latent_z_multiprimary.npy
+**/umap_all.npy
+**/umap_mp.npy
 
-# Python cache
-__pycache__/
-*.pyc
-*.pyo
-.ipynb_checkpoints/
+# Large annotated patient-level CSVs (re-generatable)
+**/c15_final_annotated.csv
+**/patients_annotated_k3.csv
 
-# LaTeX build artifacts
+# Legacy matplotlib PDF drafts (superseded by LaTeX)
+**/C15_Esophageal_Cancer_Summary.pdf
+**/C15_Paper_Draft.pdf
+**/C15_Paper_LaTeX.pdf
+**/Coexist_Cancers_Manuscript.pdf
+**/Coexist_Cancers_Report.pdf
+
+# LaTeX build artefacts
 *.aux
 *.log
 *.out
@@ -25,6 +35,15 @@ __pycache__/
 *.toc
 *.fls
 *.fdb_latexmk
+*.spl
+**/manuscript/*.pdf
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+.ipynb_checkpoints/
 
 # OS
 .DS_Store
+coexist_cancers/data/

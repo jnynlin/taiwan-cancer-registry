@@ -1,0 +1,4 @@
+﻿cluster,n,pct_3plus,median_age,pct_male,pct_death,median_yr_span,theme,top_sites
+C1,1827,10.9,61.0,76.1,58.8,2.0,GI/visceral mixed,"Colon(553), Tongue NOS(260), Mouth NOS(259), Lung/bronch(252)"
+C2,1170,4.2,61.0,30.4,49.1,3.0,Female-enriched/breast,"Breast(591), Liver(499), Lung/bronch(266), Colon(232)"
+C3,1071,13.2,55.0,96.5,68.8,1.0,Aerodigestive SCC field,"Esophagus(599), Mouth NOS(275), Tongue NOS(231), Hypopharynx(204)"

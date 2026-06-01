@@ -1,0 +1,27 @@
+﻿Variable,Value,OS
+=== SURGERY ===,,
+  Other/unknown,n=1067 (45.1%),Median OS=11.9 mo
+  No surgery,n=769 (32.5%),Median OS=9.3 mo
+  Radical esophagectomy,n=334 (14.1%),Median OS=26.1 mo
+  Endoscopic resection,n=180 (7.6%),Median OS=29.3 mo
+  Partial esophagectomy,n=17 (0.7%),Median OS=24.2 mo
+Surgical margin (operated),,
+  R0 (no residual),n=449,Median OS=27.2 mo
+  R1 (microscopic),n=47,Median OS=23.2 mo
+  Unknown,n=30,Median OS=37.3 mo
+  R2 (macroscopic),n=5,Median OS=21.0 mo
+LN dissection (operated),,
+  Radical/3-field,n=345,
+  No LN dissection,n=181,
+  Limited,n=3,
+  Systematic,n=2,
+=== CHEMOTHERAPY ===,,
+CCRT,n=947 (40.0%),Median OS=14.3 mo
+No CCRT,n=1420 (60.0%),Median OS=12.6 mo
+  Regimen: No chemo,n=663,Median OS=14.8 mo
+  Regimen: CCRT (concurrent),n=554,Median OS=14.8 mo
+  Regimen: Unknown,n=528,Median OS=13.6 mo
+  Regimen: Single agent,n=293,Median OS=13.5 mo
+  Regimen: Multi-agent (no RT),n=253,Median OS=9.8 mo
+  Regimen: Multi-agent + targeted/immuno,n=76,Median OS=6.8 mo
+Cycles (cumulative dose proxy),n=418 with data,"Median=0.0, Mean=1.2"

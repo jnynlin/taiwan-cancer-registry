@@ -1,0 +1,25 @@
+﻿feature,importance
+surgery,0.21209186
+stage_ord,0.18073106
+bmi,0.14474916
+chemo,0.13753593
+hist_SCC,0.09333587
+radiation,0.084514976
+age,0.06447816
+subsite_Abdominal esophagus,0.06372571
+subsite_Esophagus NOS,0.05216956
+hist_Other,0.040213585
+subsite_Thoracic esophagus (lower),0.039393663
+hist_Adenocarcinoma,0.027892351
+grade,0.025151253
+subsite_Overlapping esophagus,0.024391651
+betel_nut,0.02155149
+targeted,0.02113676
+hist_Carcinoma NOS,0.019370794
+subsite_Cervical esophagus,0.0030989647
+hist_Adenosquamous,0.00264287
+subsite_Thoracic esophagus (upper),0.0023671389
+smoker,-0.00063455105
+male,-0.010108471
+confirm,-0.018648386
+immunotherapy,-0.024115205
