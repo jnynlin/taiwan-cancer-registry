@@ -27,8 +27,9 @@
   linkcolor=blue!60!black,
   citecolor=blue!60!black,
   urlcolor=blue!60!black,
-  pdftitle={Surgical Margin Status, CCRT, and Deep Learning-Identified Patient
-    Subtypes as Independent Prognostic Determinants in Esophageal Cancer}
+  pdftitle={Surgical Margin Status and Deep Learning-Identified Patient
+    Subtypes as Prognostic Determinants in Esophageal Cancer:
+    A Registry-Based Analysis with MICE Imputation}
 }
 
 \graphicspath{{../results/}}
@@ -48,9 +49,9 @@
 \vspace*{1cm}
 
 \begin{center}
-{\LARGE\bfseries Surgical Margin Status, CCRT, and Deep
-Learning--Identified Patient Subtypes as Independent Prognostic
-Determinants in Esophageal Cancer\par}
+{\LARGE\bfseries Surgical Margin Status and Deep Learning--Identified
+Patient Subtypes as Prognostic Determinants in Esophageal Cancer:
+A Registry-Based Analysis with Multiple Imputation\par}
 
 \vspace{1.2cm}
 
@@ -99,22 +100,24 @@ a mean-squared-error autoencoder, UMAP, and $k$-means clustering ($k = 3$)
 --- identified novel patient subtypes.
 \textbf{Results:} Squamous-cell carcinoma (SCC) predominated (85.4\,\%) in
 a predominantly male cohort (94.5\,\%, median age 57 years); with 1,832
-deaths (77.4\,\%) and median OS of 13.4 months. R0 resection margin
-(HR 0.60, 95\,\%\,CI 0.53--0.69) and concurrent chemoradiotherapy
-(CCRT; HR 0.76, 0.67--0.85) were the strongest independent modifiable
-prognostic determinants ($p < 0.001$; apparent C-index 0.705,
-bootstrap out-of-bag C-index 0.703, 95\,\%\,CI 0.687--0.720, $B = 1000$).
-Endoscopic resection (HR 0.47) and radical esophagectomy (HR 0.61) also
-conferred independent benefit, though endoscopic resection reflects
-selection toward early-stage disease.
+deaths (77.4\,\%) and median OS of 13.4 months. Using MICE-imputed AJCC
+stage as the primary analysis (C-index 0.670), R0 resection margin was
+the single robust independent modifiable prognostic determinant
+(HR 0.63, 95\,\%\,CI 0.55--0.73, $p < 0.001$). CCRT was not
+independently significant under MICE imputation (HR 0.97, $p = 0.569$),
+consistent with the unadjusted Kaplan-Meier result ($p = 0.58$); a
+sensitivity analysis with zero-coded stage yielded HR 0.76 ($p < 0.001$),
+likely artefactual due to stage misclassification. Radical
+esophagectomy (HR 0.61) also conferred significant independent benefit.
 Deep learning identified three subtypes --- mainstream SCC ($n = 2{,}026$),
 adenocarcinoma-enriched ($n = 153$), and cervical/upper-esophagus
 ($n = 185$) --- corresponding closely to known histological and anatomical
 subgroups (OS log-rank $p = 0.009$), with no incremental OS predictive
 value beyond histology and subsite coding ($\Delta$C-index $= -0.001$).
-\textbf{Conclusions:} R0 margin and CCRT are primary therapeutic targets
-in esophageal cancer. Unsupervised deep learning reveals clinically
-meaningful patient heterogeneity beyond conventional staging.
+\textbf{Conclusions:} R0 resection margin attainment is the primary
+robust modifiable prognostic determinant in esophageal cancer. CCRT
+benefit is sensitive to stage imputation method and was non-significant
+under MICE; this uncertainty warrants prospective clarification.
 
 \vspace{0.5em}
 \noindent\textbf{Keywords:} esophageal cancer; squamous cell carcinoma;
@@ -250,15 +253,21 @@ with unknown stage ($n = 609$) were coded zero on all stage indicators,
 effectively grouping them with the Stage I reference stratum. This
 approach retains stage-unknown patients in the model while avoiding
 listwise deletion of a quarter of the cohort; it is reported as a
-limitation (Section~\ref{sec:limitations}). The final Cox cohort
-comprised 2,364 patients (including 609 with imputed stage indicators).
-The concordance (C-) index was computed from the fitted model; a
-bootstrap 95\,\% confidence interval was derived from $B = 1000$
-resamples by re-fitting the model on each bootstrap sample and evaluating
-on the held-out cases. Hazard ratios (HRs) with 95\,\% confidence
-intervals (CI) are reported. Reference categories were: Stage I (or
-unknown), no surgery, R1/R2 margin, no CCRT, and single-agent or no
-chemotherapy.
+limitation (Section~\ref{sec:limitations}). AJCC stage was imputed using Multiple Imputation by Chained Equations
+(MICE; Python \texttt{sklearn} \texttt{IterativeImputer}, estimator:
+Extra Trees Regressor, 10 iterations, seed 42) with age, sex, histology,
+subsite, surgical modality, margin status, CCRT, and chemotherapy as
+predictors; imputed stage was rounded to the nearest integer and clamped
+to the ordinal range I--IV. This replaces the zero-coding approach used
+in earlier versions and constitutes the primary analysis. For comparison,
+a sensitivity analysis using zero-coded stage (stage-unknown grouped with
+Stage I reference, $n = 2{,}364$) is also reported.
+
+The concordance (C-) index was computed from the fitted MICE model; a
+bootstrap out-of-bag 95\,\% confidence interval was derived from $B =
+1000$ resamples. Hazard ratios (HRs) with 95\,\% confidence intervals
+(CI) are reported. Reference categories were: Stage I, no surgery, R1/R2
+margin, no CCRT, and single-agent or no chemotherapy.
 
 \subsection{Unsupervised deep learning patient subtyping}
 A symmetric autoencoder was trained on a standardised, median-imputed
@@ -333,39 +342,39 @@ inversely correlated with OS (Spearman $r = -0.22$, $p < 0.001$).
 
 \subsection{Chemoradiotherapy outcomes}
 In unadjusted Kaplan-Meier analysis, CCRT and non-CCRT patients showed
-similar crude survival (log-rank $p = 0.58$; Figure~\ref{fig:chemo}),
-a finding explained by confounding by indication: patients with more
-advanced or metastatic disease are less likely to be prescribed CCRT,
-creating a selection bias that suppresses the crude CCRT benefit. After
-multivariable adjustment for stage, surgical modality, and margin status
-in the Cox model, CCRT independently reduced hazard by 24\,\% (HR 0.76,
-95\,\% CI 0.67--0.85, $p < 0.001$; Table~\ref{tab:cox}). This pattern
-is well-recognised in registry-based chemotherapy analyses and reinforces
-the necessity of adjusted rather than unadjusted comparisons.
+similar crude survival (log-rank $p = 0.58$; Figure~\ref{fig:chemo}).
+In the primary MICE-imputed Cox analysis, CCRT was not a significant
+independent predictor (HR 0.97, 95\,\% CI 0.86--1.09, $p = 0.569$;
+Table~\ref{tab:cox}), consistent with the unadjusted result. A
+sensitivity analysis using zero-coded stage yielded HR 0.76
+($p < 0.001$); however, this is likely an artefact of stage
+misclassification (see §3.5 and Discussion §4.2 for full interpretation).
 
 \subsection{Multivariable Cox proportional hazards analysis}
-Multivariable Cox regression was fitted to 2,364 patients
-(Figure~\ref{fig:cox}; Methods §\ref{sec:cox} for stage imputation
-details). The apparent C-index was 0.705; the bootstrap out-of-bag
-C-index was 0.703 (95\,\% CI 0.687--0.720, $B = 1000$), indicating
-negligible optimism ($< 0.002$) attributable to ridge penalisation.
-Independent prognostic predictors are summarised in Table~\ref{tab:cox}.
-After adjusting for all covariates, R0 resection margin was the single
-strongest modifiable predictor reflecting surgical quality (HR 0.60,
-95\,\% CI 0.53--0.69, $p < 0.001$), followed by CCRT (HR 0.76,
-0.67--0.85, $p < 0.001$). Endoscopic resection showed the largest
-HR (0.47, 0.38--0.59, $p < 0.001$), but this reflects
-selection of early-stage disease amenable to endoscopic treatment rather
-than a modifiable surgical quality metric. Radical esophagectomy
-independently reduced hazard by approximately 40\,\% (HR 0.61, 0.51--0.72,
-$p < 0.001$). Advanced stage (III and IV vs I) and male sex were adverse
-prognostic factors.
+Multivariable Cox regression was fitted to 2,364 patients using
+MICE-imputed AJCC stage as the primary analysis
+(Figure~\ref{fig:cox}; C-index 0.670).
+Independent prognostic predictors are summarised in
+Table~\ref{tab:cox}. R0 resection margin was the single strongest
+and most robust modifiable predictor (HR 0.63, 95\,\% CI 0.55--0.73,
+$p < 0.001$). Radical esophagectomy independently reduced hazard by
+approximately 40\,\% (HR 0.61, 0.51--0.72, $p < 0.001$). Endoscopic
+resection showed the largest HR (0.48, 0.38--0.60, $p < 0.001$),
+reflecting selection of early-stage disease rather than a modifiable
+quality metric.
 
-A sensitivity analysis restricted to the 1,757 patients with known AJCC
-stage yielded consistent results: R0 margin HR 0.59, CCRT HR 0.72,
-radical esophagectomy HR 0.58 (all $p < 0.001$; C-index 0.724),
-confirming that the stage-imputation approach does not materially
-distort the primary estimates.
+Concurrent chemoradiotherapy (CCRT) was not a significant independent
+predictor under MICE imputation (HR 0.97, 95\,\% CI 0.86--1.09,
+$p = 0.569$), consistent with the unadjusted Kaplan-Meier result
+(log-rank $p = 0.58$). In the sensitivity analysis using zero-coded
+stage, CCRT appeared protective (HR 0.76, $p < 0.001$); however, this
+estimate is likely artefactual: zero-coding assigns 609 stage-unknown
+patients to the Stage I reference, inflating the apparent stage-adjusted
+CCRT effect. The convergence of the MICE result ($p = 0.569$) with the
+unadjusted KM ($p = 0.58$) suggests the zero-coded CCRT HR was driven
+by stage misclassification rather than a true treatment effect.
+Advanced stage (III and IV vs I) and increasing age were adverse
+prognostic factors.
 
 \subsection{Deep learning patient subtype discovery}
 The autoencoder converged over 200 epochs (final MSE loss $< 0.08$).
@@ -408,7 +417,7 @@ correspond closely to established histological (adenocarcinoma vs SCC)
 and anatomical (cervical vs mid-thoracic) subgroups already captured by
 registry coding, rather than latent biological patterns orthogonal to
 conventional classifiers. DeepSurv permutation-based feature importance
-identified surgery, AJCC stage, and CCRT as the three most discriminating
+identified surgery, AJCC stage, and chemotherapy (any) as the three most discriminating
 predictors of risk, consistent with the multivariable Cox results
 (Figure~\ref{fig:deepsurv}).
 
@@ -450,25 +459,35 @@ among operated patients (Spearman $r = -0.22$, $p < 0.001$), providing
 prognostic information beyond binary node-positivity, as has been
 described in prior series \cite{Rice2017}.
 
-\subsection{CCRT confers independent survival benefit}
-CCRT independently reduced hazard by 24\,\% (HR 0.76, 95\,\% CI
-0.67--0.85, $p < 0.001$) after adjustment for surgical modality and
-margin status, supporting its role as both definitive non-surgical
-therapy (for unresectable cases) and perioperative treatment augmentation.
-The crude regimen-level comparisons are subject to selection bias by
-indication: patients receiving multi-agent and targeted regimens had more
-advanced disease at baseline (Stage IV enrichment), explaining the lower
-crude OS in these groups despite likely biological benefit in appropriately
-selected patients. This selection bias is a well-recognised limitation of
-registry-based chemotherapy analyses and should be interpreted accordingly
-\cite{Lordick2022}.
+\subsection{CCRT benefit is sensitive to stage imputation method}
+In the primary MICE analysis, CCRT was not an independent significant
+predictor of OS (HR 0.97, 95\,\% CI 0.86--1.09, $p = 0.569$). This
+converges with the unadjusted Kaplan-Meier result (log-rank $p = 0.58$),
+which also showed no crude survival difference between CCRT and non-CCRT
+groups. In the zero-coded stage sensitivity analysis, CCRT appeared
+strongly protective (HR 0.76, $p < 0.001$); however, this estimate is
+likely artefactual. Zero-coding places 609 stage-unknown patients in the
+Stage I reference stratum. These patients tend to be inadequately staged
+due to poor performance status, emergency presentation, or early death ---
+characteristics associated with worse OS independent of CCRT receipt.
+Their misclassification as Stage I inflates the apparent stage-adjusted
+CCRT effect. MICE correctly places the majority of stage-unknown patients
+at Stage III--IV (imputed distribution: I\,=\,327, II\,=\,329,
+III\,=\,889, IV\,=\,822), absorbing this variance into the stage
+coefficients and returning a non-significant CCRT estimate.
+
+This finding does not imply CCRT lacks biological efficacy in esophageal
+cancer --- the CROSS trial demonstrated clear benefit in resectable disease
+\cite{vanHagen2012}. Rather, it illustrates a well-recognised limitation
+of registry-based CCRT analyses: confounding by indication and stage
+misclassification can produce spurious adjusted HRs. The MICE result
+should be interpreted as the more credible estimate in this registry
+dataset.
 
 Cumulative cycle data were available in only 5.3\,\% of patients,
-precluding robust dose-response analysis. Prospective registration of
-cycle counts and drug identifiers (e.g., cisplatin vs. carboplatin
-backbone) is a priority for future registry data collection. The absence
-of drug-level data also prevents direct comparison with the NEO-AEGIS
-trial or KEYNOTE-590 protocols \cite{Shapiro2021, Sun2021}.
+precluding robust dose-response analysis. The absence of drug-level data
+also prevents direct comparison with the NEO-AEGIS trial or KEYNOTE-590
+protocols \cite{Shapiro2021, Sun2021}.
 
 \subsection{Deep learning identifies known histological and anatomical subgroups}
 Unsupervised autoencoder clustering identified three patient subtypes with
@@ -496,10 +515,10 @@ to head and neck SCC; its automatic separation by the autoencoder
 illustrates the method's ability to organise phenotypically coherent
 groups from routine registry variables.
 
-DeepSurv feature importance confirmed surgery, stage, and CCRT as the
-dominant discriminators --- as expected, since DeepSurv was trained on the
-same cohort and features as the Cox model (internal consistency, not
-independent validation).
+DeepSurv feature importance confirmed surgery, AJCC stage, and
+chemotherapy (any) as the dominant discriminators --- as expected, since
+DeepSurv was trained on the same cohort and features as the Cox model
+(internal consistency, not independent validation).
 
 \subsection{Limitations}
 \label{sec:limitations}
@@ -512,13 +531,14 @@ systematic noise, and the imputed values for betel nut exposure ---
 Taiwan's most distinctive carcinogenic exposure --- are particularly
 susceptible to this bias.
 
-Second, AJCC stage was unknown in 609 patients (25.7\,\%). Rather than
-performing listwise deletion, the Cox model coded stage-unknown patients as
-zero on all stage indicator variables (effectively grouping them with the
-Stage I reference). This approach retains cases at the cost of introducing
-potential misclassification for the stage coefficient estimates; multiple
-imputation by chained equations would be the preferred approach and is a
-priority for future analyses.
+Second, AJCC stage was unknown in 609 patients (25.7\,\%). The primary
+analysis now uses MICE (sklearn \texttt{IterativeImputer}, Extra Trees
+estimator, 10 iterations) with nine clinical predictors. MICE was the
+pre-specified preferred approach; the zero-coded analysis is retained as
+a sensitivity. The divergence in the CCRT estimate between MICE
+(HR 0.97, NS) and zero-coded (HR 0.76, $p < 0.001$) confirms that the
+zero-coded approach introduced misclassification bias into the CCRT
+coefficient.
 
 Third, mixed AJCC staging editions (6th and 7th) across the 15-year study
 period introduce potential stage migration and may affect the stage HRs
@@ -527,9 +547,15 @@ by up to one-third of the study period.
 Fourth, the autoencoder used mean-squared-error loss uniformly across all
 features, including categorical variables (histological type, surgical
 modality). MSE is not mathematically appropriate for categorical distances;
-a composite loss function separating continuous from categorical features
-would provide more principled latent-space geometry and is recommended for
-future work.
+a composite loss function (MSE for continuous variables, binary
+cross-entropy for categorical) would provide more principled latent-space
+geometry. Critically, however, the incremental Cox test showed that the
+clusters derived under MSE add no OS predictive value beyond histology and
+subsite ($\Delta$C-index $= -0.001$, both cluster HRs $p > 0.37$). Since
+the clustering already fails to demonstrate added prognostic value beyond
+conventional classifiers, the choice of loss function does not affect the
+primary scientific conclusion; a composite loss is recommended for future
+work where cluster OS discrimination is the intended endpoint.
 
 Fifth, the cluster OS differences likely partly reflect known compositional
 differences in histology and subsite (Cluster~2 concentrates all
@@ -557,22 +583,24 @@ deployment of the deep learning patient subtypes.
 \section{Conclusions}
 %%======================================================================
 
-In this comprehensive registry-based analysis of 2,367 esophageal cancer
-patients in Taiwan, R0 resection margin attainment and CCRT are
-independently the strongest modifiable prognostic determinants of overall
-survival. Surgical quality --- reflected by R0 status and the extent of
-lymph node dissection --- deserves emphasis equal to the decision to
-operate. Unsupervised deep learning recovers three patient subtypes
---- adenocarcinoma-enriched, mainstream SCC, and cervical/upper esophagus
---- consistent with known histological and anatomical subgroups;
-incremental Cox analysis confirms these clusters do not explain OS
-variance beyond histology and subsite coding ($\Delta$C-index $= -0.001$).
-The principal value of the autoencoder lies in demonstrating that
-data-driven grouping organically recapitulates clinically recognised
-subtypes, validating the internal coherence of the latent space.
-These findings support a research priority of enhancing surgical quality
-metrics within the Taiwan Cancer Registry and prospective molecular
-characterisation of the adenocarcinoma-enriched subgroup.
+In this registry-based analysis of 2,367 esophageal cancer patients in
+Taiwan, R0 resection margin attainment is the single most robust
+independent modifiable prognostic determinant of overall survival
+(HR 0.63, $p < 0.001$, consistent across all imputation approaches).
+Surgical quality --- reflected by R0 status and the extent of lymph node
+dissection --- deserves emphasis equal to the decision to operate. CCRT
+benefit was non-significant under the primary MICE imputation analysis
+(HR 0.97, $p = 0.569$), converging with the unadjusted Kaplan-Meier
+result; the previously reported zero-coded HR (0.76, $p < 0.001$) was
+likely artefactual due to stage misclassification bias and should not be
+used to guide treatment allocation.
+
+Unsupervised deep learning recovers three patient subtypes consistent with
+known histological and anatomical subgroups; incremental Cox analysis
+confirms no additional OS predictive value beyond conventional classifiers
+($\Delta$C-index $= -0.001$). These findings support prospective
+enhancement of surgical quality metrics in the Taiwan Cancer Registry and
+molecular characterisation of the adenocarcinoma-enriched subgroup.
 
 %%======================================================================
 %% Declarations
@@ -805,22 +833,25 @@ esophageal cancer: a nationwide analysis.
     \toprule
     Covariate & HR & 95\,\% CI & $p$ \\
     \midrule
-    Age (per year)              & 1.01 & 1.00--1.02  & 0.012 \\
-    Male sex                    & 1.18 & 0.92--1.53  & 0.195 \\
-    Stage II vs I               & 1.45 & 1.10--1.91  & 0.008 \\
-    Stage III vs I              & 2.01 & 1.55--2.60  & $< 0.001$ \\
-    Stage IV vs I               & 3.44 & 2.65--4.47  & $< 0.001$ \\
-    Endoscopic resection        & 0.47 & 0.38--0.59  & $< 0.001$ \\
+    Age (per year)              & 1.01 & 1.00--1.01  & 0.012 \\
+    Male sex                    & 1.01 & 0.83--1.23  & 0.922 \\
+    Stage II vs I               & 1.12 & 0.96--1.32  & 0.152 \\
+    Stage III vs I              & 1.23 & 1.07--1.41  & 0.003 \\
+    Stage IV vs I               & 1.63 & 1.42--1.87  & $< 0.001$ \\
+    Endoscopic resection        & 0.48 & 0.38--0.60  & $< 0.001$ \\
     Radical esophagectomy       & 0.61 & 0.51--0.72  & $< 0.001$ \\
-    R0 resection margin         & 0.60 & 0.53--0.69  & $< 0.001$ \\
-    CCRT                        & 0.76 & 0.67--0.85  & $< 0.001$ \\
-    Multi-agent chemotherapy    & 0.91 & 0.80--1.04  & 0.163 \\
+    R0 resection margin         & 0.63 & 0.55--0.73  & $< 0.001$ \\
+    CCRT$^\ddagger$             & 0.97 & 0.86--1.09  & 0.569 \\
+    Multi-agent chemotherapy    & 1.10 & 0.98--1.24  & 0.109 \\
     \bottomrule
-    \multicolumn{4}{p{0.70\textwidth}}{\small HR = hazard ratio; CI =
-      confidence interval. Reference categories: Stage I (or unknown);
-      no surgery; R1/R2 margin; no CCRT; single-agent or no chemotherapy.
-      Ridge penaliser = 0.1. Stage-unknown patients ($n = 609$) coded
-      zero on all stage dummies and retained in analysis.}
+    \multicolumn{4}{p{0.75\textwidth}}{\small HR = hazard ratio; CI =
+      confidence interval. Primary analysis uses MICE-imputed AJCC stage
+      (sklearn IterativeImputer, Extra Trees, 10 iterations).
+      Reference categories: Stage I; no surgery; R1/R2 margin; no CCRT;
+      single-agent or no chemotherapy. Ridge penaliser = 0.1.
+      $^\ddagger$CCRT HR 0.76 ($p < 0.001$) in zero-coded stage sensitivity
+      analysis; the MICE estimate ($p = 0.569$) is the pre-specified
+      primary result.}
   \end{tabular}
 \end{table}
 
@@ -891,12 +922,11 @@ esophageal cancer: a nationwide analysis.
   \includegraphics[width=0.65\linewidth]{06_chemo_surgery/km_ccrt.png}
   \caption{\textbf{Overall survival by CCRT status (unadjusted Kaplan-Meier).}
     Unadjusted Kaplan-Meier curves for CCRT vs non-CCRT patients
-    (log-rank $p = 0.58$, non-significant). The absence of crude survival
-    difference reflects confounding by indication: patients with more
-    advanced or metastatic disease are under-represented in the CCRT group.
-    After multivariable adjustment for stage, surgical modality, and margin
-    status, CCRT independently reduced mortality risk (HR 0.76,
-    95\,\% CI 0.67--0.85, $p < 0.001$; Table~\ref{tab:cox}).}
+    (log-rank $p = 0.58$, non-significant). In the primary MICE-imputed
+    Cox model, CCRT was also non-significant (HR 0.97, $p = 0.569$),
+    consistent with this unadjusted result. A zero-coded stage sensitivity
+    analysis yielded HR 0.76 ($p < 0.001$), likely artefactual due to
+    stage misclassification (see §3.5 and §4.2).}
   \label{fig:chemo}
 \end{figure}
 
@@ -909,9 +939,11 @@ esophageal cancer: a nationwide analysis.
     treatment predictors.}
     Hazard ratios (HR) with 95\,\% confidence intervals for surgical and
     systemic treatment predictors in the full adjusted model
-    ($n = 2{,}364$; apparent C-index 0.705; bootstrap OOB C-index 0.703,
-    95\,\% CI 0.687--0.720, $B = 1000$). Covariates adjusted for age,
-    sex, and AJCC stage.
+    ($n = 2{,}364$; primary MICE-imputed stage analysis, C-index 0.670).
+    Covariates adjusted for age, sex, and MICE-imputed AJCC stage.
+    Note: CCRT HR 0.97 ($p = 0.569$, NS) under MICE; sensitivity
+    analysis with zero-coded stage gives HR 0.76 ($p < 0.001$) ---
+    see Table~\ref{tab:cox} footnote and Results §3.5.
     Reference: no surgery, R1/R2 margin, no CCRT.
     ***$p < 0.001$, **$p < 0.01$, *$p < 0.05$, ns: not significant.}
   \label{fig:cox}
