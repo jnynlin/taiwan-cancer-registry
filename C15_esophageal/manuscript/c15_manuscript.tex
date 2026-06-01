@@ -378,7 +378,9 @@ unadjusted KM ($p = 0.58$) suggests the zero-coded CCRT HR was driven
 by stage misclassification rather than a true treatment effect.
 
 A complete-case sensitivity analysis restricted to the 1,757 patients
-with recorded AJCC stage (C-index 0.724) yielded consistent estimates
+with recorded AJCC stage and complete covariate data (one staged patient
+excluded for missing covariate; Table~\ref{tab:baseline} lists $n = 1{,}758$
+with known stage; C-index 0.724) yielded consistent estimates
 for R0 margin (HR 0.59, 95\,\% CI 0.51--0.69, $p < 0.001$) and all
 surgical predictors. However, CCRT remained independently significant
 in this subset (HR 0.72, 95\,\% CI 0.63--0.81, $p < 0.001$),
@@ -396,6 +398,7 @@ Advanced stage (III and IV vs I) and increasing age were adverse
 prognostic factors.
 
 \subsection{Deep learning patient subtype discovery}
+\label{sec:dl}
 The autoencoder converged over 200 epochs (final MSE loss $< 0.08$).
 $k$-means clustering over $k = 2$--6 selected $k = 3$ by cosine
 silhouette score (silhouette at $k = 3$: 0.514 vs 0.481 at $k = 2$,
@@ -496,8 +499,9 @@ III\,=\,889, IV\,=\,822), absorbing this variance into the stage
 coefficients and returning a non-significant CCRT estimate.
 
 However, the CCRT finding is not straightforward. A complete-case
-analysis restricted to the 1,757 patients with recorded stage yielded
-CCRT HR 0.72 (95\,\% CI 0.63--0.81, $p < 0.001$), diverging from the
+analysis restricted to the 1,757 patients with recorded stage and
+complete covariate data yielded CCRT HR 0.72 (95\,\% CI 0.63--0.81,
+$p < 0.001$), diverging from the
 MICE estimate by more than 25\,\%. This discrepancy reflects two
 competing sources of bias: (1) stage-misclassification bias in the
 zero-coded and complete-case analyses, where the 609 stage-unknown
@@ -598,8 +602,11 @@ Fifth, the cluster OS differences likely partly reflect known compositional
 differences in histology and subsite (Cluster~2 concentrates all
 adenocarcinomas; Cluster~3 is anatomically defined cervical cancers) rather
 than novel latent biological signal orthogonal to conventional classifiers.
-A model adding cluster assignment to histology and subsite would test
-whether clustering explains additional OS variance.
+This was directly tested: an incremental Cox model adding cluster assignment
+to histology and subsite covariates showed non-significant cluster HRs
+(Cluster~2: HR 0.876, $p = 0.37$; Cluster~3: HR 1.09, $p = 0.45$) and a
+negligible $\Delta$C-index of $-0.001$ (§\ref{sec:dl}). The clusters
+therefore do not explain OS variance beyond conventional registry coding.
 
 Sixth, no comparison against PCA-based clustering was performed; it remains
 possible that a simpler linear dimensionality reduction would achieve
