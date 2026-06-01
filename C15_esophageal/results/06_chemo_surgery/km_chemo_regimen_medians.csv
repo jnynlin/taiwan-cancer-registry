@@ -1,0 +1,6 @@
+﻿Group,n,Events,Median OS (mo)
+No chemo,662,455,19.8
+Single agent,292,205,14.3
+Multi-agent (no RT),253,227,9.8
+CCRT (concurrent),554,471,14.8
+Multi-agent + targeted/immuno,76,67,6.2
