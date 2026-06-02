@@ -1,9 +1,6 @@
 {
   "R": {
-    "Version": "4.2.2",
-    "Repositories": {
-      "CRAN": "https://cloud.r-project.org"
-    }
+    "Version": "4.3.3"
   },
   "Packages": {
     "DT": {
