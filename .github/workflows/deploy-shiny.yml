@@ -1,0 +1,60 @@
+name: Deploy to shinyapps.io
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'C15_esophageal/c15_editor/**'
+      - '.github/workflows/deploy-shiny.yml'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: '4.3.3'
+
+      - name: Cache R packages
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.R_LIBS_USER }}
+          key: r-shiny-${{ hashFiles('C15_esophageal/c15_editor/app.R') }}
+          restore-keys: r-shiny-
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev
+
+      - name: Install R packages
+        run: |
+          Rscript -e "
+            pkgs <- c('shiny','DT','dplyr','readr','ggplot2','naniar','rsconnect')
+            install.packages(pkgs[!pkgs %in% installed.packages()[,'Package']],
+                             repos='https://cloud.r-project.org')
+          "
+
+      - name: Deploy to shinyapps.io
+        env:
+          SHINYAPPS_ACCOUNT: ${{ secrets.SHINYAPPS_ACCOUNT }}
+          SHINYAPPS_TOKEN:   ${{ secrets.SHINYAPPS_TOKEN }}
+          SHINYAPPS_SECRET:  ${{ secrets.SHINYAPPS_SECRET }}
+        run: |
+          Rscript -e "
+            rsconnect::setAccountInfo(
+              name   = Sys.getenv('SHINYAPPS_ACCOUNT'),
+              token  = Sys.getenv('SHINYAPPS_TOKEN'),
+              secret = Sys.getenv('SHINYAPPS_SECRET')
+            )
+            rsconnect::deployApp(
+              appDir    = 'C15_esophageal/c15_editor',
+              appName   = 'c15-editor',
+              appTitle  = 'C15 食道癌登錄資料品質編輯器',
+              forceUpdate = TRUE,
+              launch.browser = FALSE
+            )
+          "
