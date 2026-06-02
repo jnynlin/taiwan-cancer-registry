@@ -57,4 +57,7 @@ jobs:
               forceUpdate = TRUE,
               launch.browser = FALSE
             )
+            Sys.sleep(10)
+            cat('\\n=== shinyapps.io startup log ===\\n')
+            rsconnect::showLogs(appName = 'c15-editor', entries = 50)
           "
