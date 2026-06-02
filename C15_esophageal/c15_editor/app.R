@@ -153,7 +153,7 @@ ui <- fluidPage(
                          choices  = setNames(KEY_COLS, COL_LABELS),
                          selected = KEY_COLS),
       hr(),
-      tags$small("v2.0 · C15 Esophageal")
+      tags$small("v2.1 · C15 Esophageal")
     ),
 
     mainPanel(
