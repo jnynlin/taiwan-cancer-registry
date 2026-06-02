@@ -30,22 +30,18 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev
 
-      - name: Install R packages
+      - name: Install rsconnect
         run: |
           Rscript -e "
-            pkgs <- c('shiny','DT','dplyr','readr','ggplot2','naniar','rsconnect')
-            install.packages(pkgs[!pkgs %in% installed.packages()[,'Package']],
-                             repos='https://cloud.r-project.org')
+            install.packages('rsconnect', repos='https://cloud.r-project.org')
           "
 
-      - name: Regenerate manifest with R 4.3.3
+      - name: Restore renv packages
+        working-directory: C15_esophageal/c15_editor
         run: |
           Rscript -e "
-            rsconnect::writeManifest(
-              appDir        = 'C15_esophageal/c15_editor',
-              appFiles      = 'app.R',
-              appPrimaryDoc = 'app.R'
-            )
+            install.packages('renv', repos='https://cloud.r-project.org')
+            renv::restore(prompt = FALSE)
           "
 
       - name: Deploy to shinyapps.io
