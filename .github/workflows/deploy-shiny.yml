@@ -47,19 +47,21 @@ jobs:
           "
 
       - name: Deploy to shinyapps.io
+        working-directory: C15_esophageal/c15_editor
         env:
           SHINYAPPS_ACCOUNT: ${{ secrets.SHINYAPPS_ACCOUNT }}
           SHINYAPPS_TOKEN:   ${{ secrets.SHINYAPPS_TOKEN }}
           SHINYAPPS_SECRET:  ${{ secrets.SHINYAPPS_SECRET }}
         run: |
           Rscript -e "
+            library(rsconnect)
             rsconnect::setAccountInfo(
               name   = Sys.getenv('SHINYAPPS_ACCOUNT'),
               token  = Sys.getenv('SHINYAPPS_TOKEN'),
               secret = Sys.getenv('SHINYAPPS_SECRET')
             )
             rsconnect::deployApp(
-              appDir    = 'C15_esophageal/c15_editor',
+              appDir    = '.',
               appName   = 'c15-editor',
               appTitle  = 'C15 食道癌登錄資料品質編輯器',
               forceUpdate = TRUE,
