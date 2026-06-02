@@ -174,17 +174,9 @@ ui <- fluidPage(
         # ── Tab 2: Data editor ───────────────────────────────────────────
         tabPanel("資料編輯",
           uiOutput("upload_prompt"),
-          conditionalPanel("output.data_loaded",
-          div(class = "edit-bar",
-            uiOutput("miss_badge"),
-            uiOutput("row_info"),
-            actionButton("open_edit", "編輯選取列", icon = icon("pen"),
-                         class = "btn-primary btn-sm"),
-            actionButton("clear_sel", "取消選取", class = "btn-sm btn-secondary")
-          ),
-          DTOutput("editor_tbl"),
+          uiOutput("edit_bar_ui"),   # server renders when data loaded
+          DTOutput("editor_tbl"),    # always in DOM so proxy works
           uiOutput("edit_count_msg")
-          ) # end conditionalPanel
         ),
 
         # ── Tab 3: Changelog & Export ────────────────────────────────────
@@ -227,9 +219,16 @@ server <- function(input, output, session) {
     )
   )
 
-  # ── Data loaded flag (used by conditionalPanel) ──────────────────────────
-  output$data_loaded <- reactive({ !is.null(rv$full) })
-  outputOptions(output, "data_loaded", suspendWhenHidden = FALSE)
+  output$edit_bar_ui <- renderUI({
+    req(rv$full)
+    div(class = "edit-bar",
+      uiOutput("miss_badge"),
+      uiOutput("row_info"),
+      actionButton("open_edit", "編輯選取列", icon = icon("pen"),
+                   class = "btn-primary btn-sm"),
+      actionButton("clear_sel", "取消選取", class = "btn-sm btn-secondary")
+    )
+  })
 
   output$upload_prompt <- renderUI({
     if (!is.null(rv$full)) return(NULL)
@@ -370,7 +369,7 @@ server <- function(input, output, session) {
     df   <- rv$data[rows, cols, drop=FALSE]
 
     # Mark NA cells with italic red placeholder text via JS
-    dt <- datatable(
+    datatable(
       df,
       rownames  = FALSE,
       selection = "single",
@@ -385,23 +384,19 @@ server <- function(input, output, session) {
         pageLength  = 50,
         dom         = "lfrtip",
         columnDefs  = list(list(width="90px", targets="_all")),
-        # Render NA cells as red italic text
         rowCallback = JS("
           function(row, data) {
-            $('td', row).each(function(i) {
-              if ($(this).text() === '' || $(this).text() === 'NA') {
+            $('td', row).each(function() {
+              var txt = $(this).text().trim();
+              if (txt === '' || txt === 'NA') {
                 $(this).html('<span style=\"color:#dc2626;font-style:italic;\">NA</span>');
+                $(this).css('background-color', '#fff1f2');
               }
             });
           }
         ")
       )
-    ) %>%
-      formatStyle(cols,
-        backgroundColor = styleEqual(NA_character_, "#fff1f2"),
-        target = "cell"
-      )
-    dt
+    )
   }, server = TRUE)
 
   # Track row selection → map back to real row in rv$data
