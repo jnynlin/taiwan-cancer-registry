@@ -7,7 +7,9 @@ library(naniar)
 
 # ── Configuration ─────────────────────────────────────────────────────────────
 
-DATA_PATH <- normalizePath("../data/c15_enriched.csv")
+# Local run: auto-load if file exists; shinyapps.io: upload-only
+DATA_PATH <- normalizePath("../data/c15_enriched.csv", mustWork = FALSE)
+AUTO_LOAD <- file.exists(DATA_PATH)
 
 KEY_COLS <- c(
   "病歷號(2)", "sex", "age", "bmi",
@@ -171,6 +173,8 @@ ui <- fluidPage(
 
         # ── Tab 2: Data editor ───────────────────────────────────────────
         tabPanel("資料編輯",
+          uiOutput("upload_prompt"),
+          conditionalPanel("output.data_loaded",
           div(class = "edit-bar",
             uiOutput("miss_badge"),
             uiOutput("row_info"),
@@ -180,6 +184,7 @@ ui <- fluidPage(
           ),
           DTOutput("editor_tbl"),
           uiOutput("edit_count_msg")
+          ) # end conditionalPanel
         ),
 
         # ── Tab 3: Changelog & Export ────────────────────────────────────
@@ -222,6 +227,22 @@ server <- function(input, output, session) {
     )
   )
 
+  # ── Data loaded flag (used by conditionalPanel) ──────────────────────────
+  output$data_loaded <- reactive({ !is.null(rv$full) })
+  outputOptions(output, "data_loaded", suspendWhenHidden = FALSE)
+
+  output$upload_prompt <- renderUI({
+    if (!is.null(rv$full)) return(NULL)
+    div(style = "text-align:center; padding:60px 20px;",
+      tags$div(style = "font-size:48px; color:#cbd5e1;", icon("file-csv")),
+      tags$h3(style = "color:#475569; margin-top:16px;", "請上傳 C15 資料檔"),
+      tags$p(style = "color:#94a3b8; font-size:14px;",
+             "使用左側「上傳 CSV」選擇 c15_enriched.csv"),
+      tags$p(style = "color:#94a3b8; font-size:12px;",
+             "資料僅在本次 session 暫存，關閉瀏覽器後自動清除")
+    )
+  })
+
   # ── Data loading ────────────────────────────────────────────────────────
 
   load_into_rv <- function(path) {
@@ -231,7 +252,7 @@ server <- function(input, output, session) {
     rv$selected <- NULL
   }
 
-  observe({ req(is.null(rv$full)); load_into_rv(DATA_PATH) })
+  observe({ req(is.null(rv$full)); if (AUTO_LOAD) load_into_rv(DATA_PATH) })
 
   observeEvent(input$upload, {
     req(input$upload)
