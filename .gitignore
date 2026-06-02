@@ -47,3 +47,9 @@ __pycache__/
 # OS
 .DS_Store
 coexist_cancers/data/
+
+# UADT field derived data (re-buildable from all_cancers.csv)
+uadt_field/data/
+# Patient-level survival tables (contain PIDs)
+uadt_field/results/05_survival/survival_table.csv
+uadt_field/results/05_survival/tv_table.csv
