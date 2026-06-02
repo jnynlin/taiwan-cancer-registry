@@ -1,0 +1,11 @@
+Package: c15editor
+Type: Shiny
+Title: C15 食道癌登錄資料品質編輯器
+Version: 2.1
+Imports:
+  shiny (>= 1.7.0),
+  DT (>= 0.28),
+  dplyr (>= 1.1.0),
+  readr (>= 2.1.0),
+  ggplot2 (>= 3.4.0),
+  naniar (>= 1.0.0)
