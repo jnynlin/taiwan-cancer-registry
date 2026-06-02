@@ -38,6 +38,16 @@ jobs:
                              repos='https://cloud.r-project.org')
           "
 
+      - name: Regenerate manifest with R 4.3.3
+        run: |
+          Rscript -e "
+            rsconnect::writeManifest(
+              appDir        = 'C15_esophageal/c15_editor',
+              appFiles      = 'app.R',
+              appPrimaryDoc = 'app.R'
+            )
+          "
+
       - name: Deploy to shinyapps.io
         env:
           SHINYAPPS_ACCOUNT: ${{ secrets.SHINYAPPS_ACCOUNT }}
