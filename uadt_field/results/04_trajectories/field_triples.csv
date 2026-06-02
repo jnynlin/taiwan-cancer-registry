@@ -1,0 +1,10 @@
+﻿step1,step2,step3,n
+Tongue,Gum,Oral NOS,6
+Tongue,Pyriform,Esophagus,4
+Oral NOS,Tongue,Gum,4
+Palate,Hypopharynx,Esophagus,4
+Tongue,Oral NOS,Palate,3
+Tongue,Gum,Palate,3
+Oral NOS,Tongue,Palate,3
+Palate,Tongue,Gum,3
+Tonsil,Hypopharynx,Esophagus,3

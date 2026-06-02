@@ -1,0 +1,4 @@
+﻿covariate,HR,CI_lo,CI_hi,p
+multi_field,0.859,0.79,0.934,0.0004
+age_first,1.021,1.019,1.024,0.0
+sex_m,1.552,1.38,1.746,0.0
