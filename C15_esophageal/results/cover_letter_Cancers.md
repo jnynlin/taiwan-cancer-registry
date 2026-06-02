@@ -24,14 +24,19 @@ with particularly high incidence and mortality in East Asian populations where s
 carcinoma driven by betel nut, tobacco, and alcohol exposure predominates. We conducted a
 comprehensive analysis of 2,367 consecutive esophageal cancer cases from a single-center
 Taiwan Cancer Registry spanning 2006–2020—one of the largest real-world Asian esophageal
-cancer cohorts reported to date. Our key finding is that R0 surgical resection margin
-status (HR 0.60, 95% CI 0.53–0.69) and concurrent chemoradiotherapy (HR 0.76, 95% CI
-0.67–0.85) are independent prognostic determinants after multivariable adjustment
-(C-index 0.705, bootstrap 95% CI 0.694–0.719). Furthermore, unsupervised deep learning
-via an autoencoder-UMAP-k-means pipeline identified three biologically distinct patient
-clusters—including an adenocarcinoma-enriched subgroup (n=153) and a cervical/upper
-esophagus cohort (n=185)—with differential survival trajectories that are invisible to
-conventional AJCC staging alone.
+cancer cohorts reported to date. Our primary finding is that R0 surgical resection margin status (HR 0.63,
+95% CI 0.55–0.73) and radical esophagectomy (HR 0.61, 95% CI 0.51–0.72) are the
+strongest independent prognostic determinants after multivariable adjustment including
+MICE-imputed AJCC stage (C-index 0.670, bootstrap OOB 0.666, 95% CI 0.647–0.683).
+Endoscopic resection conferred the largest survival benefit (HR 0.48, 95% CI 0.38–0.60),
+consistent with early-stage disease selection. The effect of concurrent chemoradiotherapy
+was inconclusive across imputation methods (MICE HR 0.97, p = 0.569; zero-coded HR 0.76,
+p < 0.001; >25% divergence), precluding a registry-based conclusion on CCRT benefit.
+Unsupervised deep learning via an autoencoder-UMAP-k-means pipeline identified three
+biologically distinct patient clusters—including an adenocarcinoma-enriched subgroup
+(n = 153) and a cervical/upper esophagus cohort (n = 185)—though incremental survival
+discrimination beyond conventional staging was negligible (ΔC-index = −0.001), reflecting
+the dominance of surgical modality and margin status as prognostic anchors.
 
 We believe this work is well-suited for *Cancers* for several reasons. The journal has
 published extensively on gastrointestinal malignancies, multimodal treatment outcomes, and
