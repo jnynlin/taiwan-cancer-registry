@@ -571,9 +571,27 @@ The $>$25\,\% divergence between MICE and the other two estimates
 prevents a definitive registry-based conclusion on CCRT benefit; this
 uncertainty is acknowledged throughout (see §4.2).
 
-Third, mixed AJCC staging editions (6th and 7th) across the 15-year study
-period introduce potential stage migration and may affect the stage HRs
-by up to one-third of the study period.
+Third, mixed AJCC staging editions across the 15-year study period
+introduce stage migration that differentially affects the Stage~IV
+hazard ratio. The 6th edition (2008--2009; $n = 285$) classified
+cervical lymph-node metastasis (M1a) as Stage~IV; the 7th edition
+(2010--2017; $n = 1{,}188$) reclassified this as Stage~III, yielding
+a Stage~IV prevalence of 45.0\,\% versus 24.9\,\%, respectively.
+For 636 patients diagnosed in 2018--2020 the AJCC edition field was
+not recorded under the revised registry form; an additional 257 patients
+carried the sentinel code 99 (edition unknown) with no recoverable
+staging data. To quantify the impact, we ran two pre-specified
+sensitivity analyses: (i) inclusion of AJCC-edition dummies
+(6th, unknown, 2018\,+; 7th = reference) as additional covariates,
+and (ii) restriction to 7th-edition patients only ($n = 1{,}187$,
+2010--2017). Hazard ratios for surgical modality, resection margin,
+and CCRT were stable across all three models (maximum deviation
+$<$15\,\%). The Stage~IV HR increased from 1.63 (primary MICE) to
+1.78 (AJCC-adjusted) and 2.17 (7th-edition only; 33\,\% deviation),
+consistent with 6th-edition M1a reclassification diluting the Stage~IV
+contrast in the primary model. The 7th-edition-only estimate
+(HR 2.17, 95\,\%\,CI 1.78--2.64) is the more interpretable reference
+for comparisons with contemporary staging studies.
 
 Fourth, the autoencoder used mean-squared-error loss uniformly across all
 features, including categorical variables (histological type, surgical
