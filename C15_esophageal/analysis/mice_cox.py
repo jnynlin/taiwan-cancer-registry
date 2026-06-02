@@ -189,3 +189,134 @@ pd.DataFrame(rows).to_csv(OUT / "mice_cox_comparison.csv", index=False)
 print(f"\nSaved: {OUT / 'mice_cox_comparison.csv'}")
 print(f"\nMICE C-index: {cph_mice.concordance_index_:.4f}")
 print(f"Zero C-index: {cph_zero.concordance_index_:.4f}")
+
+# ══════════════════════════════════════════════════════════════════════════════
+# STEP 3  Recover stage_group from clin_stage for 2018–2020 (AJCC version NA)
+# ══════════════════════════════════════════════════════════════════════════════
+CLIN_TO_GROUP = {
+    "0":  "I",
+    "1": "I",  "1A": "I",  "1B": "I",
+    "2": "II", "2A": "II", "2B": "II", "2E": "II",
+    "3": "III","3A": "III","3B": "III","3C": "III",
+    "4": "IV", "4A": "IV", "4B": "IV",
+}
+
+ajcc_col     = "AJCC癌症分期版本(104)"
+df["ajcc_v"] = pd.to_numeric(df[ajcc_col], errors="coerce")
+
+is_2018plus  = df["ajcc_v"].isna()
+missing_sg   = df["stage_ord"].isna()
+
+recovered = (
+    df.loc[is_2018plus & missing_sg, "clin_stage"]
+      .astype(str).str.strip().map(CLIN_TO_GROUP)
+)
+n_rec = recovered.notna().sum()
+df.loc[is_2018plus & missing_sg & recovered.notna(), "stage_group"] = recovered[recovered.notna()]
+df["stage_ord"] = df["stage_group"].map(STAGE_ORD)   # recompute
+
+print(f"\n{'─'*60}")
+print(f"STEP 3 — Stage recovery (2018+ from clin_stage): +{n_rec} cases")
+print(f"  Stage known before: {missing_sg.sum()} missing → now {df['stage_ord'].isna().sum()} missing")
+
+# ══════════════════════════════════════════════════════════════════════════════
+# STEP 1  AJCC edition covariate dummies  (7th = reference)
+# ══════════════════════════════════════════════════════════════════════════════
+df["ajcc_6th"]    = (df["ajcc_v"] == 6).astype(int)
+df["ajcc_unk"]    = (df["ajcc_v"] == 99).astype(int)
+df["ajcc_2018p"]  = df["ajcc_v"].isna().astype(int)
+
+# Re-run MICE with edition dummies added as predictors
+mice_features_v2 = mice_features + ["ajcc_6th", "ajcc_unk", "ajcc_2018p"]
+mice_df_v2 = df[mice_features_v2].copy()
+
+imputer_v2 = IterativeImputer(
+    estimator=ExtraTreesRegressor(n_estimators=50, random_state=42),
+    max_iter=10, random_state=42, min_value=1, max_value=4,
+)
+mice_arr_v2 = imputer_v2.fit_transform(mice_df_v2)
+mice_out_v2 = pd.DataFrame(mice_arr_v2, columns=mice_features_v2, index=df.index)
+mice_out_v2["stage_imputed"] = mice_out_v2["stage_ord"].round().clip(1, 4).astype(int)
+
+print(f"\nSTEP 1 — AJCC-adjusted MICE imputed stage distribution:")
+print(mice_out_v2["stage_imputed"].value_counts().sort_index())
+
+# Cox: AJCC-adjusted (7th = reference, adds 3 edition dummies)
+feat_ajcc = pd.DataFrame({
+    "os_months":                  df["os_months"],
+    "event":                      df["event"],
+    "age":                        df["age"],
+    "male":                       df["male"],
+    "stage_II":                   (mice_out_v2["stage_imputed"] == 2).astype(int),
+    "stage_III":                  (mice_out_v2["stage_imputed"] == 3).astype(int),
+    "stage_IV":                   (mice_out_v2["stage_imputed"] == 4).astype(int),
+    "surg_Endoscopic_resection":  df["surg_Endoscopic_resection"],
+    "surg_Partial_esophagectomy": df["surg_Partial_esophagectomy"],
+    "surg_Radical_esophagectomy": df["surg_Radical_esophagectomy"],
+    "margin_R0":                  df["margin_R0"],
+    "ccrt":                       df["ccrt_bin"],
+    "chemo_multi":                df["chemo_multi"],
+    "ajcc_6th":                   df["ajcc_6th"],
+    "ajcc_unk":                   df["ajcc_unk"],
+    "ajcc_2018p":                 df["ajcc_2018p"],
+}).dropna()
+
+cph_ajcc = CoxPHFitter(penalizer=0.1)
+cph_ajcc.fit(feat_ajcc, duration_col="os_months", event_col="event")
+print(f"  AJCC-adjusted Cox n={len(feat_ajcc)}, C-index={cph_ajcc.concordance_index_:.4f}")
+
+# ══════════════════════════════════════════════════════════════════════════════
+# STEP 2  7th-edition-only sensitivity (n=1,188, 2010–2017, clean staging)
+# ══════════════════════════════════════════════════════════════════════════════
+df7       = df[df["ajcc_v"] == 7].copy()
+mo7       = mice_out_v2.loc[df7.index].copy()
+
+feat_7th = pd.DataFrame({
+    "os_months":                  df7["os_months"],
+    "event":                      df7["event"],
+    "age":                        df7["age"],
+    "male":                       df7["male"],
+    "stage_II":                   (mo7["stage_imputed"] == 2).astype(int),
+    "stage_III":                  (mo7["stage_imputed"] == 3).astype(int),
+    "stage_IV":                   (mo7["stage_imputed"] == 4).astype(int),
+    "surg_Endoscopic_resection":  df7["surg_Endoscopic_resection"],
+    "surg_Partial_esophagectomy": df7["surg_Partial_esophagectomy"],
+    "surg_Radical_esophagectomy": df7["surg_Radical_esophagectomy"],
+    "margin_R0":                  df7["margin_R0"],
+    "ccrt":                       df7["ccrt_bin"],
+    "chemo_multi":                df7["chemo_multi"],
+}).dropna()
+
+cph_7th = CoxPHFitter(penalizer=0.1)
+cph_7th.fit(feat_7th, duration_col="os_months", event_col="event")
+print(f"\nSTEP 2 — 7th-edition-only: n={len(feat_7th)}, C-index={cph_7th.concordance_index_:.4f}")
+
+# ── Combined HR comparison: Primary vs AJCC-adjusted vs 7th-only ─────────────
+print(f"\n{'─'*80}")
+print(f"{'Variable':<32}  {'Primary':>8}  {'AJCC-adj':>8}  {'7th-only':>8}  {'Robust?':>8}")
+print("─"*80)
+rows2 = []
+for v in key_vars:
+    hr_p  = cph_mice.summary["exp(coef)"].get(v, np.nan)
+    hr_a  = cph_ajcc.summary["exp(coef)"].get(v, np.nan)
+    hr_7  = cph_7th.summary["exp(coef)"].get(v, np.nan)
+    p_p   = cph_mice.summary["p"].get(v, np.nan)
+    p_a   = cph_ajcc.summary["p"].get(v, np.nan)
+    p_7   = cph_7th.summary["p"].get(v, np.nan)
+    # Robust if max deviation across all 3 < 15%
+    hrs   = [x for x in [hr_p, hr_a, hr_7] if not np.isnan(x)]
+    max_dev = (max(hrs) - min(hrs)) / min(hrs) * 100 if len(hrs) > 1 else np.nan
+    robust  = "✓" if max_dev < 15 else f"⚠ {max_dev:.0f}%"
+    print(f"{v:<32}  {hr_p:8.3f}  {hr_a:8.3f}  {hr_7:8.3f}  {robust:>8}")
+    rows2.append(dict(variable=v,
+                      HR_primary=round(hr_p,3), p_primary=round(p_p,4),
+                      HR_ajcc_adj=round(hr_a,3), p_ajcc_adj=round(p_a,4),
+                      HR_7th_only=round(hr_7,3), p_7th_only=round(p_7,4),
+                      max_pct_dev=round(max_dev,1)))
+
+pd.DataFrame(rows2).to_csv(OUT / "mice_ajcc_sensitivity.csv", index=False)
+print(f"\nSaved: {OUT / 'mice_ajcc_sensitivity.csv'}")
+print(f"\nC-index summary:")
+print(f"  Primary (n={len(feat_mice)}):       {cph_mice.concordance_index_:.4f}")
+print(f"  AJCC-adjusted (n={len(feat_ajcc)}): {cph_ajcc.concordance_index_:.4f}")
+print(f"  7th-only (n={len(feat_7th)}):      {cph_7th.concordance_index_:.4f}")

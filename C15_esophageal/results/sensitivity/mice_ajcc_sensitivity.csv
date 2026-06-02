@@ -1,0 +1,8 @@
+variable,HR_primary,p_primary,HR_ajcc_adj,p_ajcc_adj,HR_7th_only,p_7th_only,max_pct_dev
+margin_R0,0.632,0.0,0.582,0.0,0.603,0.0,8.6
+ccrt,0.967,0.5694,0.932,0.2647,0.853,0.1029,13.4
+surg_Endoscopic_resection,0.476,0.0,0.479,0.0,0.461,0.0,3.8
+surg_Radical_esophagectomy,0.606,0.0,0.631,0.0,0.62,0.0,4.2
+stage_II,1.124,0.1517,1.142,0.0891,1.222,0.0519,8.7
+stage_III,1.226,0.0034,1.342,0.0,1.4,0.0003,14.1
+stage_IV,1.63,0.0,1.784,0.0,2.17,0.0,33.1
