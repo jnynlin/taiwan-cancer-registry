@@ -1,0 +1,4 @@
+horizon_yr,mean_CIF_death,mean_CIF_2nd_uadt,ctd_death,ctd_2nd_uadt,cox_cindex_05b
+1,0.2575,0.0483,0.5946,0.5999,0.6
+3,0.4878,0.0805,0.5946,0.5999,0.6
+5,0.5669,0.1038,0.5946,0.5999,0.6
