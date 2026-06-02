@@ -1,0 +1,13 @@
+dim,top3_pos,top3_neg,max_loading,axis_name
+z0,"C18, C20, C61","C22, C53, C50",0.6366026954412773,Hormonal/gynecologic
+z1,"C34, C61, C20","C16, C06, C02",0.422072304559313,UADT/field-cancerization
+z2,"C22, C67, C02","C50, C53, C34",0.533871797715667,Hormonal/gynecologic
+z3,"C18, C20, C67","C22, C06, C50",0.4852947144479425,Liver-GI
+z4,"C50, C53, C20","C34, C06, C02",0.6472972092384158,UADT/field-cancerization
+z5,"C61, C18, C20","C50, C06, C53",0.5926193368596674,Hormonal/gynecologic
+z6,"C34, C20, C06","C53, C22, C42",0.4476132307563084,Liver-GI
+z7,"C34, C22, C61","C50, C06, C02",0.5514953137902937,UADT/field-cancerization
+z8,"C53, C20, C50","C18, C22, C15",0.3736223964135032,Hormonal/gynecologic
+z9,"C34, C06, C02","C18, C61, C67",0.36224519592749116,UADT/field-cancerization
+z10,"C22, C61, C34","C53, C20, C42",0.5400280979990673,Liver-GI
+z11,"C18, C20, C53","C22, C06, C54",0.5320601136972001,Hormonal/gynecologic

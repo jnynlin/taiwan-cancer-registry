@@ -53,3 +53,7 @@ uadt_field/data/
 # Patient-level survival tables (contain PIDs)
 uadt_field/results/05_survival/survival_table.csv
 uadt_field/results/05_survival/tv_table.csv
+
+# VAE derived data + model weights (data re-buildable; weights large)
+dl_vae/data/
+dl_vae/models/
