@@ -72,12 +72,12 @@ We analysed a population-based cancer registry spanning 2003--2020 comprising
 (ICD-O C02--C06, C09--C10, C12--C13, C15). Standardised incidence ratios
 (SIR) quantified the elevation in second-primary risk compared with the general
 population. Synchronous versus metachronous transitions were characterised
-by a symmetry score. Survival impact of multi-site ({\geq}2 UADT sites) disease
+by a symmetry score. Survival impact of multi-site ($\geq$2 UADT sites) disease
 was estimated using time-varying Cox regression to eliminate immortal-time bias,
 and validated with a competing-risks DeepHit neural network model.
 
 \noindent\textbf{Results.}
-Among 10,113 UADT field patients, 1,067 (10.6\%) developed {\geq}2 field sites.
+Among 10,113 UADT field patients, 1,067 (10.6\%) developed $\geq$2 field sites.
 Pyriform sinus patients had the highest absolute second-primary rate (24.2\%
 co-occurring with esophagus; SIR\,=\,3.78, 95\%\,CI\,2.40--5.68) followed
 by hypopharynx--esophagus (16.4\%; SIR\,=\,2.86, 95\%\,CI\,1.96--4.04).
@@ -180,7 +180,7 @@ attenuating the observed OR relative to the general population comparator.
 \subsection{Transition directionality}
 
 Synchronous pairs were defined as those diagnosed within 6 months of each other
-(sensitivity analyses at 3 and 9 months). For each pair with {\geq}10 recorded
+(sensitivity analyses at 3 and 9 months). For each pair with $\geq$10 recorded
 transitions, a symmetry score was computed as
 $\min(n_{\text{fwd}}, n_{\text{rev}}) / \max(n_{\text{fwd}}, n_{\text{rev}})$,
 where a score approaching 1.0 indicates bidirectionality.
@@ -229,7 +229,7 @@ The predominant sites were esophagus (C15; $n$\,=\,2,344, 23.2\%),
 oral cavity NOS (C06; $n$\,=\,2,603), and tongue (C02; $n$\,=\,2,320).
 Of all patients, 1,067 (10.6\%) developed cancer at two or more field
 sites; 144 (1.4\%) developed three or more. The cohort was overwhelmingly
-male ({\textgreater}90\% for all pharyngeal and esophageal sites), consistent
+male ($>$90\% for all pharyngeal and esophageal sites), consistent
 with the male predominance of betel nut use in Taiwan.
 
 \subsection{Co-occurrence and standardised incidence ratios}
@@ -418,8 +418,8 @@ Model & HR & 95\%\,CI & $p$ \\
 Time-varying Cox        & \textbf{2.14} & \textbf{1.97--2.33} & $<$\textbf{0.001} \\
 \midrule
 \multicolumn{4}{l}{\textit{Age at first diagnosis (per decade, time-varying model)}} \\
-Age (continuous)        & [value] & [CI] & [p] \\
-Sex (male vs.\ female)  & [value] & [CI] & [p] \\
+Age (per year)          & 1.025 & 1.023--1.027 & $<$0.001 \\
+Sex (male vs.\ female)  & 1.43  & 1.287--1.587 & $<$0.001 \\
 \bottomrule
 \end{tabular}\\[0.5em]
 \small HR: hazard ratio. $\Delta$HR between models: 1.28.
@@ -433,6 +433,7 @@ Sex (male vs.\ female)  & [value] & [CI] & [p] \\
 \begin{figure}[ht]
   \centering
   \includegraphics[width=0.9\textwidth]{fig1a_site_prevalence.png}
+  % file: uadt_field/results/01_cohort/fig1a_site_prevalence.png
   \caption{\textbf{Cohort characteristics.}
   Prevalence of cancer at each of the ten UADT field sites among 10,113 patients
   in the Taiwan Cancer Registry, 2003--2020.
@@ -455,7 +456,7 @@ Sex (male vs.\ female)  & [value] & [CI] & [p] \\
 
 \begin{figure}[ht]
   \centering
-  \includegraphics[width=0.9\textwidth]{fig4a_trajectory_network.png}
+  \includegraphics[width=0.9\textwidth]{fig4a_trajectory_graph.png}
   \caption{\textbf{Directed transition network.}
   Nodes represent UADT field sites; directed edges represent observed first-to-second
   cancer transitions. Edge width is proportional to the number of transitions;
@@ -469,7 +470,7 @@ Sex (male vs.\ female)  & [value] & [CI] & [p] \\
 \begin{figure}[ht]
   \centering
   \begin{minipage}{0.48\textwidth}
-    \includegraphics[width=\textwidth]{fig5a_km_curves.png}
+    \includegraphics[width=\textwidth]{fig5a_km_landmark.png}
   \end{minipage}\hfill
   \begin{minipage}{0.48\textwidth}
     \includegraphics[width=\textwidth]{fig5b_cox_forest.png}
