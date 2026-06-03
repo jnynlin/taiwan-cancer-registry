@@ -63,8 +63,10 @@ tobacco, and alcohol — creating conditions for field cancerization, in which
 mucosal exposure produces independent primary tumours at multiple sites.
 Taiwan's high prevalence of betel nut chewing offers a unique population to
 study field cancerization epidemiology. We aimed to quantify UADT co-occurrence
-rates, characterise the directionality of site-to-site transitions, and determine
-the survival impact of multi-site UADT disease.
+rates, characterise the directionality of site-to-site transitions, determine
+the survival impact of multi-site UADT disease, and demonstrate the magnitude
+of immortal-time bias as a methodological warning for retrospective
+multi-primary cancer analyses.
 
 \noindent\textbf{Materials and Methods.}
 We analysed a population-based cancer registry spanning 2003--2020 comprising
@@ -135,7 +137,9 @@ We analysed a 17-year population-based cancer registry from Taiwan to
 all 45 UADT site pairs, (ii)~test whether site-to-site transitions are
 bidirectional — a hallmark of field effect as opposed to loco-regional spread —
 and (iii)~determine whether multi-site UADT disease independently predicts
-mortality after rigorous correction for immortal-time bias.
+mortality after rigorous correction for immortal-time bias, and
+(iv)~quantify the magnitude of immortal-time artifact in this setting
+as a cautionary example for retrospective multi-primary cancer research.
 
 % ── 2. Materials and Methods ──────────────────────────────────────────────────
 \section{Materials and Methods}
@@ -317,6 +321,13 @@ Cox regression is a methodological illustration of a widespread pitfall in
 multi-primary cancer analyses. The $\Delta$HR\,=\,1.28 quantifies the distortion
 and underscores why immortal-time correction is essential when the exposure
 (second cancer) occurs during follow-up~\citep{suissa2008}.
+We highlight this not merely as a secondary finding but as a cautionary
+contribution to the clinical epidemiology community: any retrospective
+registry study that assigns ``multi-primary'' status as a fixed baseline
+covariate is at risk of this bias, potentially reversing the apparent direction
+of risk by more than twofold. Investigators performing such analyses should
+routinely report both the landmark and time-varying estimates, with the
+$\Delta$HR made explicit.
 The 2.14-fold excess mortality likely reflects the combined tumour burden of
 multiple primaries rather than a more aggressive biological phenotype, though
 we cannot formally distinguish these mechanisms with registry data alone.
@@ -330,6 +341,19 @@ Current guidelines for synchronous endoscopy at the time of head and neck cancer
 workup are consistent with this finding~\citep{muto2010,huang2015},
 but the competing-risks data additionally support active re-surveillance at
 6--12 months, before the mortality hazard depletes the surviving at-risk pool.
+
+To operationalise this temporal risk profile, institutions treating UADT
+cancers should consider embedding a mandatory 6-to-12-month esophagoscopy
+milestone directly into the electronic health record (EHR) care pathway for
+pyriform sinus and hypopharynx diagnoses.
+Automating this step as an order-set trigger — in the same manner that
+adjuvant chemotherapy cycles or post-treatment PET scans are scheduled
+at fixed intervals — would reduce reliance on clinician recall and ensure
+that high-risk patients are captured within the actionable window identified
+here.
+Prospective validation of such a pathway, with endoscopic yield and
+second-cancer detection rate as endpoints, would convert these
+epidemiological findings into a randomised or quasi-experimental evidence base.
 
 \subsection{Strengths and limitations}
 
@@ -349,6 +373,18 @@ and (iv) the competing-risks model concordance index of $\sim$0.60
 reflects the limited covariate set available (age, sex, first site) and would
 improve with inclusion of stage and treatment data.
 
+Despite these constraints, the sheer magnitude of the observed effects —
+a 3.78-fold SIR and a 2.14-fold mortality excess — suggests that the
+field cancerization signal is robust enough to persist across variation in
+stage distribution and treatment approach.
+A future prospective multicentre study aiming to build on these findings
+should prospectively collect: (a) clinical TNM stage at first and second
+UADT diagnosis; (b) treatment modality (surgery, radiotherapy,
+chemoradiotherapy, or combinations); (c) quantitative betel nut,
+tobacco, and alcohol exposure histories; and (d) systematic endoscopy
+surveillance dates and findings, enabling calculation of lead-time-adjusted
+detection rates and formal surveillance efficacy endpoints.
+
 % ── 5. Conclusion ─────────────────────────────────────────────────────────────
 \section{Conclusion}
 
@@ -363,7 +399,11 @@ Competing-risks modelling demonstrates that the window for effective surveillanc
 is concentrated in the first 1--2 years after initial diagnosis.
 These findings provide quantitative support for routine, early esophagoscopic
 surveillance in pyriform sinus and hypopharynx cancer patients in
-betel-nut-endemic populations.
+betel-nut-endemic populations, and argue for embedding a mandatory
+6-to-12-month esophagoscopy milestone into EHR-based clinical care pathways.
+The $\Delta$HR\,=\,1.28 between landmark and time-varying estimates serves
+as a quantitative cautionary example for retrospective multi-primary cancer
+analyses, applicable beyond the UADT context.
 
 % ── Declarations ──────────────────────────────────────────────────────────────
 \section*{Declarations}
@@ -459,11 +499,15 @@ Sex (male vs.\ female)  & 1.43  & 1.287--1.587 & $<$0.001 \\
   \includegraphics[width=0.9\textwidth]{fig4a_trajectory_graph.png}
   \caption{\textbf{Directed transition network.}
   Nodes represent UADT field sites; directed edges represent observed first-to-second
-  cancer transitions. Edge width is proportional to the number of transitions;
-  edge colour indicates the synchronous fraction (darker = higher proportion
-  within 6 months). The bidirectionality of the pyriform--esophagus and
-  hypopharynx--esophagus arcs (symmetry\,=\,0.879) supports a field
-  mechanism rather than directional spread.}
+  cancer transitions. Edge width is proportional to the number of transitions.
+  Edge colour encodes the \textit{synchronous fraction}: the proportion of
+  transitions for that directed pair in which the second diagnosis occurred within
+  6 months of the first (scale: light blue\,=\,0\% to dark navy\,=\,100\%;
+  colorblind-safe sequential palette).
+  The bidirectionality of the pyriform--esophagus and
+  hypopharynx--esophagus arcs (symmetry score\,=\,0.879,
+  defined as $\min(n_{\mathrm{fwd}},n_{\mathrm{rev}})/\max(n_{\mathrm{fwd}},n_{\mathrm{rev}})$)
+  supports a field mechanism rather than directional spread.}
   \label{fig:trajectories}
 \end{figure}
 
