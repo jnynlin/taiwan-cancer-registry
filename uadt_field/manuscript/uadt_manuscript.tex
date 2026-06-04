@@ -1,5 +1,5 @@
-%% Oral Oncology — submission format
-%% Target: Oral Oncology (Elsevier)
+%% Cancer Epidemiology — submission format
+%% Target: Cancer Epidemiology (Elsevier)
 %% Word count target: ~3500 body text
 \documentclass[12pt,a4paper]{article}
 
@@ -10,7 +10,7 @@
 \usepackage{booktabs}
 \usepackage{amsmath}
 \usepackage{hyperref}
-\usepackage{natbib}
+\usepackage[numbers,compress]{natbib}
 \usepackage{lineno}
 \linenumbers
 
@@ -58,45 +58,37 @@
 \newpage
 \begin{abstract}
 \noindent\textbf{Objectives.}
-The upper aerodigestive tract (UADT) is exposed to shared carcinogens — betel nut,
-tobacco, and alcohol — creating conditions for field cancerization, in which
-mucosal exposure produces independent primary tumours at multiple sites.
-Taiwan's high prevalence of betel nut chewing offers a unique population to
-study field cancerization epidemiology. We aimed to quantify UADT co-occurrence
-rates, characterise the directionality of site-to-site transitions, determine
-the survival impact of multi-site UADT disease, and demonstrate the magnitude
-of immortal-time bias as a methodological warning for retrospective
-multi-primary cancer analyses.
+The upper aerodigestive tract (UADT) is exposed to shared carcinogens (betel nut,
+tobacco, alcohol), creating conditions for field cancerization.
+We aimed to quantify UADT co-occurrence rates, characterise transition
+directionality, determine the survival impact of multi-site disease, and
+quantify immortal-time bias in retrospective multi-primary cancer analyses.
 
 \noindent\textbf{Materials and Methods.}
-We analysed a population-based cancer registry spanning 2003--2020 comprising
-10,113 patients with at least one cancer at a predefined UADT field site
-(ICD-O C02--C06, C09--C10, C12--C13, C15). Standardised incidence ratios
-(SIR) quantified the elevation in second-primary risk compared with the general
-population. Synchronous versus metachronous transitions were characterised
-by a symmetry score. Survival impact of multi-site ($\geq$2 UADT sites) disease
-was estimated using time-varying Cox regression to eliminate immortal-time bias,
-and validated with a competing-risks DeepHit neural network model.
+A population-based cancer registry (2003--2020) comprising 10,113 patients with
+cancer at a predefined UADT site (ICD-O C02--C06, C09--C10, C12--C13, C15)
+was analysed. Standardised incidence ratios (SIR) quantified second-primary risk.
+Transition symmetry was assessed by a bidirectionality score.
+Survival impact was estimated by time-varying Cox regression and validated with
+a competing-risks DeepHit model.
 
 \noindent\textbf{Results.}
-Among 10,113 UADT field patients, 1,067 (10.6\%) developed $\geq$2 field sites.
-Pyriform sinus patients had the highest absolute second-primary rate (24.2\%
-co-occurring with esophagus; SIR\,=\,3.78, 95\%\,CI\,2.40--5.68) followed
-by hypopharynx--esophagus (16.4\%; SIR\,=\,2.86, 95\%\,CI\,1.96--4.04).
-Transitions were bidirectional and predominantly synchronous (60\% within 6 months;
-symmetry score 0.879, binomial $p$\,=\,0.70), consistent with shared field
-exposure rather than metastasis. After immortal-time correction, multi-site
-disease carried a hazard ratio for death of 2.14 (95\%\,CI\,1.97--2.33,
-$p$\,<\,0.001). Competing-risks analysis confirmed 5-year cumulative incidence
-of second UADT cancer of 10.4\% against a backdrop of 56.7\% all-cause mortality,
-underscoring the urgency of early surveillance.
+Among 10,113 patients, 1,067 (10.6\%) developed $\geq$2 field sites.
+Pyriform sinus--esophagus had the highest absolute co-occurrence (24.2\%;
+SIR\,=\,3.78, 95\%\,CI\,2.40--5.68); hypopharynx--esophagus was second
+(16.4\%; SIR\,=\,2.86, 95\%\,CI\,1.96--4.04). Hypopharynx--esophagus transitions
+were bidirectional (symmetry\,=\,0.879, $p$\,=\,0.70) and predominantly
+synchronous (60\% within 6 months), confirming shared field exposure.
+After immortal-time correction, multi-site disease carried
+HR\,=\,2.14 (95\%\,CI\,1.97--2.33, $p$\,<\,0.001).
+Competing-risks analysis yielded a 5-year cumulative incidence of second UADT
+cancer of 10.4\% against 56.7\% all-cause mortality.
 
 \noindent\textbf{Conclusions.}
 One in four pyriform sinus patients develops a second esophageal primary.
-Bidirectional, predominantly synchronous transitions and a 2.14-fold mortality
-excess confirm a field cancerization mechanism. Routine early esophagoscopic
-surveillance within 1--2 years of a UADT diagnosis is warranted, particularly
-for pyriform sinus and hypopharynx primaries.
+A 2.14-fold mortality excess and bidirectional synchronous transitions confirm
+field cancerization. Early esophagoscopy within 1--2 years of UADT diagnosis
+is warranted, particularly for pyriform sinus and hypopharynx primaries.
 
 \bigskip
 \noindent\textbf{Keywords:} field cancerization; upper aerodigestive tract;
@@ -195,7 +187,7 @@ $p_{\text{forward}} = 0.5$).
 
 Survival from first UADT field diagnosis to all-cause death was analysed using
 time-varying Cox regression implemented in the \texttt{lifelines} package
-(v\,[version])~\citep{davidson2019}. Patients were split at the date of their
+(v0.30.3)~\citep{davidson2019}. Patients were split at the date of their
 second UADT diagnosis: exposure to the \texttt{multi\_field} indicator was set
 to zero before that date and to one thereafter, eliminating the immortal-time
 bias inherent in fixed-covariate landmark analyses~\citep{suissa2008}.
@@ -255,13 +247,15 @@ magnitude, SIR elevation (gum--oral cavity SIR\,=\,3.38, 95\%\,CI\,2.39--4.64).
 
 \subsection{Bidirectionality and synchronous transitions}
 
-Among the 134 recorded pyriform--esophagus transitions,
+Among the 156 recorded hypopharynx--esophagus transitions,
 60\% occurred within 6 months (synchronous), consistent across sensitivity
-analyses at 3 months (57\%) and 9 months (61\%).
-The symmetry score for the hypopharynx--esophagus pair was 0.879
-(hypopharynx\,$\to$\,esophagus: $n$\,=\,74; reverse: $n$\,=\,60),
-with a binomial test confirming no significant directional preference
-($p$\,=\,0.70) (Figure~\ref{fig:trajectories}).
+analyses at 3 months (56\%) and 9 months (63\%).
+The symmetry score for this pair was 0.879
+(hypopharynx\,$\to$\,esophagus: $n$\,=\,76 total, $n$\,=\,33 metachronous;
+reverse: $n$\,=\,67 total, $n$\,=\,29 metachronous),
+with a binomial test on metachronous transitions confirming no significant
+directional preference ($p$\,=\,0.70) (Figure~\ref{fig:trajectories}).
+The 118 pyriform--esophagus pairs showed a higher synchronous fraction (77\%).
 This bidirectionality is inconsistent with loco-regional spread, which would
 produce unidirectional progression, and instead supports shared carcinogen
 exposure as the dominant mechanism.
@@ -430,18 +424,19 @@ shared publicly.
 Index site & Second site & $O$ & $E$ & SIR & 95\%\,CI & FDR \\
 \midrule
 Esophagus (C15)   & Hypopharynx (C13) & 30 & 6.43 & 4.67 & 3.15--6.66 & $<$0.001 \\
-Floor of mouth (C04) & Hypopharynx (C13) & 5 & 1.17 & 4.27 & 1.39--9.96 & 0.040 \\
+Floor of mouth (C04) & Hypopharynx (C13) & 5$^\dagger$ & 1.17 & 4.27 & 1.39--9.96 & 0.040 \\
 Pyriform (C12)    & Esophagus (C15)   & 23 & 6.08 & 3.78 & 2.40--5.68 & $<$0.001 \\
 Esophagus (C15)   & Pyriform (C12)    & 12 & 3.34 & 3.59 & 1.85--6.27 & 0.002 \\
 Gum (C03)         & Oral NOS (C06)    & 38 & 11.25 & 3.38 & 2.39--4.64 & $<$0.001 \\
 Oropharynx (C10)  & Esophagus (C15)   & 14 & 4.36 & 3.21 & 1.76--5.39 & 0.002 \\
 Palate (C05)      & Oral NOS (C06)    & 23 & 7.22 & 3.18 & 2.02--4.78 & $<$0.001 \\
-Hypopharynx (C13) & Esophagus (C15)   & 32 & 11.2 & 2.86 & 1.96--4.04 & $<$0.001 \\
+Palate (C05)      & Gum (C03)         & 18 & 6.14 & 2.93 & 1.74--4.63 & $<$0.001 \\
+Hypopharynx (C13) & Esophagus (C15)   & 32 & 11.20 & 2.86 & 1.96--4.04 & $<$0.001 \\
 Tonsil (C09)      & Esophagus (C15)   & 28 & 11.85 & 2.36 & 1.57--3.41 & $<$0.001 \\
-Esophagus (C15)   & Tonsil (C09)      & 10 & 4.32 & 2.31 & 1.11--4.25 & 0.068 \\
 \bottomrule
 \end{tabular}\\[0.5em]
-\small $O$: observed; $E$: expected (sex- and age-standardised); FDR: Benjamini--Hochberg.
+\small $O$: observed; $E$: expected (sex- and age-standardised); FDR: Benjamini--Hochberg.\\
+\small $^\dagger$Wide confidence interval; interpret with caution ($O$\,=\,5, at minimum reporting threshold).
 \end{table}
 
 \begin{table}[ht]
@@ -463,7 +458,6 @@ Sex (male vs.\ female)  & 1.43  & 1.287--1.587 & $<$0.001 \\
 \bottomrule
 \end{tabular}\\[0.5em]
 \small HR: hazard ratio. $\Delta$HR between models: 1.28.
-\small [value] placeholders to be filled from cox\_results.csv.
 \end{table}
 
 % ── Figures ───────────────────────────────────────────────────────────────────
@@ -584,7 +578,7 @@ exposures in survival analysis~\citep{suissa2008,therneau2013}.
 
 % ── References ────────────────────────────────────────────────────────────────
 \newpage
-\bibliographystyle{abbrvnat}
+\bibliographystyle{unsrt}
 \bibliography{references}
 
 \end{document}
