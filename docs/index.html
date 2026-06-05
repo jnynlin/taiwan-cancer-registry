@@ -579,7 +579,7 @@ const PAGES = {
     badge: { text:'● Decide Direction', bg:'#1a0c38', color:'#a78bfa' },
   },
   'multihistory-draft': {
-    src:   'drafts/multihistory_draft.pdf',
+    src:   'drafts/multihistory_viewer.html',
     title: 'Multi-History Transformer — Draft PDF',
     crumb: 'Draft Manuscripts',
     badge: { text:'Updated 2026-06-05', bg:'#0d1f4a', color:'#60a5fa' },
@@ -620,10 +620,7 @@ function navigate(target) {
     const frame = document.createElement('iframe');
     frame.className = 'page-frame';
     frame.src = pg.src;
-    const isPDF = pg.src.endsWith('.pdf');
-    frame.setAttribute('sandbox', isPDF
-      ? 'allow-scripts allow-same-origin allow-popups'
-      : 'allow-scripts allow-same-origin allow-forms');
+    frame.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms allow-downloads');
     document.getElementById('content').appendChild(frame);
     iframes[target] = frame;
     // small delay to let it register before showing

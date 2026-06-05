@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{width:100%;height:100%;background:#080d17;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif}
+  #bar{
+    height:42px;background:#0f172a;border-bottom:1px solid #1e3050;
+    display:flex;align-items:center;padding:0 18px;gap:14px;
+    position:fixed;top:0;left:0;right:0;z-index:10;
+  }
+  #bar strong{font-size:13px;font-weight:700;color:#f1f5f9;white-space:nowrap}
+  #bar span{font-size:11px;color:#64748b;white-space:nowrap}
+  .pill{
+    padding:2px 9px;border-radius:10px;font-size:10px;font-weight:700;
+    background:#0d1f4a;color:#60a5fa;border:1px solid #1e3a8a;white-space:nowrap
+  }
+  #bar a{
+    margin-left:auto;padding:5px 14px;border-radius:5px;
+    background:#0d1f4a;color:#60a5fa;border:1px solid #2563eb;
+    font-size:11px;font-weight:600;text-decoration:none;white-space:nowrap;
+    transition:background .15s
+  }
+  #bar a:hover{background:#1e3a8a}
+  embed{
+    position:fixed;top:42px;left:0;right:0;bottom:0;
+    width:100%;height:calc(100vh - 42px);
+  }
+</style>
+</head>
+<body>
+  <div id="bar">
+    <strong>Multi-History Transformer — Draft Manuscript</strong>
+    <span class="pill">Updated 2026-06-05</span>
+    <span>k=1 R@1=0.232 · k=2 R@1=0.205 · Negative result confirmed</span>
+    <a href="multihistory_draft.pdf" download="MultiHistory_Draft.pdf">⬇ Download PDF</a>
+  </div>
+  <embed src="multihistory_draft.pdf" type="application/pdf">
+</body>
+</html>
