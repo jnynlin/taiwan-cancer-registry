@@ -278,6 +278,18 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--b
       <div class="nav-dot" style="background:var(--c-undecided)"></div>
     </div>
 
+    <!-- DRAFT MANUSCRIPTS -->
+    <div class="nav-section">
+      <div class="nav-section-label">Draft Manuscripts</div>
+    </div>
+
+    <div class="nav-item" data-target="multihistory-draft"
+         style="--c-dot:#60a5fa;--c-badge-bg:#0d1f4a;--c-badge:#60a5fa">
+      <span class="nav-icon">📑</span>
+      <span class="nav-label">Multi-History Transformer</span>
+      <span class="nav-badge">Updated</span>
+    </div>
+
   </nav>
 </div><!-- /sidebar -->
 
@@ -463,6 +475,30 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--b
 
       </div>
 
+      <!-- DRAFT MANUSCRIPTS -->
+      <div class="home-section-hdr">
+        <h3 style="color:var(--c-rerun)">Draft Manuscripts</h3>
+      </div>
+      <div class="home-grid hg-3">
+
+        <div class="page-card" data-target="multihistory-draft"
+             style="--c-top:var(--c-rerun);--c-icon-bg:var(--c-rerun-d)">
+          <div class="pc-top">
+            <div class="pc-icon">📑</div>
+            <div class="pc-titles">
+              <div class="pc-title">Multi-History Transformer</div>
+              <div class="pc-sub">Updated 2026-06-05 · k=1 R@1=0.232 confirmed</div>
+            </div>
+          </div>
+          <div class="pc-desc">Corrected draft after 3 bug fixes (norm_first, age normalization, site dedup). Negative result confirmed: k=2 R@1=0.205 &lt; k=1 R@1=0.232. Manuscript framing: motivates causal GPT-style retraining.</div>
+          <div class="pc-footer">
+            <span class="pc-badge" style="background:var(--c-rerun-d);color:var(--c-rerun)">● Re-run Complete</span>
+            <span class="pc-open">View PDF →</span>
+          </div>
+        </div>
+
+      </div>
+
       <!-- QUICK LINKS -->
       <div class="home-section-hdr" style="margin-top:28px">
         <h3>Quick References</h3>
@@ -542,6 +578,12 @@ const PAGES = {
     crumb: 'Clinical Datasets',
     badge: { text:'● Decide Direction', bg:'#1a0c38', color:'#a78bfa' },
   },
+  'multihistory-draft': {
+    src:   'drafts/multihistory_draft.pdf',
+    title: 'Multi-History Transformer — Draft PDF',
+    crumb: 'Draft Manuscripts',
+    badge: { text:'Updated 2026-06-05', bg:'#0d1f4a', color:'#60a5fa' },
+  },
 };
 
 // ─── STATE ────────────────────────────────────────────────────────
@@ -578,7 +620,10 @@ function navigate(target) {
     const frame = document.createElement('iframe');
     frame.className = 'page-frame';
     frame.src = pg.src;
-    frame.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms');
+    const isPDF = pg.src.endsWith('.pdf');
+    frame.setAttribute('sandbox', isPDF
+      ? 'allow-scripts allow-same-origin allow-popups'
+      : 'allow-scripts allow-same-origin allow-forms');
     document.getElementById('content').appendChild(frame);
     iframes[target] = frame;
     // small delay to let it register before showing
