@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Research Directions — TCGA & Patient Database Studies</title>
+<style>
+:root{
+  --bg:#080d17; --bg2:#0f172a; --bg3:#1e293b; --bg4:#273549;
+  --border:#1e3050; --border2:#2d4060;
+  --text:#e2e8f0; --muted:#64748b; --muted2:#94a3b8;
+
+  --immediate:#16a34a; --immediate-d:#052e16; --immediate-l:#86efac;
+  --method:#2563eb;    --method-d:#0d1f4a;    --method-l:#93c5fd;
+  --pop:#7c3aed;       --pop-d:#1a0c38;       --pop-l:#c4b5fd;
+  --avoid:#b91c1c;     --avoid-d:#1c0505;     --avoid-l:#fca5a5;
+  --inprog:#0e7490;    --inprog-d:#042f3d;    --inprog-l:#67e8f9;
+
+  --effort-low:#166534;  --effort-low-t:#86efac;
+  --effort-med:#92400e;  --effort-med-t:#fde68a;
+  --effort-high:#991b1b; --effort-high-t:#fca5a5;
+
+  --font: -apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
+  --mono: 'SF Mono','Fira Code','Consolas',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;line-height:1.5}
+
+/* ── HEADER ─────────────────────────────────────────────── */
+#hdr{
+  padding:26px 40px 18px;
+  background:linear-gradient(175deg,#0c1829 0%,var(--bg) 100%);
+  border-bottom:1px solid var(--border);
+}
+#hdr h1{font-size:24px;font-weight:800;letter-spacing:-.4px;color:#f1f5f9;margin-bottom:4px}
+#hdr p{font-size:13px;color:var(--muted);margin-bottom:16px}
+.hdr-stats{display:flex;gap:10px;flex-wrap:wrap}
+.hstat{padding:4px 14px;border-radius:20px;font-size:11px;font-weight:700;border:1px solid;white-space:nowrap}
+.hstat-immediate{background:var(--immediate-d);color:var(--immediate-l);border-color:#145a2a}
+.hstat-method   {background:var(--method-d);   color:var(--method-l);   border-color:#153570}
+.hstat-pop      {background:var(--pop-d);       color:var(--pop-l);      border-color:#3b1a7a}
+.hstat-avoid    {background:var(--avoid-d);     color:var(--avoid-l);    border-color:#5a0d0d}
+
+/* ── FILTERS ─────────────────────────────────────────────── */
+#fbar{
+  padding:10px 40px;border-bottom:1px solid var(--border);
+  background:var(--bg2);display:flex;gap:6px;flex-wrap:wrap;align-items:center
+}
+#fbar span{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;
+  letter-spacing:.8px;margin-right:4px}
+.fb{
+  padding:5px 14px;border-radius:5px;font-size:12px;font-weight:500;
+  cursor:pointer;border:1px solid var(--border);background:transparent;
+  color:var(--muted);transition:all .15s;white-space:nowrap
+}
+.fb:hover{color:var(--text);border-color:#334155}
+.fb.on{color:#f1f5f9;background:var(--bg3);border-color:#475569}
+.sort-sel{
+  margin-left:auto;padding:5px 10px;border-radius:5px;font-size:12px;
+  background:var(--bg3);color:var(--text);border:1px solid var(--border);
+  cursor:pointer;font-family:var(--font)
+}
+
+/* ── PRIORITY STRIP ──────────────────────────────────────── */
+#pstrip{
+  padding:14px 40px;border-bottom:1px solid var(--border);background:var(--bg2);
+  overflow-x:auto;
+}
+.pstrip-label{font-size:10px;font-weight:700;text-transform:uppercase;
+  letter-spacing:1px;color:var(--muted);margin-bottom:10px}
+.pstrip-row{display:flex;gap:8px;min-width:max-content}
+.pchip{
+  display:flex;align-items:center;gap:8px;
+  padding:7px 12px;border-radius:8px;
+  background:var(--bg3);border:1px solid var(--border);
+  cursor:pointer;transition:all .15s;min-width:190px
+}
+.pchip:hover{border-color:#475569;background:var(--bg4)}
+.pchip.active{border-color:var(--accent-color);background:var(--accent-bg)}
+.prank{
+  width:22px;height:22px;border-radius:50%;
+  font-size:11px;font-weight:800;display:flex;
+  align-items:center;justify-content:center;flex-shrink:0
+}
+.pchip-text{font-size:11px;line-height:1.3;color:var(--text)}
+.pchip-sub{font-size:9px;color:var(--muted);margin-top:1px}
+
+/* ── MAIN CONTENT ────────────────────────────────────────── */
+#main{padding:28px 40px;max-width:1400px;margin:0 auto}
+
+.section-hdr{
+  display:flex;align-items:center;gap:12px;margin-bottom:18px;margin-top:8px
+}
+.section-hdr h2{font-size:13px;font-weight:800;text-transform:uppercase;
+  letter-spacing:1px}
+.section-hdr::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* ── CARDS GRID ──────────────────────────────────────────── */
+.grid{display:grid;gap:16px;margin-bottom:32px}
+.grid-3{grid-template-columns:repeat(3,1fr)}
+.grid-2{grid-template-columns:repeat(2,1fr)}
+@media(max-width:1200px){.grid-3{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:780px){.grid-3,.grid-2{grid-template-columns:1fr}}
+
+.card{
+  background:var(--bg2);border:1px solid var(--border);border-radius:10px;
+  padding:18px 18px 14px;cursor:pointer;
+  transition:all .18s;position:relative;overflow:hidden;
+  display:flex;flex-direction:column;gap:10px
+}
+.card::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
+  background:var(--c-accent);border-radius:10px 0 0 10px
+}
+.card:hover{border-color:var(--c-accent);transform:translateY(-2px);
+  box-shadow:0 8px 32px rgba(0,0,0,.4)}
+
+.card-top{display:flex;align-items:flex-start;gap:10px}
+.card-rank{
+  width:28px;height:28px;border-radius:50%;flex-shrink:0;
+  font-size:13px;font-weight:800;display:flex;align-items:center;
+  justify-content:center;background:var(--c-accent-d);color:var(--c-accent)
+}
+.card-titles{flex:1}
+.card-title{font-size:14px;font-weight:700;color:#f1f5f9;line-height:1.35;margin-bottom:3px}
+.card-short{font-size:11px;color:var(--muted2);font-style:italic;line-height:1.4}
+
+.card-badges{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.badge{
+  padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.4px;white-space:nowrap
+}
+.badge-cat-immediate{background:var(--immediate-d);color:var(--immediate-l)}
+.badge-cat-method    {background:var(--method-d);   color:var(--method-l)}
+.badge-cat-pop       {background:var(--pop-d);       color:var(--pop-l)}
+.badge-effort-low    {background:var(--effort-low);  color:var(--effort-low-t)}
+.badge-effort-medium {background:var(--effort-med);  color:var(--effort-med-t)}
+.badge-effort-high   {background:var(--effort-high); color:var(--effort-high-t)}
+.badge-status-inprog {background:var(--inprog-d);    color:var(--inprog-l)}
+.badge-status-planned{background:#132044;            color:#60a5fa}
+.badge-status-new    {background:#1a0838;            color:#a78bfa}
+
+.card-kq{
+  background:var(--bg);border-left:2px solid var(--c-accent);
+  border-radius:0 5px 5px 0;padding:8px 12px;
+  font-size:12px;color:var(--muted2);font-style:italic;line-height:1.4
+}
+.card-kq strong{display:block;font-size:9px;text-transform:uppercase;
+  letter-spacing:.7px;color:var(--c-accent);font-style:normal;margin-bottom:3px}
+
+.card-meta{display:flex;flex-direction:column;gap:5px}
+.card-meta-row{display:flex;align-items:flex-start;gap:6px;font-size:11px}
+.meta-icon{color:var(--muted);width:12px;flex-shrink:0;margin-top:1px}
+.meta-label{color:var(--muted);width:52px;flex-shrink:0}
+.meta-val{color:var(--muted2);line-height:1.4}
+
+.extends-row{display:flex;flex-wrap:wrap;gap:4px;margin-top:2px}
+.ext-chip{
+  padding:1px 7px;border-radius:3px;font-size:9px;font-weight:600;
+  background:var(--bg3);border:1px solid var(--border2);color:var(--muted2)
+}
+
+.card-view{
+  margin-top:auto;padding-top:8px;border-top:1px solid var(--border);
+  font-size:11px;color:var(--c-accent);font-weight:600;text-align:right;
+  display:flex;align-items:center;justify-content:space-between
+}
+.effort-bar{display:flex;gap:3px;align-items:center}
+.effort-pip{width:8px;height:4px;border-radius:2px;background:var(--border)}
+.effort-pip.filled{background:var(--c-accent)}
+
+/* ── AVOID SECTION ───────────────────────────────────────── */
+.avoid-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:28px}
+@media(max-width:780px){.avoid-grid{grid-template-columns:1fr}}
+.avoid-card{
+  background:var(--avoid-d);border:1px solid #3a0d0d;border-radius:8px;
+  padding:14px 16px;display:flex;gap:12px;align-items:flex-start
+}
+.avoid-x{
+  width:24px;height:24px;border-radius:50%;background:#3a0d0d;
+  color:var(--avoid-l);font-size:13px;font-weight:800;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px
+}
+.avoid-title{font-size:13px;font-weight:700;color:#fca5a5;margin-bottom:4px}
+.avoid-reason{font-size:12px;color:#9a6060;line-height:1.45}
+
+/* ── MODAL ───────────────────────────────────────────────── */
+#modal-overlay{
+  position:fixed;inset:0;background:rgba(4,8,16,.88);z-index:1000;
+  display:none;align-items:center;justify-content:center;padding:24px;
+  backdrop-filter:blur(4px)
+}
+#modal-overlay.show{display:flex}
+#modal{
+  background:var(--bg2);border:1px solid var(--border2);border-radius:12px;
+  width:100%;max-width:780px;max-height:88vh;overflow-y:auto;
+  box-shadow:0 24px 80px rgba(0,0,0,.7);position:relative
+}
+#modal-close{
+  position:sticky;top:0;float:right;cursor:pointer;
+  background:var(--bg3);color:var(--muted2);font-size:18px;
+  border:none;padding:8px 12px;border-radius:0 12px 0 8px;
+  transition:color .15s;z-index:1
+}
+#modal-close:hover{color:var(--text)}
+#modal-body{padding:28px 28px 24px}
+
+.modal-badge-row{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+.modal-title{font-size:22px;font-weight:800;color:#f1f5f9;line-height:1.3;margin-bottom:6px}
+.modal-short{font-size:14px;color:var(--muted2);font-style:italic;margin-bottom:20px}
+
+.modal-section{margin-bottom:20px}
+.modal-slabel{
+  font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.9px;
+  color:var(--muted);margin-bottom:8px;display:flex;align-items:center;gap:6px
+}
+.modal-slabel::after{content:'';flex:1;height:1px;background:var(--border)}
+
+.modal-kq{
+  background:var(--bg);border-left:3px solid var(--c-accent);
+  border-radius:0 6px 6px 0;padding:12px 16px;
+  font-size:14px;color:#c7d8f0;font-style:italic;line-height:1.5
+}
+.modal-p{font-size:13px;color:#94a3b8;line-height:1.6}
+.modal-steps{list-style:none;display:flex;flex-direction:column;gap:8px}
+.modal-steps li{
+  display:flex;align-items:flex-start;gap:10px;
+  font-size:13px;color:#94a3b8;line-height:1.45
+}
+.step-num{
+  width:20px;height:20px;border-radius:50%;flex-shrink:0;margin-top:1px;
+  background:var(--bg4);color:var(--c-accent);font-size:10px;font-weight:800;
+  display:flex;align-items:center;justify-content:center
+}
+.modal-novelty{
+  background:linear-gradient(135deg,var(--c-accent-d) 0%,var(--bg) 100%);
+  border:1px solid;border-color:var(--c-accent);border-radius:7px;
+  padding:14px 16px;font-size:13px;line-height:1.55;color:#c7d8f0
+}
+.modal-meta-table{width:100%;border-collapse:collapse}
+.modal-meta-table tr td{
+  padding:7px 10px;font-size:12px;border-bottom:1px solid var(--border)
+}
+.modal-meta-table tr:last-child td{border-bottom:none}
+.modal-meta-table td:first-child{color:var(--muted);width:120px;font-weight:600}
+.modal-meta-table td:last-child{color:var(--muted2)}
+.modal-extends-chips{display:flex;flex-wrap:wrap;gap:5px}
+.modal-ext-chip{
+  padding:3px 10px;border-radius:4px;font-size:11px;font-weight:600;
+  background:var(--bg3);border:1px solid var(--border2);color:var(--muted2)
+}
+
+/* ── TOOLTIP ─────────────────────────────────────────────── */
+#tt{
+  position:fixed;pointer-events:none;z-index:500;
+  background:rgba(15,23,42,.97);border:1px solid var(--border2);
+  border-radius:7px;padding:8px 12px;font-size:11px;
+  color:var(--text);box-shadow:0 4px 20px rgba(0,0,0,.5);
+  opacity:0;transition:opacity .1s;max-width:220px;line-height:1.4
+}
+#tt.show{opacity:1}
+
+/* ── FOOTER ──────────────────────────────────────────────── */
+#footer{
+  padding:16px 40px;border-top:1px solid var(--border);
+  font-size:11px;color:var(--muted);background:var(--bg2);
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px
+}
+</style>
+</head>
+<body>
+
+<div id="hdr">
+  <h1>Research Directions — TCGA &amp; Patient Database Studies</h1>
+  <p>Ranked by impact × feasibility · based on existing data, pipeline infrastructure, and open gaps in completed manuscripts</p>
+  <div class="hdr-stats">
+    <div class="hstat hstat-immediate">Immediate Extensions: 3</div>
+    <div class="hstat hstat-method">Methodological: 3</div>
+    <div class="hstat hstat-pop">Population-Specific: 2</div>
+    <div class="hstat hstat-avoid">Deprioritize: 4</div>
+  </div>
+</div>
+
+<div id="fbar">
+  <span>Filter:</span>
+  <button class="fb on" data-f="all">All suggestions</button>
+  <button class="fb" data-f="immediate">Immediate Extensions</button>
+  <button class="fb" data-f="method">Methodological</button>
+  <button class="fb" data-f="pop">Population-Specific</button>
+  <button class="fb" data-f="low">Low effort</button>
+  <button class="fb" data-f="inprog">Already started</button>
+  <select class="sort-sel" id="sort-sel">
+    <option value="rank">Sort: Priority rank</option>
+    <option value="effort">Sort: Effort (low → high)</option>
+    <option value="category">Sort: Category</option>
+  </select>
+</div>
+
+<div id="pstrip">
+  <div class="pstrip-label">Priority ranking — click to jump</div>
+  <div class="pstrip-row" id="pstrip-row"></div>
+</div>
+
+<div id="main">
+
+  <!-- IMMEDIATE EXTENSIONS -->
+  <div class="section-hdr">
+    <h2 style="color:var(--immediate-l)">Immediate Extensions</h2>
+  </div>
+  <div class="grid grid-3" id="grid-immediate"></div>
+
+  <!-- METHODOLOGICAL -->
+  <div class="section-hdr">
+    <h2 style="color:var(--method-l)">Methodological Innovations</h2>
+  </div>
+  <div class="grid grid-3" id="grid-method"></div>
+
+  <!-- POPULATION -->
+  <div class="section-hdr">
+    <h2 style="color:var(--pop-l)">Population-Specific Pan-Cancer</h2>
+  </div>
+  <div class="grid grid-2" id="grid-pop"></div>
+
+  <!-- AVOID -->
+  <div class="section-hdr">
+    <h2 style="color:var(--avoid-l)">Deprioritize / Avoid</h2>
+  </div>
+  <div class="avoid-grid" id="grid-avoid"></div>
+
+</div>
+
+<div id="footer">
+  <span>Click any card for full methodology details · Rank = impact × feasibility score</span>
+  <span>June 2026 · Based on Taiwan Registry + TCGA + CMUH pipeline infrastructure</span>
+</div>
+
+<!-- MODAL -->
+<div id="modal-overlay">
+  <div id="modal">
+    <button id="modal-close">✕</button>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<div id="tt"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════════════════════
+const CAT = {
+  immediate: { label:'Immediate Extension', cls:'badge-cat-immediate', accent:'#16a34a', accentD:'#052e16' },
+  method:    { label:'Methodological',      cls:'badge-cat-method',    accent:'#3b82f6', accentD:'#0d1f4a' },
+  pop:       { label:'Population-Specific', cls:'badge-cat-pop',       accent:'#a78bfa', accentD:'#1a0c38' },
+};
+
+const EFFORT = {
+  low:    { label:'Low effort',    cls:'badge-effort-low',    pips:1, days:'1–2 weeks' },
+  medium: { label:'Medium effort', cls:'badge-effort-medium', pips:2, days:'2–4 weeks' },
+  high:   { label:'High effort',   cls:'badge-effort-high',   pips:3, days:'4–8 weeks' },
+};
+
+const STATUS_LBL = {
+  inprog:  { label:'In Progress', cls:'badge-status-inprog' },
+  planned: { label:'Planned',     cls:'badge-status-planned' },
+  new:     { label:'New',         cls:'badge-status-new' },
+};
+
+const SUGGESTIONS = [
+  {
+    id:'hnsc', rank:1, category:'immediate', effort:'low', status:'new',
+    title:'TCGA-HNSC: APOBEC Signature & UADT Molecular Validation',
+    short:'Bridge Taiwan field cancerization epidemiology to tumor-level molecular mechanism',
+    data:'TCGA-HNSC · n≈500 · via TCGAbiolinks (same pipeline as BRCA)',
+    extends:['UADT Field Cancerization','Co-existing Cancer Patterns'],
+    journal:'Cancer Research / Clinical Cancer Research',
+    kq:'Does APOBEC mutational signature (SBS2/SBS13) explain the bidirectional C12↔C13↔C15 co-occurrence and field effect observed in the Taiwan registry?',
+    rationale:'Your UADT field study is purely epidemiological — co-occurrence rates, SIR, and TV Cox HR. TCGA-HNSC (head and neck squamous cell carcinoma, n≈500) covers the same anatomical territory and provides the molecular layer. APOBEC cytosine deaminase (SBS2/SBS13) is the dominant mutational process in HNSC and acts as a field-effect mutagen across oropharynx → hypopharynx → esophagus — precisely mirroring your bidirectional C12↔C13↔C15 registry pattern. No existing paper connects a population-level registry field cancerization finding to APOBEC signature burden.',
+    approach:[
+      'Download TCGA-HNSC via TCGAbiolinks (same R script as TCGA-BRCA); extract MAF mutation files',
+      'Compute mutational signatures with SigProfilerMatplotlib or deconstructSigs; quantify SBS2/SBS13 burden per sample',
+      'Stratify by primary subsite (oropharynx / hypopharynx / oral cavity / larynx)',
+      'Test: APOBEC burden correlates with synchronous vs metachronous second primary rate in SEER/registry-linked TCGA samples',
+      'Use Taiwan registry SIR=4.7 and TV Cox HR=2.14 as epidemiological anchors in the Discussion',
+      'Secondary: survival analysis — does high APOBEC burden predict worse OS in HNSC?',
+    ],
+    novelty:'First paper to directly link population-level registry field cancerization (Taiwan) to tumor-level APOBEC mutational signature. Bridges epidemiology and molecular oncology — a high-impact combination that neither field alone can produce.',
+  },
+  {
+    id:'causal', rank:2, category:'method', effort:'low', status:'planned',
+    title:'Causal Cancer Sequence Transformer (GPT-style)',
+    short:'Fix training/inference mismatch — retrain with lower-triangular attention mask',
+    data:'Taiwan Registry 84k patients (existing) · no new data required',
+    extends:['Multi-History Transformer','Surveillance Calendar'],
+    journal:'npj Digital Medicine / Journal of Biomedical Informatics',
+    kq:'When trained causally (GPT-style, past context only), does each additional cancer in history improve next-cancer prediction — and by how much?',
+    rationale:'The current BERT model was trained bidirectionally (all cancers visible at every masked position), then evaluated causally (first cancer only). This mismatch explains the R@1 gap: 0.312 bidirectional vs 0.232 first-only. The actual clinical question — "given k past cancers, predict the next" — was never the training objective. A single code change (lower-triangular attention mask) transforms the model into a true causal predictor. If k=2 context improves R@1 over k=1 after causal retraining, the Multi-History paper becomes affirmative rather than a negative result.',
+    approach:[
+      'Add lower-triangular causal mask to Script 07: nn.Transformer.generate_square_subsequent_mask(MAX_SEQ)',
+      'Change training objective: given positions 0..k−1 predict position k (next cancer, not random masked position)',
+      'Retrain with identical architecture (76k params, d=64, 2L/4H, SEED=42)',
+      'Re-evaluate R@k at context lengths k=1, 2, 3 using corrected Script 25',
+      'Compare: bidirectional ceiling R@1=0.312 vs causal first-only baseline 0.232 vs causal multi-history (new)',
+      'Clinical framing: "given a patient with 2 prior cancers, what is the probability of each next site?"',
+    ],
+    novelty:'First causally-trained, time-aware cancer sequence prediction model. Transforms a co-occurrence embedding tool into a clinically deployable next-event predictor. Causal vs bidirectional evaluation framework provides a reusable benchmark for future cancer sequence models.',
+  },
+  {
+    id:'seer', rank:3, category:'pop', effort:'medium', status:'new',
+    title:'Taiwan vs SEER Pan-Cancer Co-occurrence Axis Comparison',
+    short:'Cross-population validation that HBV/GI-systemic axis is Taiwan-specific',
+    data:'SEER 18 multi-primary data · n≈1M · free via SEER*Stat API',
+    extends:['HBV/GI-Systemic Axis','Co-existing Cancer Patterns','Temporal Trends'],
+    journal:'International Journal of Cancer / Cancer Epidemiology',
+    kq:'Is the HBV/GI-systemic axis absent or substantially weaker in SEER (HBV prevalence ~0.3%) compared to Taiwan (HBV prevalence ~15%)?',
+    rationale:'Your HBV axis paper\'s primary limitation is lack of cross-population validation. SEER (US population, HBV-low) is the ideal comparator. Expected finding: SEER shows a strong UADT axis (tobacco/alcohol) and hormonal axis, but no HBV/GI-systemic axis — confirming Taiwan\'s axis structure is driven by endemic HBV rather than metabolic or dietary factors shared globally. This comparison simultaneously validates both your HBV Axis paper and Co-existing Cancers paper (which currently cannot claim cross-population generalizability).',
+    approach:[
+      'Download SEER 18 multi-primary data via SEER*Stat batch export; standardize ICD-O site codes to match Taiwan C-codes',
+      'Run your existing association rules + NMF pipeline (scripts 02–03) on SEER multi-primary subset',
+      'Compare lift/OR matrices: quantify GI-systemic axis prominence Taiwan >> SEER',
+      'Compare NMF programs: does a "C22/C34/C61 liver-lung-prostate" program appear in SEER?',
+      'Age-standardize site incidence rates for fair comparison between populations',
+      'Bonus: include SEER Asian sub-cohort (higher HBV prevalence) as intermediate comparison group',
+    ],
+    novelty:'Direct Taiwan vs SEER co-occurrence axis comparison. First population-level demonstration that carcinogen exposure history is encoded in the co-occurrence matrix structure — with HBV as the population-specific carcinogen fingerprint.',
+  },
+  {
+    id:'lihc', rank:4, category:'immediate', effort:'low', status:'new',
+    title:'TCGA-LIHC: HBV Serology Molecular Validation',
+    short:'Provide the missing serology piece for your HBV/GI-systemic axis paper',
+    data:'TCGA-LIHC · n≈370 · HBV/HCV/alcohol etiology annotation · via TCGAbiolinks',
+    extends:['HBV/GI-Systemic Axis'],
+    journal:'Hepatology / Journal of Hepatology / Gut',
+    kq:'Do HBV-driven HCC patients show distinct immune, molecular, and co-occurrence profiles that match the Taiwan registry GI-systemic axis?',
+    rationale:'Your HBV axis paper\'s #1 open issue is that the registry lacks HBV serology — you cannot distinguish HBV from NAFLD from alcohol as the GI-systemic driver. TCGA-LIHC has HBV/HCV/alcohol etiology annotation in its clinical XML. Running your CIBERSORT immune pipeline (identical to TCGA-ESCA) on LIHC stratified by etiology would: (1) directly address the reviewer\'s most likely challenge, (2) provide a hepatology journal anchor, and (3) link Taiwan\'s epidemiological decline to a molecular immune phenotype.',
+    approach:[
+      'Download TCGA-LIHC clinical + RNA-seq via TCGAbiolinks; extract etiology annotation (HBV/HCV/alcohol/unknown)',
+      'Stratify: HBV+ (n≈100) vs HCV+ vs alcohol vs NAFLD vs unknown',
+      'Run CIBERSORT nu-SVR (nu=0.5, same settings as ESCA) — compare immune microenvironment by etiology',
+      'Survival analysis by etiology + immune subtype (KM + Cox)',
+      'Mutational signatures by etiology: APOBEC vs SBS4 (tobacco) vs SBS24 (aflatoxin) vs SBS16 (alcohol)',
+      'Anchor to Taiwan data: HBV-driven LIHC immune profile → link to registry C22 declining ρ=−0.983',
+    ],
+    novelty:'Molecular validation of a population-level epidemiological finding (Taiwan HBV axis) in an independent genomic cohort. The HBV-LIHC immune microenvironment is a highly cited area — connecting it to registry-level surveillance adds translational value.',
+  },
+  {
+    id:'apc', rank:5, category:'pop', effort:'medium', status:'new',
+    title:'Birth-Cohort APC Analysis: HBV Vaccination Natural Experiment',
+    short:'Decompose C22 HCC decline into period effect vs cohort effect (vaccination)',
+    data:'Taiwan Registry (existing) · birth-year stratification · R apc package',
+    extends:['Temporal Trends 2003–2020','HBV/GI-Systemic Axis'],
+    journal:'JNCI / Gut / Lancet Regional Health — Western Pacific',
+    kq:'Is the C22 HCC decline a birth-cohort effect (HBV vaccination, expected) or a period effect (treatment improvement) — and does the 1984 vaccination cut-off create a detectable inflection?',
+    rationale:'Taiwan began universal HBV vaccination in 1984, creating a natural experiment with a sharp birth-cohort boundary. Your registry shows C22 ρ=−0.983 declining and your temporal study shows all birth cohorts declining. An age-period-cohort (APC) model can formally decompose how much of the decline is attributable to cohort effects (the vaccination mechanism) vs period effects (treatment, surveillance). This would be the first multi-cancer-registry confirmation of HBV vaccination\'s hepatocellular carcinoma prevention impact using APC decomposition — a public health milestone paper.',
+    approach:[
+      'Construct 5-year age × calendar period incidence table from Taiwan registry (C22 as primary analysis)',
+      'Fit APC model using R `apc` package (Kuang-Nielsen-Nielsen 2008 or Holford approach)',
+      'Primary test: is cohort effect significantly stronger for birth cohorts born ≥1984 vs <1984?',
+      'Sensitivity: adjust for concurrent HCV trends, alcohol consumption data (MOHW statistics)',
+      'Secondary analysis: apply APC to C53 cervix (HPV vaccination 2007) as a positive-control replication',
+      'Linkage: connect cohort effect magnitude to HBV seroprevalence surveys (national prevalence data)',
+    ],
+    novelty:'First APC decomposition of vaccine-preventable cancer decline using a population-based multi-cancer registry with birth-cohort resolution. Dual-cancer angle (HBV+HPV) strengthens public health policy impact.',
+  },
+  {
+    id:'thca', rank:6, category:'immediate', effort:'low', status:'inprog',
+    title:'TCGA-THCA + TriNetX PTC: Papillary Thyroid Carcinoma',
+    short:'Complete the already-started TCGA-THCA and TriNetX analyses',
+    data:'TCGA-THCA · n≈500 · tcga-thca/ directory · TriNetX PTC · trinetx-ptc/ directory',
+    extends:[],
+    journal:'Thyroid / European Journal of Endocrinology / Clinical Endocrinology',
+    kq:'Do BRAF V600E vs RAS-mutant PTC subtypes differ in immune microenvironment and recurrence risk, and does TriNetX real-world data validate TCGA survival patterns?',
+    rationale:'You already have tcga-thca/, ptc-tcga/, and trinetx-ptc/ directories suggesting this work is in progress. Completing it generates a publication from near-finished work. Critically, C73 (thyroid) is absent from the Taiwan registry — a gap flagged in your Syndrome Validation paper as limiting LFS/Cowden screening. A TCGA-THCA + TriNetX paper would: (1) produce a near-term publication, (2) build the evidence base for requesting C73 addition to the Taiwan registry, enabling population-level thyroid cancer surveillance.',
+    approach:[
+      'TCGA-THCA: classify BRAF V600E (60%), RAS-mutant (15%), other subtypes by mutation data',
+      'Survival by molecular subtype, age, histology (classic vs follicular variant PTC)',
+      'Immune deconvolution: CIBERSORT nu-SVR (same pipeline as ESCA) — compare immune profiles by subtype',
+      'TriNetX: real-world recurrence rates, RAI treatment utilization, time-to-recurrence by subtype',
+      'Incremental Cox: does BRAF status add prognosis beyond stage + histology?',
+      'Policy conclusion: propose C73 registry amendment citing population-level surveillance gap',
+    ],
+    novelty:'TCGA + TriNetX combined design (molecular discovery → real-world validation) is increasingly required by reviewers and strengthens both datasets.',
+  },
+  {
+    id:'imputation', rank:7, category:'method', effort:'high', status:'new',
+    title:'Registry-to-Molecular Subtype Imputation',
+    short:'Predict PAM50 subtypes from Taiwan registry clinical variables at population scale',
+    data:'TCGA-BRCA (existing results) + Taiwan Registry C50 patients · n≈15,000',
+    extends:['TCGA-BRCA DL Phenotyping','Co-existing Cancers','Sex-Specific Atlas'],
+    journal:'npj Precision Oncology / Nature Communications',
+    kq:'Can PAM50 breast cancer subtypes be reliably imputed from clinical registry variables (age, histology, laterality, year) — and what is the Taiwan population-level subtype distribution?',
+    rationale:'Taiwan registry has demographics and cancer sites but no genomics. TCGA has genomics but small n and non-Taiwan population. Training a clinical → PAM50 classifier on TCGA and deploying it on Taiwan C50 patients (n≈15,000) would enable population-level molecular subtype estimates for a country where genomic sequencing is not routine. Your TCGA-BRCA 7-cluster VAE is the starting point — clusters partially map to PAM50 (ARI=0.301), providing a cross-validation anchor.',
+    approach:[
+      'Train XGBoost classifier: TCGA-BRCA clinical features → PAM50 label (features: age, stage, histology, laterality, ER/PR/HER2 proxy)',
+      'Validate in 5-fold CV within TCGA (n≈1,000) and external validation in METABRIC (already available from your analysis)',
+      'If C-statistic > 0.75: deploy on Taiwan C50 patients in the registry; impute likely PAM50 subtype per patient',
+      'Compare imputed distribution to your BRCA VAE cluster distribution (C0–C6)',
+      'Stratify imputed subtypes by year (temporal trends) and age group',
+      'Policy impact: estimate Basal C5 (poor prognosis) prevalence in Taiwan — target for intensive surveillance',
+    ],
+    novelty:'First population-level molecular subtype imputation from a national cancer registry. Addresses the genomic equity gap — most countries cannot afford routine genomic profiling. Demonstrates that registry epidemiology can be "enriched" with molecular information from TCGA.',
+  },
+  {
+    id:'synthetic', rank:8, category:'method', effort:'medium', status:'new',
+    title:'Synthetic Patient Augmentation for Small Institutional Cohorts',
+    short:'VAE-generated synthetic ESCC patients from C15 registry to overcome n=344 limit',
+    data:'Taiwan C15 Registry (existing) + CMUH ESCC n=334 (existing) · no new patients',
+    extends:['CMUH ESCC Single-Center','Taiwan C15 Esophageal'],
+    journal:'Artificial Intelligence in Medicine / BMC Medical Informatics',
+    kq:'Can registry-conditioned synthetic patients generated by a conditional VAE improve DL survival performance in a small (n=344) referral-centre ESCC cohort?',
+    rationale:'CMUH transfer learning failed (C-index 0.625 vs Cox 0.690) because of era and case-mix mismatch. The underlying problem is n=334 being too small for DL. Synthetic augmentation — using a conditional VAE trained on the Taiwan C15 national registry, conditioned on referral-centre case-mix characteristics — bypasses the transfer learning mismatch while still leveraging registry-scale training. If successful, this generalizes to any institution with a small clinical cohort adjacent to a large national registry.',
+    approach:[
+      'Train conditional VAE on Taiwan C15 registry (n=2,367) conditioned on: stage, surgery flag, CCRT flag, age decile',
+      'Characterize CMUH case mix (stage distribution, treatment distribution) as conditioning target',
+      'Sample 1,000 synthetic patients matching CMUH referral-centre characteristics',
+      'Augmented training set: CMUH real n=334 + synthetic n=1,000',
+      'Re-evaluate DeepSurv + XGBoost C-index: augmented vs no augmentation vs transfer learning',
+      'Ablation: vary synthetic:real ratio (1:1, 3:1, 5:1) to find optimal augmentation level',
+    ],
+    novelty:'Synthetic registry-conditioned augmentation for small institutional DL — directly addresses the resource imbalance between national registries and institutional clinical datasets. Generalizable framework applicable across any country with a national cancer registry + institutional cohorts.',
+  },
+];
+
+const AVOID_ITEMS = [
+  {
+    title:'More single-center DL survival (CMUH-style)',
+    reason:'DL does not outperform Cox at n<500 — your CMUH paper already demonstrates this. Additional single-center studies add no methodological novelty unless synthetic augmentation (Suggestion 8) or multi-center federation is applied.',
+  },
+  {
+    title:'Additional TCGA cancer types with standard DL pipelines',
+    reason:'Diminishing returns without a specific biological hypothesis. Reviewers ask "what is new?" unless the cancer type is connected to an existing finding (e.g., HNSC connects to UADT field, LIHC connects to HBV axis).',
+  },
+  {
+    title:'Deep immune deconvolution in Taiwan registry patients',
+    reason:'Registry lacks RNA expression data. Without a linked biobank (tissue or blood), CIBERSORT/TIMER cannot be applied to registry patients. The CMUH CDDP biobank (n=75) is the only clinical sub-cohort option, and that requires IRB extension.',
+  },
+  {
+    title:'Methylation / CNV studies without a pre-specified clinical hook',
+    reason:'Hard to publish as standalone discovery epigenomics without (1) large n, (2) strong prior clinical hypothesis, and (3) independent validation cohort. Only pursue if a specific biomarker (e.g., HOXB methylation in BRCA) is motivated by your existing findings.',
+  },
+];
+
+// ═══════════════════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════════════════
+function badge(cfg, text){
+  return `<span class="badge ${cfg.cls}">${text||cfg.label}</span>`;
+}
+function effortPips(effort){
+  const cfg = EFFORT[effort];
+  const pips = [1,2,3].map(i =>
+    `<div class="effort-pip ${i<=cfg.pips?'filled':''}"></div>`
+  ).join('');
+  return `<div class="effort-bar" title="${cfg.label} (${cfg.days})">${pips}</div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// RENDER PRIORITY STRIP
+// ═══════════════════════════════════════════════════════════════════
+function buildStrip(){
+  const row = document.getElementById('pstrip-row');
+  const sorted = [...SUGGESTIONS].sort((a,b) => a.rank - b.rank);
+  sorted.forEach(s => {
+    const cat = CAT[s.category];
+    const div = document.createElement('div');
+    div.className = 'pchip';
+    div.dataset.id = s.id;
+    div.style.setProperty('--accent-color', cat.accent);
+    div.style.setProperty('--accent-bg', cat.accentD);
+    div.innerHTML = `
+      <div class="prank" style="background:${cat.accentD};color:${cat.accent}">${s.rank}</div>
+      <div>
+        <div class="pchip-text">${s.title.split(':')[0].substring(0,30)}${s.title.split(':')[0].length>30?'…':''}</div>
+        <div class="pchip-sub">${cat.label} · ${EFFORT[s.effort].days}</div>
+      </div>`;
+    div.addEventListener('click', () => {
+      document.getElementById('card-'+s.id)?.scrollIntoView({behavior:'smooth',block:'center'});
+      openModal(s.id);
+    });
+    row.appendChild(div);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// RENDER CARDS
+// ═══════════════════════════════════════════════════════════════════
+function buildCard(s){
+  const cat = CAT[s.category];
+  const eff = EFFORT[s.effort];
+  const stat = STATUS_LBL[s.status];
+  const div = document.createElement('div');
+  div.className = 'card';
+  div.id = 'card-'+s.id;
+  div.dataset.cat = s.category;
+  div.dataset.effort = s.effort;
+  div.dataset.status = s.status;
+  div.style.setProperty('--c-accent', cat.accent);
+  div.style.setProperty('--c-accent-d', cat.accentD);
+
+  const extChips = s.extends.map(e =>
+    `<span class="ext-chip">↗ ${e}</span>`
+  ).join('');
+
+  div.innerHTML = `
+    <div class="card-top">
+      <div class="card-rank" style="background:${cat.accentD};color:${cat.accent}">${s.rank}</div>
+      <div class="card-titles">
+        <div class="card-title">${s.title}</div>
+        <div class="card-short">${s.short}</div>
+      </div>
+    </div>
+    <div class="card-badges">
+      <span class="badge ${cat.cls}">${cat.label}</span>
+      <span class="badge ${eff.cls}">${eff.label}</span>
+      <span class="badge ${stat.cls}">${stat.label}</span>
+    </div>
+    <div class="card-kq">
+      <strong>Key Question</strong>${s.kq}
+    </div>
+    <div class="card-meta">
+      <div class="card-meta-row">
+        <span class="meta-icon">🗄</span>
+        <span class="meta-label">Data</span>
+        <span class="meta-val">${s.data}</span>
+      </div>
+      <div class="card-meta-row">
+        <span class="meta-icon">📰</span>
+        <span class="meta-label">Journal</span>
+        <span class="meta-val">${s.journal}</span>
+      </div>
+      ${s.extends.length ? `<div class="card-meta-row">
+        <span class="meta-icon">🔗</span>
+        <span class="meta-label">Extends</span>
+        <div class="extends-row">${extChips}</div>
+      </div>` : ''}
+    </div>
+    <div class="card-view">
+      ${effortPips(s.effort)}
+      <span>View full approach →</span>
+    </div>`;
+  div.addEventListener('click', () => openModal(s.id));
+  return div;
+}
+
+function buildAvoidCard(item){
+  const div = document.createElement('div');
+  div.className = 'avoid-card';
+  div.innerHTML = `
+    <div class="avoid-x">✕</div>
+    <div>
+      <div class="avoid-title">${item.title}</div>
+      <div class="avoid-reason">${item.reason}</div>
+    </div>`;
+  return div;
+}
+
+function renderAll(){
+  ['immediate','method','pop'].forEach(cat => {
+    const grid = document.getElementById('grid-'+cat);
+    if (!grid) return;
+    grid.innerHTML = '';
+    SUGGESTIONS.filter(s => s.category === cat)
+      .sort((a,b) => a.rank - b.rank)
+      .forEach(s => grid.appendChild(buildCard(s)));
+  });
+  const avoidGrid = document.getElementById('grid-avoid');
+  AVOID_ITEMS.forEach(item => avoidGrid.appendChild(buildAvoidCard(item)));
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// MODAL
+// ═══════════════════════════════════════════════════════════════════
+function openModal(id){
+  const s = SUGGESTIONS.find(x => x.id === id);
+  if (!s) return;
+  const cat = CAT[s.category];
+  const eff = EFFORT[s.effort];
+  const stat = STATUS_LBL[s.status];
+
+  const stepsHTML = s.approach.map((step, i) =>
+    `<li><div class="step-num" style="color:${cat.accent}">${i+1}</div><span>${step}</span></li>`
+  ).join('');
+
+  const extHTML = s.extends.length
+    ? `<div class="modal-extends-chips">${s.extends.map(e => `<span class="modal-ext-chip">↗ ${e}</span>`).join('')}</div>`
+    : '<span style="color:var(--muted);font-size:12px">No direct extensions — new direction</span>';
+
+  document.getElementById('modal-body').innerHTML = `
+    <div class="modal-badge-row">
+      <span class="badge ${cat.cls}">${cat.label}</span>
+      <span class="badge ${eff.cls}">${eff.label} · ${eff.days}</span>
+      <span class="badge ${stat.cls}">${stat.label}</span>
+      <span class="badge" style="background:#1a1a2e;color:#60a5fa">Rank #${s.rank}</span>
+    </div>
+    <div class="modal-title">${s.title}</div>
+    <div class="modal-short">${s.short}</div>
+
+    <div class="modal-section">
+      <div class="modal-slabel">Key Research Question</div>
+      <div class="modal-kq" style="border-color:${cat.accent}">${s.kq}</div>
+    </div>
+
+    <div class="modal-section">
+      <div class="modal-slabel">Rationale</div>
+      <div class="modal-p">${s.rationale}</div>
+    </div>
+
+    <div class="modal-section">
+      <div class="modal-slabel">Proposed Approach</div>
+      <ul class="modal-steps">${stepsHTML}</ul>
+    </div>
+
+    <div class="modal-section">
+      <div class="modal-slabel">Novelty Statement</div>
+      <div class="modal-novelty" style="border-color:${cat.accent};background:linear-gradient(135deg,${cat.accentD} 0%,var(--bg) 100%)">${s.novelty}</div>
+    </div>
+
+    <div class="modal-section">
+      <div class="modal-slabel">Study Details</div>
+      <table class="modal-meta-table">
+        <tr><td>Data source</td><td>${s.data}</td></tr>
+        <tr><td>Target journal</td><td>${s.journal}</td></tr>
+        <tr><td>Effort estimate</td><td>${eff.label} — ${eff.days}</td></tr>
+        <tr><td>Status</td><td>${stat.label}</td></tr>
+        <tr><td>Extends</td><td>${extHTML}</td></tr>
+      </table>
+    </div>`;
+
+  document.getElementById('modal-overlay').classList.add('show');
+  document.getElementById('modal').scrollTop = 0;
+}
+
+document.getElementById('modal-close').onclick = () =>
+  document.getElementById('modal-overlay').classList.remove('show');
+document.getElementById('modal-overlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('modal-overlay'))
+    document.getElementById('modal-overlay').classList.remove('show');
+});
+document.addEventListener('keydown', e => {
+  if (e.key==='Escape') document.getElementById('modal-overlay').classList.remove('show');
+});
+
+// ═══════════════════════════════════════════════════════════════════
+// FILTER
+// ═══════════════════════════════════════════════════════════════════
+document.querySelectorAll('.fb').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.fb').forEach(b => b.classList.remove('on'));
+    btn.classList.add('on');
+    const f = btn.dataset.f;
+    document.querySelectorAll('.card').forEach(card => {
+      const show = f==='all'
+        || card.dataset.cat === f
+        || card.dataset.effort === f
+        || (f==='inprog' && card.dataset.status === 'inprog');
+      card.style.display = show ? 'flex' : 'none';
+    });
+    // show/hide section headers based on visible cards
+    ['immediate','method','pop'].forEach(cat => {
+      const grid = document.getElementById('grid-'+cat);
+      const visible = grid && [...grid.querySelectorAll('.card')].some(c => c.style.display!=='none');
+      const hdr = grid?.previousElementSibling;
+      if (hdr) hdr.style.display = visible ? 'flex' : 'none';
+    });
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════
+// SORT
+// ═══════════════════════════════════════════════════════════════════
+document.getElementById('sort-sel').addEventListener('change', function(){
+  ['immediate','method','pop'].forEach(cat => {
+    const grid = document.getElementById('grid-'+cat);
+    if (!grid) return;
+    const cards = [...grid.querySelectorAll('.card')];
+    cards.sort((a, b) => {
+      const sa = SUGGESTIONS.find(x => x.id === a.id.replace('card-',''));
+      const sb = SUGGESTIONS.find(x => x.id === b.id.replace('card-',''));
+      if (!sa || !sb) return 0;
+      if (this.value === 'rank') return sa.rank - sb.rank;
+      if (this.value === 'effort') {
+        const order = {low:0,medium:1,high:2};
+        return order[sa.effort] - order[sb.effort];
+      }
+      return sa.category.localeCompare(sb.category);
+    });
+    cards.forEach(c => grid.appendChild(c));
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════════
+buildStrip();
+renderAll();
+</script>
+</body>
+</html>

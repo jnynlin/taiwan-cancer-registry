@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Future Study Flow — Cancer Research Pipeline 2026</title>
+<style>
+:root {
+  --bg:        #080d17;
+  --bg2:       #0f172a;
+  --bg3:       #1e293b;
+  --border:    #1e3050;
+  --text:      #e2e8f0;
+  --muted:     #64748b;
+  --accent:    #38bdf8;
+
+  --c-ready:      #16a34a;
+  --c-ready-glow: #22c55e;
+  --c-ready-dim:  #052e16;
+  --c-issues:     #ca8a04;
+  --c-issues-glow:#fbbf24;
+  --c-issues-dim: #292103;
+  --c-rerun:      #2563eb;
+  --c-rerun-glow: #60a5fa;
+  --c-rerun-dim:  #0d1f4a;
+  --c-undecided:  #7c3aed;
+  --c-undecided-glow:#a78bfa;
+  --c-undecided-dim: #1a0c38;
+  --c-closed:     #374151;
+  --c-closed-glow:#6b7280;
+  --c-closed-dim: #111827;
+  --c-future:     #0e7490;
+  --c-future-glow:#22d3ee;
+  --c-future-dim: #042f3d;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;overflow-x:hidden}
+
+/* ── HEADER ─────────────────────────────────────────────────────────────── */
+#hdr{
+  padding:20px 36px 14px;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:flex-end;gap:32px;flex-wrap:wrap;
+  background:linear-gradient(180deg,#0d1730 0%,var(--bg) 100%);
+}
+#hdr h1{font-size:22px;font-weight:700;letter-spacing:-0.3px;color:#f1f5f9}
+#hdr small{font-size:12px;color:var(--muted);display:block;margin-top:2px}
+.chips{display:flex;gap:8px;margin-left:auto;flex-wrap:wrap;align-items:center}
+.chip{
+  padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;
+  cursor:pointer;border:1px solid transparent;white-space:nowrap;
+  transition:all .15s;user-select:none
+}
+.chip-ready    {background:var(--c-ready-dim);   color:var(--c-ready-glow);  border-color:#145a2a}
+.chip-issues   {background:var(--c-issues-dim);  color:var(--c-issues-glow); border-color:#5a3b01}
+.chip-rerun    {background:var(--c-rerun-dim);   color:var(--c-rerun-glow);  border-color:#153570}
+.chip-undecided{background:var(--c-undecided-dim);color:var(--c-undecided-glow);border-color:#3b1a7a}
+.chip-closed   {background:var(--c-closed-dim);  color:var(--c-closed-glow); border-color:#2d3748}
+
+/* ── FILTER BAR ────────────────────────────────────────────────────────── */
+#fbar{
+  padding:10px 36px;border-bottom:1px solid var(--border);
+  display:flex;gap:6px;overflow-x:auto;background:var(--bg2)
+}
+.fb{
+  padding:5px 13px;border-radius:5px;font-size:12px;font-weight:500;
+  cursor:pointer;border:1px solid var(--border);background:transparent;
+  color:var(--muted);transition:all .15s;white-space:nowrap
+}
+.fb:hover{color:var(--text);border-color:#334155}
+.fb.on{color:#f1f5f9;border-color:#475569;background:var(--bg3)}
+
+/* ── LAYOUT ─────────────────────────────────────────────────────────────── */
+#wrap{display:flex;height:calc(100vh - 108px);overflow:hidden}
+#canvas-wrap{flex:1;overflow:auto;padding:24px 36px 24px 24px}
+#svg-main{display:block;width:100%;min-width:1100px}
+
+/* ── DETAIL PANEL ───────────────────────────────────────────────────────── */
+#dpanel{
+  width:0;min-width:0;overflow:hidden;
+  border-left:1px solid var(--border);background:var(--bg2);
+  transition:width .28s cubic-bezier(.4,0,.2,1);
+  flex-shrink:0;display:flex;flex-direction:column
+}
+#dpanel.open{width:350px;min-width:350px}
+#dpanel-inner{width:350px;padding:20px 22px;overflow-y:auto;flex:1}
+
+.dp-close{
+  float:right;cursor:pointer;color:var(--muted);font-size:18px;
+  line-height:1;padding:2px 4px;border-radius:4px;
+  transition:color .15s
+}
+.dp-close:hover{color:var(--text)}
+.dp-badge{
+  display:inline-block;padding:2px 9px;border-radius:10px;
+  font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;
+  margin-bottom:10px
+}
+.dp-title{font-size:17px;font-weight:700;line-height:1.3;margin-bottom:3px;color:#f1f5f9}
+.dp-sub{font-size:12px;color:var(--muted);margin-bottom:14px}
+.dp-section{margin-bottom:14px}
+.dp-slabel{
+  font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;
+  color:var(--muted);margin-bottom:7px
+}
+.dp-journal{
+  background:var(--bg3);border:1px solid var(--border);border-radius:6px;
+  padding:9px 12px;font-size:12px;line-height:1.5;color:#cbd5e1
+}
+.dp-journal strong{display:block;font-size:10px;text-transform:uppercase;
+  letter-spacing:.6px;color:var(--muted);margin-bottom:4px}
+.plist{list-style:none}
+.plist li{
+  font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);
+  display:flex;align-items:flex-start;gap:7px;line-height:1.45;color:#cbd5e1
+}
+.plist li:last-child{border-bottom:none}
+.pnum{
+  width:16px;height:16px;border-radius:50%;
+  font-size:9px;font-weight:800;display:flex;align-items:center;
+  justify-content:center;flex-shrink:0;margin-top:1px;background:var(--border)
+}
+.dp-finding{
+  background:var(--bg);border-radius:6px;padding:10px 12px;
+  font-size:12px;line-height:1.55;color:#94a3b8;font-style:italic
+}
+.metrics-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.mc{background:var(--bg);border-radius:5px;padding:8px 10px}
+.mc-label{font-size:9px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:3px}
+.mc-val{font-size:14px;font-weight:700;color:var(--text)}
+.next-box{
+  background:var(--bg);border:1px solid var(--border);border-radius:7px;
+  padding:10px 12px;font-size:12px;line-height:1.5;color:#e2e8f0
+}
+.next-box strong{
+  display:block;font-size:10px;text-transform:uppercase;letter-spacing:.7px;
+  color:var(--muted);margin-bottom:5px
+}
+.dp-divider{border:none;border-top:1px solid var(--border);margin:14px 0}
+
+/* ── TOOLTIP ────────────────────────────────────────────────────────────── */
+#tooltip{
+  position:fixed;pointer-events:none;z-index:999;
+  background:rgba(15,23,42,.97);border:1px solid #334155;border-radius:8px;
+  padding:10px 14px;font-size:12px;max-width:260px;line-height:1.5;
+  color:#e2e8f0;box-shadow:0 8px 32px rgba(0,0,0,.5);
+  transition:opacity .12s;opacity:0
+}
+#tooltip.show{opacity:1}
+
+/* ── SVG embedded styles ─────────────────────────────────────────────────── */
+.lane-rect{rx:8}
+.node-rect{rx:7;cursor:pointer;transition:filter .15s}
+.node-rect:hover{filter:brightness(1.35) drop-shadow(0 0 6px currentColor)}
+.node-rect.selected{filter:brightness(1.4) drop-shadow(0 0 10px currentColor)}
+.connector{fill:none;stroke:#334155;stroke-width:1.2;
+  stroke-dasharray:4 3;marker-end:url(#arr)}
+.connector-solid{fill:none;stroke:#1e3a5f;stroke-width:1.5;
+  marker-end:url(#arr2)}
+.journal-node{cursor:pointer}
+.journal-node:hover rect{filter:brightness(1.3)}
+</style>
+</head>
+<body>
+
+<div id="hdr">
+  <div>
+    <h1>Future Study Flow — Cancer Research Pipeline</h1>
+    <small>13 active projects · 4 datasets · June 2026</small>
+  </div>
+  <div class="chips" id="stat-chips"></div>
+</div>
+
+<div id="fbar">
+  <button class="fb on" data-f="all">All</button>
+  <button class="fb" data-f="ready">● Ready to Submit</button>
+  <button class="fb" data-f="issues">● Open Issues</button>
+  <button class="fb" data-f="rerun">● Re-run Needed</button>
+  <button class="fb" data-f="undecided">● Decide Direction</button>
+  <button class="fb" data-f="closed">● Closed</button>
+</div>
+
+<div id="wrap">
+  <div id="canvas-wrap">
+    <svg id="svg-main" viewBox="0 0 1560 720" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5"
+                markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 Z" fill="#334155"/>
+        </marker>
+        <marker id="arr2" viewBox="0 0 10 10" refX="9" refY="5"
+                markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 Z" fill="#1e4a80"/>
+        </marker>
+        <marker id="arr-ready" viewBox="0 0 10 10" refX="9" refY="5"
+                markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 Z" fill="#16a34a"/>
+        </marker>
+        <filter id="glow-green"><feGaussianBlur stdDeviation="3" result="c"/>
+          <feMerge><feMergeNode in="c"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        <filter id="glow-amber"><feGaussianBlur stdDeviation="3" result="c"/>
+          <feMerge><feMergeNode in="c"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        <linearGradient id="lane-epi"  x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stop-color="#041a0c" stop-opacity=".9"/>
+          <stop offset="1" stop-color="#041a0c" stop-opacity=".3"/>
+        </linearGradient>
+        <linearGradient id="lane-seq"  x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stop-color="#071832" stop-opacity=".9"/>
+          <stop offset="1" stop-color="#071832" stop-opacity=".3"/>
+        </linearGradient>
+        <linearGradient id="lane-anal" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stop-color="#170c2e" stop-opacity=".9"/>
+          <stop offset="1" stop-color="#170c2e" stop-opacity=".3"/>
+        </linearGradient>
+        <linearGradient id="lane-ext"  x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stop-color="#1a0f0f" stop-opacity=".9"/>
+          <stop offset="1" stop-color="#1a0f0f" stop-opacity=".3"/>
+        </linearGradient>
+      </defs>
+      <!-- built by JS -->
+    </svg>
+  </div>
+  <div id="dpanel">
+    <div id="dpanel-inner"></div>
+  </div>
+</div>
+
+<div id="tooltip"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════════════════════════════
+const STATUS_CFG = {
+  ready:     { label:'Ready to Submit', fill:'#052e16', stroke:'#22c55e', text:'#86efac', badge_bg:'#052e16', badge_txt:'#22c55e' },
+  issues:    { label:'Open Issues',     fill:'#292103', stroke:'#fbbf24', text:'#fde68a', badge_bg:'#292103', badge_txt:'#fbbf24' },
+  rerun:     { label:'Re-run Needed',   fill:'#0d1f4a', stroke:'#60a5fa', text:'#bfdbfe', badge_bg:'#0d1f4a', badge_txt:'#60a5fa' },
+  undecided: { label:'Decide Direction',fill:'#1a0c38', stroke:'#a78bfa', text:'#ddd6fe', badge_bg:'#1a0c38', badge_txt:'#a78bfa' },
+  closed:    { label:'Closed',          fill:'#0f172a', stroke:'#4b5563', text:'#9ca3af', badge_bg:'#111827', badge_txt:'#6b7280' },
+  future:    { label:'Future Work',     fill:'#042f3d', stroke:'#22d3ee', text:'#a5f3fc', badge_bg:'#042f3d', badge_txt:'#22d3ee' },
+};
+
+const PROJECTS = [
+  {
+    id:'c15', group:'epi', status:'ready',
+    title:'C15 Esophageal Cancer',
+    sub:'Taiwan Registry · n=2,367',
+    journal:'Cancers (MDPI)',
+    metrics:[
+      {l:'Cohort', v:'n=2,367'},{l:'C-index', v:'0.670'},
+      {l:'Median OS', v:'13.4 mo'},{l:'Version', v:'c15-v1r4.1'},
+    ],
+    next:'Fill 4 author placeholders → submit to Cancers (MDPI)',
+    pending:[
+      'Author 1/2/3 names + ORCIDs',
+      'Institution name',
+      'IRB reference number (IRB-XXXX-XXXX)',
+      'Corresponding author email',
+    ],
+    finding:'Surgery HR=0.61 [0.51–0.72]; CCRT HR=0.97 NS (method-sensitive); MICE primary model robust to AJCC version sensitivity.',
+  },
+  {
+    id:'uadt', group:'epi', status:'ready',
+    title:'UADT Field Cancerization',
+    sub:'Taiwan Registry · n=10,113',
+    journal:'Cancer Epidemiology',
+    metrics:[
+      {l:'Co-occur', v:'24.2% (C12+C15)'},{l:'TV Cox HR', v:'2.14 [1.97–2.33]'},
+      {l:'Top SIR', v:'4.7 (Eso→Hypo)'},{l:'Sync rate', v:'77% within 6 mo'},
+    ],
+    next:'Fill \\AUTHOR, \\AFFIL, IRB, funding → submit to Cancer Epidemiology',
+    pending:[
+      '\\AUTHOR, \\AFFIL, \\CORRESPONDING (lines 27–31 of .tex)',
+      '[Institution/Region] in Methods',
+      '[IRB reference] in Methods & Declarations',
+      '[Funding statement] in Declarations',
+      'Cover letter author block',
+    ],
+    finding:'C12 pyriform: 1 in 4 patients develops esophageal cancer (24.2%). Bidirectional field effect confirmed; immortal-time-corrected TV Cox HR=2.14.',
+  },
+  {
+    id:'coexist', group:'epi', status:'ready',
+    title:'Co-existing Cancer Patterns',
+    sub:'Taiwan Registry · n=78,621',
+    journal:'Cancer Epidemiology',
+    metrics:[
+      {l:'Cohort', v:'n=78,621'},{l:'NMF programs', v:'k=7'},
+      {l:'Top SIR', v:'12.2 (Eso→Lar)'},{l:'AE clusters', v:'k=3'},
+    ],
+    next:'Fill author names, institution, IRB, suggested reviewers → submit',
+    pending:[
+      'Author names, degrees, affiliations',
+      'Institution name',
+      'IRB reference number',
+      'Suggested reviewers (3)',
+    ],
+    finding:'3 biological co-occurrence domains: aerodigestive SCC field, female reproductive/hormonal, age-related GI/urological. C3 UADT cluster: 13% get 3rd cancer, 69% mortality.',
+  },
+  {
+    id:'surveillance', group:'dl_seq', status:'issues',
+    title:'Sequence Surveillance Calendar',
+    sub:'Taiwan Registry · Transformer · R@1=0.232',
+    journal:'Target: Clinical informatics journal',
+    metrics:[
+      {l:'R@1 (first-only)', v:'0.232 ✓'},{l:'R@3', v:'0.498'},
+      {l:'UADT 6-mo', v:'74%'},{l:'Timing pairs', v:'519'},
+    ],
+    next:'Remove stale caution note → resolve 3 open issues → choose journal',
+    pending:[
+      'Remove "treat with caution" note — R@1=0.232 confirmed (Script 25 bugs fixed 2026-06-05)',
+      'Risk stratification: use relative tertiles of prob1 (not absolute threshold 0.15)',
+      'Timing model: add log-normal hazard regression head to Transformer for direct time prediction',
+      'Prospective validation caveat: retrospective R@k demonstrates feasibility only',
+    ],
+    finding:'R@1=0.232 (8.6× random); 74% C12/C13→C15 transitions within 6 months validates guideline endoscopy window. Model timing aligns with Muto 2004 / Huang 2015.',
+  },
+  {
+    id:'multihistory', group:'dl_seq', status:'rerun',
+    title:'Multi-History Transformer',
+    sub:'Taiwan Registry · 3 bugs fixed 2026-06-05',
+    journal:'Target: TBD after re-run',
+    metrics:[
+      {l:'Script 25 R@1', v:'0.067 ⚠ artifact'},{l:'After fix R@1', v:'~0.232 expected'},
+      {l:'Bugs fixed', v:'3 (norm_first, age, dedup)'},{l:'Next', v:'Causal retrain'},
+    ],
+    next:'Re-run Script 25 → update draft PDF → decide negative-result vs causal-retrain paper',
+    pending:[
+      'Re-run 25_multihistory_eval.py (all 3 bugs fixed: norm_first=True, age normalization from checkpoint, (pid,site) dedup)',
+      'Update MultiHistory_Draft.pdf with corrected R@k numbers',
+      'Decide framing: (A) architectural mismatch cautionary paper OR (B) retrain with causal (GPT-style) mask → show improvement',
+      '(If B) Implement lower-triangular attention mask in Script 07 → retrain → re-eval at k=1,2,3',
+    ],
+    finding:'Script 25 had 3 compounding bugs (norm_first, age normalization, no site dedup) causing R@1=0.067 artifact. All fixed. True performance ≈ Script 12 R@1=0.232. BERT bidirectional training ≠ causal inference — conceptual distinction, not a bug.',
+  },
+  {
+    id:'taxonomy', group:'dl_analysis', status:'issues',
+    title:'Three-Axis Cancer Taxonomy',
+    sub:'Taiwan Registry · VAE latent space · 3 axes',
+    journal:'Target: Cancer informatics journal',
+    metrics:[
+      {l:'Active axes', v:'3 (z4, z0, z5)'},{l:'Clusters', v:'k=5 (KMeans)'},
+      {l:'C3 HR', v:'44 ⚠ PH violation?'},{l:'Silhouette', v:'Rising (k=2→8)'},
+    ],
+    next:'Run Schoenfeld residuals on C3 HR=44 → rename Novel clusters → justify k=5',
+    pending:[
+      'Run Schoenfeld residuals for Cluster 3 HR=44 (C54/C16 likely PH violation — time-split Cox needed)',
+      'Rename "Novel-1" → biologically labelled (C34/C61/C71: lung/prostate/brain — radiation-induced?)',
+      'Rename "Novel-2" → biologically labelled (C20/C77: rectal + lymph nodes — metastatic enrichment?)',
+      'Revisit k=6/k=7; report silhouette curve; justify k=5 on biological/consistency grounds',
+      'Birth-cohort era-split for Novel-1 (C22/C34/C61) HBV vaccination hypothesis',
+    ],
+    finding:'Only 3 active latent axes (entire 46-site co-occurrence space is low-dimensional). z4=UADT/male (stable era), z0/z5=Hormonal/female (rising). C3 HR=44 suspicious — PH check mandatory.',
+  },
+  {
+    id:'hbv', group:'dl_analysis', status:'issues',
+    title:'HBV / GI-Systemic Axis',
+    sub:'Taiwan Registry · C22 ρ=−0.983 declining',
+    journal:'Target: Cancer epidemiology/biology',
+    metrics:[
+      {l:'C22 trend', v:'ρ=−0.983 p<.001'},{l:'C22 SIR', v:'<<1 (all sites)'},
+      {l:'UADT–C22 OR', v:'0.11–0.35'},{l:'Two axes', v:'Non-overlapping'},
+    ],
+    next:'Acknowledge HBV serology gap → plan cross-pop comparison → submit',
+    pending:[
+      'Clarify: registry lacks HBV serology — cannot distinguish HBV vs alcohol vs NAFLD as driver; state as limitation',
+      'Birth-cohort stratification: age<50 sub-group (born 1970+) should show steeper C22 decline if HBV vaccination is mechanism',
+      'Cross-population validation: compare axis structure vs SEER (HBV-low setting) to confirm Taiwan specificity',
+    ],
+    finding:'Two independent non-overlapping carcinogenic axes: HBV/GI-systemic (C22/C34/C61) and betel/tobacco UADT (C12/C13/C15). C22 declining ρ=−0.983 consistent with 1986 HBV vaccination cohorts.',
+  },
+  {
+    id:'temporal', group:'dl_analysis', status:'issues',
+    title:'Temporal Trends 2003–2020',
+    sub:'Taiwan Registry · Spearman ρ per site',
+    journal:'Target: Cancer epidemiology',
+    metrics:[
+      {l:'C22 ρ', v:'−0.983 ✓'},{l:'C54 ρ', v:'+0.925 ✓'},
+      {l:'C53 ρ', v:'−0.946 ✓'},{l:'C12 ρ', v:'+0.562 ⚠ rising'},
+    ],
+    next:'Clarify C12 rising mechanism → person-year model for multi-primary → submit',
+    pending:[
+      'Investigate C12 pyriform rising (ρ=+0.562) vs C13 hypopharynx falling (ρ=−0.773): anatomical reclassification over time vs surveillance artifact',
+      'Replace multi-primary follow-up trend (ρ=−0.901) with Poisson person-year model — current approach has censoring bias',
+      'Birth-cohort HBV vaccination test: acknowledge underpowered until registry extends to 2030+',
+    ],
+    finding:'H1 (C22 decline), H2 partial (C13 down / C12 up — split), H3 (C54/C61 rising) all confirmed. C53 ρ=−0.946 strongest declining trend — HPV vaccination era.',
+  },
+  {
+    id:'syndrome', group:'dl_analysis', status:'issues',
+    title:'Hereditary Syndrome Validation',
+    sub:'Taiwan Registry · 3 Cowden candidates confirmed',
+    journal:'Target: Clinical genetics journal',
+    metrics:[
+      {l:'LFS pass', v:'0 (C71 absent)'},{l:'Cowden high-conf', v:'3 (C50+C54)'},
+      {l:'Cowden ages', v:'46 / 49 / 57 yr'},{l:'Registry gaps', v:'C49/C73/C74'},
+    ],
+    next:'Run full C50+C54 screen on ALL multi-cancer patients → update n-candidates → submit',
+    pending:[
+      'Run match_score=1.0 Cowden filter on all multi-cancer patients (not just top-1% anomalous) — may substantially increase candidate count',
+      'Coordinate with registry maintainers to add C49 (soft tissue), C73 (thyroid), C74 (adrenal) for complete LFS/Cowden screening',
+    ],
+    finding:'3 high-confidence Cowden candidates (C50+C54, ages 46/49/57). PTEN germline referral recommended. LFS fails — C49/C74 absent. MEN1 screen was false-positive (registry restriction collapsed to C18).',
+  },
+  {
+    id:'sex_atlas', group:'dl_analysis', status:'issues',
+    title:'Sex-Specific Cancer Atlas',
+    sub:'Taiwan Registry · 16M-dom / 4F-dom sites',
+    journal:'Target: Cancer epidemiology',
+    metrics:[
+      {l:'Male-dominant', v:'16 sites FDR<.05'},{l:'Female-dominant', v:'4 sites'},
+      {l:'UADT age gap', v:'5–9yr (M younger)'},{l:'Multi-cancer', v:'2.0× male excess'},
+    ],
+    next:'Stratified Cox → age-standardized rates → person-year multi-cancer model → submit',
+    pending:[
+      'Replace unstable Cox (HR=178 artifact for sex) with stratified Cox + sex × axis interaction term',
+      'Compute age-standardized incidence rates per 100,000 against general population denominators',
+      'Person-year model for multi-cancer male excess (partially confounded by higher male mortality / shorter FU window)',
+    ],
+    finding:'C12 pyriform OR=40× male; C50 breast OR=0.002× female. UADT males present 5–9yr younger (earlier exposure onset). Male multi-cancer excess not fully explained by UADT alone — immune/hormonal mechanism possible.',
+  },
+  {
+    id:'brca', group:'external', status:'ready',
+    title:'TCGA-BRCA DL Phenotyping',
+    sub:'TCGA · n=1,072 · 60,660 genes',
+    journal:'Breast Cancer Research (BMC)',
+    metrics:[
+      {l:'Cohort', v:'n=1,072'},{l:'XGBoost C', v:'0.727 ± 0.047'},
+      {l:'Basal split', v:'C5 614d vs C6 1,093d'},{l:'Top gene', v:'HOXB5 (rank 1)'},
+    ],
+    next:'Fill 7 \\PH{} placeholders → submit to Breast Cancer Research',
+    pending:[
+      '7 \\PH{} placeholders: author names, affiliations, funding statement',
+      'Cover letter author block',
+    ],
+    finding:'Basal subtype splits into C5 (poor, 614d OS) vs C6 (better, 1,093d). HOXB5/6/3/4 fingerprint validated in METABRIC (p=1.28×10⁻¹²) and GSE96058. ΔC vs PAM50+stage = +0.005 (not incremental beyond known classifiers).',
+  },
+  {
+    id:'cmuh', group:'external', status:'undecided',
+    title:'CMUH ESCC Single-Center',
+    sub:'n=344 · 2007–2010 · 4 DL methods',
+    journal:'TBD — direction not decided',
+    metrics:[
+      {l:'Cohort', v:'n=344'},{l:'Cox C-index', v:'0.691'},
+      {l:'SHAP top driver', v:'Age (U-shaped)'},{l:'Biobank', v:'n=75 CDDP'},
+    ],
+    next:'Choose manuscript direction → finalize manuscript → fill IRB/author info',
+    pending:[
+      'DECIDE direction: (A) institutional validation vs C15 national, (B) CDDP biomarker n=75, (C) neoadjuvant CCRT+surgery series n=54, (D) multi-segment phenotype study',
+      'IRB approval number + patient consent documentation',
+      'Author names, ORCIDs, institutional affiliations',
+      'Add dpi=300 to all savefig() calls before submission',
+      'If direction B: plan CDDP biomarker analysis pipeline',
+    ],
+    finding:'CMUH validates C15 national cohort (C-index 0.690 vs 0.670; sex/stage distributions match). DL no gain over Cox at n=334. Transfer learning fails (era + referral centre mismatch). SHAP: Age has non-linear U-shaped OS effect.',
+  },
+  {
+    id:'esca', group:'external', status:'closed',
+    title:'TCGA-ESCA TP53 Immune',
+    sub:'TCGA · n=143 · CIBERSORT · CLOSED',
+    journal:'Closed — no further work',
+    metrics:[
+      {l:'M2 FDR', v:'0.045 ✓ primary'},{l:'CD8 p', v:'0.189 null'},
+      {l:'nu locked', v:'0.5'},{l:'Power deficit', v:'9.2× n_wt'},
+    ],
+    next:'None. M2 primary result stands; CD8 biological null confirmed.',
+    pending:[],
+    finding:'TP53 mut → M2 macrophage enrichment (FDR=0.045). CD8 null confirmed across 10 deconvolution methods (9.2× more WT patients needed for 80% power). ESCC ~100% TP53-mut collapses TP53 with histology.',
+  },
+];
+
+// ═══════════════════════════════════════════════════════════════════════════
+// LAYOUT CONFIG
+// ═══════════════════════════════════════════════════════════════════════════
+const LANES = [
+  { id:'epi',        label:'Registry — Epidemiology',    grad:'url(#lane-epi)',  y:54,  h:124 },
+  { id:'dl_seq',     label:'Registry — DL  ·  Sequence', grad:'url(#lane-seq)', y:193, h:124 },
+  { id:'dl_analysis',label:'Registry — DL  ·  Analysis', grad:'url(#lane-anal)',y:332, h:174 },
+  { id:'external',   label:'External Cohorts',            grad:'url(#lane-ext)', y:521, h:124 },
+];
+const NODE_W = 178, NODE_H = 74;
+const LANE_LABEL_W = 168;
+const JOURNAL_X = 1390;
+const JOURNAL_W = 155, JOURNAL_H = 36;
+const SVG_W = 1560, SVG_H = 720;
+
+// assign x positions per lane
+const laneProjects = {};
+LANES.forEach(l => { laneProjects[l.id] = PROJECTS.filter(p => p.group === l.id); });
+
+function nodeX(laneId, idx) {
+  const n = laneProjects[laneId].length;
+  const totalW = LANE_LABEL_W + 16 + n * NODE_W + (n-1) * 14;
+  const startX = LANE_LABEL_W + 20;
+  return startX + idx * (NODE_W + 14);
+}
+
+function nodeY(laneId) {
+  const lane = LANES.find(l => l.id === laneId);
+  return lane.y + (lane.h - NODE_H) / 2;
+}
+
+function nodeCX(laneId, idx) { return nodeX(laneId, idx) + NODE_W / 2; }
+function nodeCY(laneId)       { return nodeY(laneId) + NODE_H / 2; }
+
+// collect journal targets
+const journals = {};
+PROJECTS.filter(p => p.status === 'ready').forEach(p => {
+  if (!journals[p.journal]) {
+    const laneY = LANES.find(l => l.id === p.group);
+    journals[p.journal] = { name: p.journal, y: 0, groups: [] };
+  }
+  journals[p.journal].groups.push(p.group);
+});
+
+// Journal y positions
+const journalList = [
+  { name:'Cancers (MDPI)',           groups:['epi'],      y: 116 },
+  { name:'Cancer Epidemiology',      groups:['epi'],      y: 162 },
+  { name:'Breast Cancer Research',   groups:['external'], y: 583 },
+];
+
+// ═══════════════════════════════════════════════════════════════════════════
+// SVG RENDERING
+// ═══════════════════════════════════════════════════════════════════════════
+const svg = document.getElementById('svg-main');
+
+function el(tag, attrs, text) {
+  const e = document.createElementNS('http://www.w3.org/2000/svg', tag);
+  Object.entries(attrs || {}).forEach(([k,v]) => e.setAttribute(k, v));
+  if (text !== undefined) e.textContent = text;
+  return e;
+}
+
+function drawLanes() {
+  LANES.forEach(lane => {
+    const g = el('g');
+    g.appendChild(el('rect', {
+      x:0, y:lane.y, width:SVG_W - 40, height:lane.h,
+      fill:lane.grad, rx:8, opacity:.8
+    }));
+    // Lane label — vertical rotated text
+    const t = el('text', {
+      x: LANE_LABEL_W - 14,
+      y: lane.y + lane.h / 2,
+      fill:'#475569',
+      'font-size':'10',
+      'font-weight':'700',
+      'text-anchor':'middle',
+      'dominant-baseline':'middle',
+      'text-transform':'uppercase',
+      'letter-spacing':'1',
+      transform:`rotate(-90, ${LANE_LABEL_W - 14}, ${lane.y + lane.h / 2})`
+    }, lane.label.toUpperCase());
+    g.appendChild(t);
+    // vertical separator
+    g.appendChild(el('line', {
+      x1:LANE_LABEL_W, y1:lane.y+4, x2:LANE_LABEL_W, y2:lane.y+lane.h-4,
+      stroke:'#1e3050', 'stroke-width':'1'
+    }));
+    svg.appendChild(g);
+  });
+}
+
+function drawJournals() {
+  journalList.forEach(j => {
+    const g = el('g', { 'class':'journal-node', 'data-journal':j.name });
+    g.appendChild(el('rect', {
+      x:JOURNAL_X, y:j.y - JOURNAL_H/2,
+      width:JOURNAL_W, height:JOURNAL_H,
+      rx:6, fill:'#0c1e12', stroke:'#16a34a', 'stroke-width':'1.5'
+    }));
+    // Journal name (wrap)
+    const lines = wrapText(j.name, 18);
+    lines.forEach((line, i) => {
+      g.appendChild(el('text', {
+        x: JOURNAL_X + JOURNAL_W/2,
+        y: j.y - (lines.length-1)*7 + i*14,
+        'text-anchor':'middle',
+        'dominant-baseline':'middle',
+        fill:'#86efac',
+        'font-size':'9.5',
+        'font-weight':'600'
+      }, line));
+    });
+    svg.appendChild(g);
+  });
+}
+
+function wrapText(str, maxLen) {
+  const words = str.split(' ');
+  const lines = [];
+  let cur = '';
+  words.forEach(w => {
+    if ((cur + ' ' + w).trim().length > maxLen && cur) { lines.push(cur); cur = w; }
+    else cur = (cur + ' ' + w).trim();
+  });
+  if (cur) lines.push(cur);
+  return lines;
+}
+
+function drawConnections() {
+  // Ready projects → journals
+  PROJECTS.filter(p => p.status === 'ready').forEach(p => {
+    const jConf = journalList.find(j => j.name === p.journal);
+    if (!jConf) return;
+    const laneIdx = laneProjects[p.group].findIndex(x => x.id === p.id);
+    const x1 = nodeX(p.group, laneIdx) + NODE_W;
+    const y1 = nodeY(p.group) + NODE_H/2;
+    const x2 = JOURNAL_X;
+    const y2 = jConf.y;
+    const g = el('g');
+    const path = el('path', {
+      d:`M${x1},${y1} C${x1+60},${y1} ${x2-60},${y2} ${x2},${y2}`,
+      fill:'none', stroke:'#16a34a', 'stroke-width':'1.2', opacity:'.45',
+      'marker-end':'url(#arr-ready)'
+    });
+    g.appendChild(path);
+    svg.insertBefore(g, svg.firstChild);
+  });
+
+  // Internal relationships (dashed)
+  const rels = [
+    ['surveillance','multihistory'],
+    ['uadt','surveillance'],
+    ['c15','cmuh'],
+    ['hbv','temporal'],
+    ['taxonomy','syndrome'],
+  ];
+  rels.forEach(([a, b]) => {
+    const pa = PROJECTS.find(p => p.id === a);
+    const pb = PROJECTS.find(p => p.id === b);
+    if (!pa || !pb) return;
+    const ia = laneProjects[pa.group].findIndex(p => p.id === a);
+    const ib = laneProjects[pb.group].findIndex(p => p.id === b);
+    const x1 = nodeCX(pa.group, ia), y1 = nodeCY(pa.group);
+    const x2 = nodeCX(pb.group, ib), y2 = nodeCY(pb.group);
+    // pick control points
+    const mx = (x1+x2)/2, my = (y1+y2)/2;
+    const g = el('g');
+    const path = el('path', {
+      d:`M${x1},${y1} Q${mx+30},${my} ${x2},${y2}`,
+      fill:'none', stroke:'#2d4a6e', 'stroke-width':'1',
+      'stroke-dasharray':'4 3', opacity:'.55'
+    });
+    g.appendChild(path);
+    svg.insertBefore(g, svg.firstChild);
+  });
+}
+
+function drawNodes() {
+  PROJECTS.forEach(p => {
+    const cfg = STATUS_CFG[p.status];
+    const lane = LANES.find(l => l.id === p.group);
+    const idx = laneProjects[p.group].findIndex(x => x.id === p.id);
+    const x = nodeX(p.group, idx);
+    const y = nodeY(p.group);
+    const cx = x + NODE_W/2;
+    const cy = y + NODE_H/2;
+
+    const g = el('g', { 'class':'node', 'data-id':p.id, id:'node-'+p.id });
+
+    // shadow/glow rect behind
+    g.appendChild(el('rect', {
+      x:x-2, y:y-2, width:NODE_W+4, height:NODE_H+4,
+      rx:9, fill:cfg.stroke, opacity:'.12'
+    }));
+
+    // main rect
+    const rect = el('rect', {
+      x, y, width:NODE_W, height:NODE_H,
+      rx:7, fill:cfg.fill,
+      stroke:cfg.stroke, 'stroke-width':'1.4',
+      'class':'node-rect'
+    });
+    g.appendChild(rect);
+
+    // left accent bar
+    g.appendChild(el('rect', {
+      x, y:y+6, width:3, height:NODE_H-12,
+      rx:2, fill:cfg.stroke, opacity:'.8'
+    }));
+
+    // title text
+    const titleLines = wrapText(p.title, 20);
+    titleLines.forEach((line, i) => {
+      g.appendChild(el('text', {
+        x:x+12, y:y+17+i*14,
+        fill:cfg.text,
+        'font-size':'11',
+        'font-weight':'700',
+        'dominant-baseline':'middle'
+      }, line));
+    });
+
+    // subtitle
+    g.appendChild(el('text', {
+      x:x+12, y:y+NODE_H-24,
+      fill:'#475569',
+      'font-size':'9',
+      'dominant-baseline':'middle'
+    }, p.sub.length > 32 ? p.sub.substring(0,31)+'…' : p.sub));
+
+    // status badge
+    g.appendChild(el('rect', {
+      x:x+8, y:y+NODE_H-15, width:56, height:11,
+      rx:3, fill:cfg.badge_bg, opacity:'.9'
+    }));
+    g.appendChild(el('text', {
+      x:x+36, y:y+NODE_H-9,
+      fill:cfg.badge_txt,
+      'font-size':'7.5',
+      'font-weight':'800',
+      'text-anchor':'middle',
+      'dominant-baseline':'middle',
+      'letter-spacing':'.5'
+    }, p.status.toUpperCase()));
+
+    // journal micro-badge on right
+    const jShort = p.journal.length > 20 ? p.journal.substring(0,19)+'…' : p.journal;
+    g.appendChild(el('text', {
+      x:x+NODE_W-8, y:y+NODE_H-9,
+      fill:'#374151',
+      'font-size':'7.5',
+      'text-anchor':'end',
+      'dominant-baseline':'middle'
+    }, jShort));
+
+    // pending-count badge (top-right)
+    if (p.pending.length > 0 && p.status !== 'closed') {
+      g.appendChild(el('rect', {
+        x:x+NODE_W-20, y:y+4, width:16, height:14,
+        rx:7, fill:cfg.stroke, opacity:'.9'
+      }));
+      g.appendChild(el('text', {
+        x:x+NODE_W-12, y:y+11,
+        fill:cfg.fill, 'font-size':'8', 'font-weight':'800',
+        'text-anchor':'middle', 'dominant-baseline':'middle'
+      }, String(p.pending.length)));
+    }
+
+    svg.appendChild(g);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// STATUS CHIPS IN HEADER
+// ═══════════════════════════════════════════════════════════════════════════
+function drawChips() {
+  const counts = {};
+  PROJECTS.forEach(p => counts[p.status] = (counts[p.status]||0)+1);
+  const chipsEl = document.getElementById('stat-chips');
+  Object.entries(counts).forEach(([s, n]) => {
+    const c = document.createElement('div');
+    c.className = `chip chip-${s}`;
+    c.textContent = `${STATUS_CFG[s].label}: ${n}`;
+    chipsEl.appendChild(c);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// DETAIL PANEL
+// ═══════════════════════════════════════════════════════════════════════════
+let activeId = null;
+
+function openDetail(id) {
+  const p = PROJECTS.find(x => x.id === id);
+  if (!p) return;
+
+  // remove previous selection
+  document.querySelectorAll('.node-rect.selected').forEach(r => r.classList.remove('selected'));
+  const node = document.getElementById('node-'+id);
+  if (node) node.querySelector('.node-rect').classList.add('selected');
+
+  activeId = id;
+  const cfg = STATUS_CFG[p.status];
+
+  let metricsHTML = `<div class="metrics-grid">` +
+    p.metrics.map(m =>
+      `<div class="mc"><div class="mc-label">${m.l}</div><div class="mc-val">${m.v}</div></div>`
+    ).join('') + `</div>`;
+
+  let pendingHTML = p.pending.length
+    ? `<ul class="plist">${p.pending.map((t,i) =>
+        `<li><span class="pnum">${i+1}</span><span>${t}</span></li>`
+      ).join('')}</ul>`
+    : `<p style="font-size:12px;color:#4b5563;font-style:italic">No pending items.</p>`;
+
+  document.getElementById('dpanel-inner').innerHTML = `
+    <span class="dp-close" id="detail-close">✕</span>
+    <div class="dp-badge" style="background:${cfg.badge_bg};color:${cfg.badge_txt}">${STATUS_CFG[p.status].label}</div>
+    <div class="dp-title">${p.title}</div>
+    <div class="dp-sub">${p.sub}</div>
+
+    <div class="dp-section">
+      <div class="dp-slabel">Target Journal</div>
+      <div class="dp-journal"><strong>→</strong>${p.journal}</div>
+    </div>
+
+    <div class="dp-section">
+      <div class="dp-slabel">Next Action</div>
+      <div class="next-box"><strong>⚡ Priority</strong>${p.next}</div>
+    </div>
+
+    ${p.pending.length ? `<div class="dp-section">
+      <div class="dp-slabel">Pending (${p.pending.length})</div>
+      ${pendingHTML}
+    </div>` : ''}
+
+    <div class="dp-section">
+      <div class="dp-slabel">Key Metrics</div>
+      ${metricsHTML}
+    </div>
+
+    <hr class="dp-divider">
+    <div class="dp-section">
+      <div class="dp-slabel">Key Finding</div>
+      <div class="dp-finding">${p.finding}</div>
+    </div>
+  `;
+
+  const panel = document.getElementById('dpanel');
+  panel.classList.add('open');
+  document.getElementById('detail-close').onclick = closeDetail;
+}
+
+function closeDetail() {
+  document.getElementById('dpanel').classList.remove('open');
+  document.querySelectorAll('.node-rect.selected').forEach(r => r.classList.remove('selected'));
+  activeId = null;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// TOOLTIP
+// ═══════════════════════════════════════════════════════════════════════════
+const tip = document.getElementById('tooltip');
+
+function showTip(p, evt) {
+  tip.innerHTML = `<strong style="color:${STATUS_CFG[p.status].text}">${p.title}</strong>
+    <br><span style="color:#64748b;font-size:11px">${p.sub}</span>
+    <br><br><span style="color:#94a3b8;font-size:11px">⚡ ${p.next}</span>`;
+  tip.classList.add('show');
+  moveTip(evt);
+}
+
+function moveTip(evt) {
+  const x = evt.clientX + 14, y = evt.clientY - 10;
+  tip.style.left = Math.min(x, window.innerWidth - 280) + 'px';
+  tip.style.top  = Math.max(y, 8) + 'px';
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// FILTER
+// ═══════════════════════════════════════════════════════════════════════════
+let activeFilter = 'all';
+
+document.querySelectorAll('.fb').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.fb').forEach(b => b.classList.remove('on'));
+    btn.classList.add('on');
+    activeFilter = btn.dataset.f;
+    PROJECTS.forEach(p => {
+      const node = document.getElementById('node-'+p.id);
+      if (!node) return;
+      const show = activeFilter === 'all' || p.status === activeFilter;
+      node.style.opacity = show ? '1' : '0.12';
+      node.style.pointerEvents = show ? 'auto' : 'none';
+    });
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// NODE INTERACTION
+// ═══════════════════════════════════════════════════════════════════════════
+svg.addEventListener('click', evt => {
+  const node = evt.target.closest('.node');
+  if (!node) return;
+  const id = node.dataset.id;
+  if (id === activeId) { closeDetail(); return; }
+  openDetail(id);
+});
+
+svg.addEventListener('mousemove', evt => {
+  const node = evt.target.closest('.node');
+  if (node) {
+    const p = PROJECTS.find(x => x.id === node.dataset.id);
+    if (p) { showTip(p, evt); return; }
+  }
+  tip.classList.remove('show');
+  moveTip(evt);
+});
+
+svg.addEventListener('mouseleave', () => tip.classList.remove('show'));
+
+// ═══════════════════════════════════════════════════════════════════════════
+// LEGEND — bottom of SVG
+// ═══════════════════════════════════════════════════════════════════════════
+function drawLegend() {
+  const y = 670;
+  const g = el('g');
+  let x = LANE_LABEL_W + 20;
+  const entries = [
+    ['ready','Ready to Submit'],
+    ['issues','Open Issues'],
+    ['rerun','Re-run Needed'],
+    ['undecided','Decide Direction'],
+    ['closed','Closed'],
+  ];
+  entries.forEach(([s, label]) => {
+    const cfg = STATUS_CFG[s];
+    g.appendChild(el('rect', { x, y:y-7, width:10, height:10, rx:2, fill:cfg.stroke }));
+    g.appendChild(el('text', { x:x+14, y, fill:'#64748b', 'font-size':'10',
+      'dominant-baseline':'middle' }, label));
+    x += label.length * 6.2 + 28;
+  });
+  g.appendChild(el('text', { x: SVG_W - 60, y,
+    fill:'#334155', 'font-size':'9', 'text-anchor':'end',
+    'dominant-baseline':'middle' }, '● Click any node for details'));
+  svg.appendChild(g);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// SECTION DIVIDERS between lanes
+// ═══════════════════════════════════════════════════════════════════════════
+function drawDividers() {
+  [LANES[0].y + LANES[0].h + 6, LANES[1].y + LANES[1].h + 6,
+   LANES[2].y + LANES[2].h + 6].forEach(y => {
+    svg.insertBefore(el('line', {
+      x1:LANE_LABEL_W + 10, y1:y, x2:SVG_W - 50, y2:y,
+      stroke:'#1a2a45', 'stroke-width':'.8'
+    }), svg.firstChild);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PHASE HEADER STRIP
+// ═══════════════════════════════════════════════════════════════════════════
+function drawPhaseHeader() {
+  const g = el('g');
+  const phases = [
+    { label:'PROJECTS', x:LANE_LABEL_W+10, w:1050 },
+    { label:'JOURNALS', x:JOURNAL_X - 10, w:JOURNAL_W + 20 },
+  ];
+  phases.forEach(ph => {
+    g.appendChild(el('rect', { x:ph.x, y:8, width:ph.w, height:30,
+      rx:5, fill:'#0d1a2e', opacity:'.8' }));
+    g.appendChild(el('text', {
+      x:ph.x + ph.w/2, y:23, fill:'#334155', 'font-size':'9.5',
+      'font-weight':'800', 'text-anchor':'middle',
+      'dominant-baseline':'middle', 'letter-spacing':'2'
+    }, ph.label));
+  });
+  svg.insertBefore(g, svg.firstChild);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════════════════
+drawLanes();
+drawDividers();
+drawPhaseHeader();
+drawConnections();
+drawJournals();
+drawNodes();
+drawLegend();
+drawChips();
+</script>
+</body>
+</html>

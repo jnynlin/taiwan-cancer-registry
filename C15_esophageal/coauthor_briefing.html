@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Co-Author Briefing — C15 Esophageal Cancer, Taiwan</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; font-size: 15px; line-height: 1.65; color: #222; background: #f4f6f9; }
+  a { color: #2e7fbf; }
+  .page-wrap { max-width: 960px; margin: 0 auto; padding: 0 20px 60px; }
+
+  .site-header { background: #14304a; color: #fff; padding: 36px 40px 28px; margin-bottom: 32px; }
+  .site-header .tag { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #7db9e2; margin-bottom: 10px; }
+  .site-header h1 { font-size: 22px; font-weight: 700; line-height: 1.35; margin-bottom: 12px; }
+  .site-header .meta { font-size: 13px; color: #a8c4d9; }
+  .site-header .meta span { margin-right: 20px; }
+  .badge { display: inline-block; background: #2e7fbf; color: #fff; font-size: 11px; font-weight: 700; letter-spacing: 0.8px; padding: 3px 10px; border-radius: 20px; text-transform: uppercase; margin-left: 8px; vertical-align: middle; }
+  .badge.orange { background: #e07b39; }
+  .badge.red    { background: #d62728; }
+
+  h2 { font-size: 17px; font-weight: 700; color: #14304a; border-left: 4px solid #2e7fbf; padding-left: 12px; margin: 36px 0 14px; }
+  p  { margin-bottom: 10px; }
+
+  .action-banner { background: #fff3cd; border: 1.5px solid #e6b800; border-radius: 8px; padding: 18px 24px; margin: 24px 0; }
+  .action-banner .title { font-weight: 700; font-size: 14px; color: #7a5600; margin-bottom: 8px; }
+  .action-banner ul { padding-left: 20px; }
+  .action-banner li { margin-bottom: 4px; font-size: 14px; }
+
+  .warn-banner { background: #fff0f0; border: 1.5px solid #d62728; border-radius: 8px; padding: 14px 20px; margin: 16px 0; font-size: 13.5px; }
+  .warn-banner strong { color: #d62728; }
+
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; margin: 18px 0 24px; }
+  .card { background: #fff; border-radius: 8px; padding: 18px 16px; border-top: 3px solid #2e7fbf; box-shadow: 0 1px 4px rgba(0,0,0,0.07); text-align: center; }
+  .card.red-top    { border-top-color: #d62728; }
+  .card.green-top  { border-top-color: #2ca02c; }
+  .card.navy-top   { border-top-color: #14304a; }
+  .card.orange-top { border-top-color: #e07b39; }
+  .card.purple-top { border-top-color: #9467bd; }
+  .card .num   { font-size: 26px; font-weight: 800; color: #14304a; line-height: 1; margin-bottom: 4px; }
+  .card .label { font-size: 11.5px; color: #666; line-height: 1.35; }
+
+  .abstract-box { background: #fff; border-radius: 8px; padding: 20px 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); font-size: 13.5px; margin: 14px 0 24px; border-left: 4px solid #14304a; }
+  .abstract-box p { margin-bottom: 10px; }
+  .abstract-box p:last-child { margin-bottom: 0; }
+  .abstract-box strong { color: #14304a; }
+
+  .cox-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 14px 0 24px; }
+  @media (max-width: 600px) { .cox-grid { grid-template-columns: 1fr; } }
+  .cox-box { background: #fff; border-radius: 8px; padding: 16px 18px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); font-size: 13.5px; }
+  .cox-box h4 { font-size: 13px; font-weight: 700; margin-bottom: 10px; color: #14304a; padding-bottom: 6px; border-bottom: 2px solid #eee; }
+  .cox-box ul { padding-left: 16px; }
+  .cox-box ul li { margin-bottom: 4px; }
+  .cox-box.green-border { border-left: 3px solid #2ca02c; }
+  .cox-box.red-border   { border-left: 3px solid #d62728; }
+  .cox-box.grey-border  { border-left: 3px solid #aaa; }
+  .cox-box.purple-border { border-left: 3px solid #9467bd; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.07); margin: 14px 0 24px; }
+  thead { background: #14304a; color: #fff; }
+  thead th { padding: 10px 14px; text-align: left; font-size: 12px; letter-spacing: 0.5px; }
+  tbody tr:nth-child(even) { background: #f8f9fb; }
+  tbody td { padding: 9px 14px; border-bottom: 1px solid #eee; }
+  td.hi       { font-weight: 700; color: #2ca02c; }
+  td.hi-red   { font-weight: 700; color: #d62728; }
+  td.italic   { font-style: italic; color: #888; }
+
+  .checklist { background: #fff; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); overflow: hidden; margin: 14px 0 12px; }
+  .checklist-header { background: #14304a; color: #fff; padding: 10px 18px; font-size: 13px; font-weight: 700; letter-spacing: 0.5px; }
+  .check-item { display: flex; align-items: flex-start; padding: 12px 18px; border-bottom: 1px solid #eee; gap: 14px; cursor: pointer; transition: background 0.12s; }
+  .check-item:last-child { border-bottom: none; }
+  .check-item:hover { background: #f8fdf8; }
+  .check-item.done { background: #f6fff6; }
+  .check-item.done .item-label { opacity: 0.55; }
+  .check-item.done .item-label strong { text-decoration: line-through; }
+  .check-box { width: 18px; height: 18px; border: 2px solid #aaa; border-radius: 4px; flex-shrink: 0; margin-top: 2px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.15s, border-color 0.15s; user-select: none; }
+  .check-box.checked { background: #2ca02c; border-color: #2ca02c; }
+  .check-box.checked::after { content: "✓"; color: #fff; font-size: 12px; font-weight: 700; line-height: 1; }
+  .item-label { font-size: 13.5px; flex: 1; }
+  .item-label strong { color: #14304a; }
+  .item-note { font-size: 12px; color: #888; margin-top: 2px; }
+  .who { font-size: 11px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; padding: 2px 8px; border-radius: 12px; flex-shrink: 0; margin-top: 2px; }
+  .who.author { background: #fff3cd; color: #7a5600; }
+  .who.tech   { background: #d4edda; color: #155724; }
+  .who.verify { background: #e8d5f5; color: #5a1a8a; }
+  .who.mdpi   { background: #d1ecf1; color: #0c5460; }
+
+  .timeline { margin: 14px 0 24px; }
+  .tl-item { display: flex; gap: 16px; margin-bottom: 10px; }
+  .tl-week { min-width: 80px; font-size: 12px; font-weight: 700; color: #2e7fbf; padding-top: 2px; }
+  .tl-text { font-size: 13.5px; }
+
+  .page-footer { margin-top: 48px; padding-top: 18px; border-top: 1px solid #ddd; font-size: 12px; color: #888; text-align: center; }
+</style>
+</head>
+<body>
+
+<div class="site-header">
+  <div class="page-wrap" style="padding:0;">
+    <div class="tag">Co-Author Briefing · Manuscript in Preparation · v1r4.1</div>
+    <h1>Surgical Margin Status and Deep Learning–Identified Patient Subtypes<br>
+        as Prognostic Determinants in Esophageal Cancer:<br>
+        A Registry-Based Analysis with Multiple Imputation</h1>
+    <div class="meta">
+      <span>Taiwan Cancer Registry 2006–2020</span>
+      <span>n = 2,367 patients (C15)</span>
+      <span>4 peer-review rounds completed</span>
+      <span>Target: <em>Cancers</em> (MDPI)</span>
+      <span class="badge orange">Ready for submission</span>
+    </div>
+  </div>
+</div>
+
+<div class="page-wrap">
+
+  <div class="action-banner">
+    <div class="title">⚠ Action required from all authors before submission</div>
+    <ul>
+      <li><strong>Author names + affiliations</strong> — full name, department, institution, city for each of the 3 authors</li>
+      <li><strong>Corresponding author</strong> — email address and telephone</li>
+      <li><strong>ORCID iDs</strong> — MDPI requires ORCID for all authors (Elsevier does not)</li>
+      <li><strong>IRB approval number</strong> — appears twice in manuscript (lines 286, 682–683)</li>
+      <li><strong>Data release agreement number</strong> — cover letter line 56 (registry data release no. [XXXX])</li>
+      <li><strong>APC / waiver</strong> — confirm MDPI article processing charge or institutional waiver before submitting</li>
+      <li><strong>Suggested reviewers × 3</strong> — esophageal surgery, GI registry, deep learning in oncology</li>
+    </ul>
+  </div>
+
+  <div class="warn-banner">
+    <strong>⚠ Two cover letter issues to fix before sending:</strong><br>
+    1. "single-center Taiwan Cancer Registry" — the TCR is a <em>national</em> registry. Change to "population-based Taiwan Cancer Registry" unless the data truly came from one institution.<br>
+    2. "one of the largest real-world Asian esophageal cancer cohorts" — Cheng et al. 2018 (<em>Cancer Medicine</em>) reported n=14,394 from the same registry. Remove or qualify this claim.
+  </div>
+
+  <h2>Key statistics at a glance</h2>
+  <div class="cards">
+    <div class="card"><div class="num">2,367</div><div class="label">esophageal cancer patients<br>2006–2020</div></div>
+    <div class="card navy-top"><div class="num">94.5%</div><div class="label">male<br>85.4% SCC</div></div>
+    <div class="card red-top"><div class="num">13.4 mo</div><div class="label">median overall survival<br>77.4% dead</div></div>
+    <div class="card orange-top"><div class="num">25.7%</div><div class="label">stage unknown<br>(n = 609 → MICE imputed)</div></div>
+    <div class="card green-top"><div class="num">HR 0.63</div><div class="label">R0 margin<br>[0.55–0.73] p&lt;0.001</div></div>
+    <div class="card green-top"><div class="num">HR 0.61</div><div class="label">radical esophagectomy<br>[0.51–0.72] p&lt;0.001</div></div>
+    <div class="card purple-top"><div class="num">0.670</div><div class="label">Cox C-index (MICE)<br>OOB 0.666 [0.647–0.683]</div></div>
+    <div class="card"><div class="num">ΔC = 0</div><div class="label">deep learning adds<br>zero OS value (−0.001)</div></div>
+  </div>
+
+  <h2>Abstract</h2>
+  <div class="abstract-box">
+    <p><strong>Background:</strong> Esophageal cancer prognosis is poor; independent prognostic determinants of surgical quality in Asian registry populations remain incompletely characterised.</p>
+    <p><strong>Methods:</strong> We analysed 2,367 esophageal cancer (ICD-10 C15) cases from the Taiwan Cancer Registry (2006–2020) using Kaplan-Meier analysis, multivariable Cox regression with MICE-imputed AJCC stage (C-index 0.670), and unsupervised deep learning subtyping.</p>
+    <p><strong>Results:</strong> The cohort was predominantly male (94.5%; SCC, 85.4%; median OS 13.4 months; 1,832 deaths). R0 resection margin was the single robust modifiable predictor (HR 0.63, 95%CI 0.55–0.73, p&lt;0.001). CCRT was non-significant under MICE (HR 0.97, p=0.569; unadjusted log-rank p=0.58) but significant in complete-case analysis of staged patients (HR 0.72, p&lt;0.001); the &gt;25% divergence precludes a definitive conclusion. Radical esophagectomy independently reduced hazard (HR 0.61, p&lt;0.001). Deep learning identified three subtypes — mainstream SCC, adenocarcinoma-enriched, and cervical/upper-oesophagus — with no incremental OS value beyond conventional classifiers (ΔC-index = −0.001).</p>
+    <p><strong>Conclusions:</strong> R0 resection margin attainment is the primary modifiable prognostic determinant. CCRT benefit is method-sensitive; prospective data with complete staging are required.</p>
+  </div>
+
+  <h2>Four key findings</h2>
+  <div class="cox-grid">
+    <div class="cox-box green-border">
+      <h4>① R0 margin — primary result</h4>
+      <ul>
+        <li>HR = <strong>0.63</strong> [0.55–0.73] p&lt;0.001</li>
+        <li>~37% hazard reduction vs R1/R2</li>
+        <li>Robust across all sensitivity analyses</li>
+        <li>Median OS: R0 39.4 mo vs R1 14.7 mo</li>
+        <li>Strongest modifiable predictor in cohort</li>
+      </ul>
+    </div>
+    <div class="cox-box green-border">
+      <h4>② Surgery type</h4>
+      <ul>
+        <li>Endoscopic resection HR = 0.48 [0.38–0.60]</li>
+        <li>Radical esophagectomy HR = 0.61 [0.51–0.72]</li>
+        <li>Endoscopic: reflects early-stage selection, not modifiable quality metric</li>
+        <li>Radical: 30.2 mo vs 8.9 mo (no surgery)</li>
+        <li>Lymph node ratio ρ = −0.22 (p&lt;0.001)</li>
+      </ul>
+    </div>
+    <div class="cox-box red-border">
+      <h4>③ CCRT — inconclusive (three estimates)</h4>
+      <ul>
+        <li>MICE primary: HR 0.97, p=0.569 <strong>NS</strong></li>
+        <li>Zero-coded stage: HR 0.76, p&lt;0.001 (artifact)</li>
+        <li>Complete-case (n=1,757): HR 0.72, p&lt;0.001</li>
+        <li>Divergence &gt;25% → no definitive conclusion</li>
+        <li>Unadjusted KM log-rank p=0.58 (NS)</li>
+        <li>Prospective data required</li>
+      </ul>
+    </div>
+    <div class="cox-box purple-border">
+      <h4>④ Deep learning — negative result</h4>
+      <ul>
+        <li>3 clusters: mainstream SCC (n=2,026), adenocarcinoma-enriched (n=153), cervical/upper (n=185)</li>
+        <li>KM log-rank p=0.009 across clusters</li>
+        <li>Cluster 2 HR 0.876 (p=0.37 NS)</li>
+        <li>Cluster 3 HR 1.09 (p=0.45 NS)</li>
+        <li>ΔC-index = −0.001 (DL adds nothing)</li>
+        <li>Clusters = known histological/anatomical groups</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>Cox regression results — Table 2</h2>
+  <table>
+    <thead><tr><th>Variable</th><th>HR</th><th>95% CI</th><th>p</th><th>Note</th></tr></thead>
+    <tbody>
+      <tr><td>R0 resection margin</td><td class="hi">0.63</td><td>0.55–0.73</td><td>&lt;0.001</td><td>Primary modifiable determinant</td></tr>
+      <tr><td>Radical esophagectomy</td><td class="hi">0.61</td><td>0.51–0.72</td><td>&lt;0.001</td><td>vs no surgery</td></tr>
+      <tr><td>Endoscopic resection</td><td class="hi">0.48</td><td>0.38–0.60</td><td>&lt;0.001</td><td>Early-stage selection, not quality metric</td></tr>
+      <tr><td>Stage III vs I</td><td class="hi-red">1.23</td><td>1.07–1.41</td><td>0.003</td><td>MICE-imputed</td></tr>
+      <tr><td>Stage IV vs I</td><td class="hi-red">1.63</td><td>1.42–1.87</td><td>&lt;0.001</td><td>MICE-imputed</td></tr>
+      <tr><td><strong>CCRT (MICE primary)</strong></td><td class="italic">0.97</td><td class="italic">0.86–1.09</td><td class="italic">0.569 NS</td><td class="italic">Inconclusive — see sensitivity</td></tr>
+      <tr><td>CCRT (zero-coded stage)</td><td class="italic">0.76</td><td class="italic">—</td><td class="italic">&lt;0.001</td><td class="italic">Likely artifact of stage misclassification</td></tr>
+      <tr><td>CCRT (complete-case, n=1,757)</td><td class="italic">0.72</td><td class="italic">0.63–0.81</td><td class="italic">&lt;0.001</td><td class="italic">&gt;25% divergence from MICE → inconclusive</td></tr>
+      <tr><td colspan="5" style="font-size:12px;color:#888;padding:6px 14px;">C-index (MICE apparent) = 0.670 · OOB bootstrap (B=500): 0.666 [0.647–0.683]</td></tr>
+    </tbody>
+  </table>
+
+  <h2>AJCC stage sensitivity (MDPI Supplementary)</h2>
+  <table>
+    <thead><tr><th>Model</th><th>n</th><th>Stage IV HR</th><th>95% CI</th><th>C-index</th></tr></thead>
+    <tbody>
+      <tr><td>MICE primary (all patients)</td><td>2,364</td><td>1.63</td><td>1.42–1.87</td><td>0.670</td></tr>
+      <tr><td>AJCC edition dummies added</td><td>2,364</td><td>—</td><td>—</td><td>0.695</td></tr>
+      <tr><td>7th edition only (2010–2017)</td><td>1,187</td><td class="hi">2.17</td><td class="hi">1.78–2.64</td><td>0.711</td></tr>
+    </tbody>
+  </table>
+  <p style="font-size:12px;color:#888;margin-top:-12px;margin-bottom:24px;">7th-only HR = 2.17 is the contemporary reference. Attenuation in primary model reflects 6th-edition M1a (cervical LN) dilution reclassified to Stage III in 7th edition.</p>
+
+  <h2>Figures in the manuscript</h2>
+  <table>
+    <thead><tr><th>Figure</th><th>Content</th><th>File</th></tr></thead>
+    <tbody>
+      <tr><td>Fig 1A–C</td><td>Age/sex distribution, histology/stage bars, incidence trend</td><td>results/02_descriptive/</td></tr>
+      <tr><td>Fig 2A–B</td><td>KM by stage; KM by histology</td><td>results/03_survival/km_stage.png, km_histology.png</td></tr>
+      <tr><td>Fig 3A–B</td><td>KM by surgical modality; KM by margin status (R0 vs R1)</td><td>results/03_survival/km_surgery.png + 06_chemo_surgery/km_surgery_margin.png</td></tr>
+      <tr><td>Fig 4</td><td>KM by CCRT (showing all 3 estimates)</td><td>results/06_chemo_surgery/km_ccrt.png</td></tr>
+      <tr><td>Fig 5</td><td>Cox HR forest plot (MICE primary)</td><td>results/06_chemo_surgery/cox_treatment_forest.png</td></tr>
+      <tr><td>Fig 6A–C</td><td>UMAP embedding; k-means k=3 clusters; KM by cluster</td><td>results/04_deep_learning/umap_kmeans_k3.png, km_clusters_k3.png</td></tr>
+      <tr><td>Fig 7</td><td>DeepSurv permutation feature importance</td><td>results/04_deep_learning/deepsurv_feature_importance.png</td></tr>
+      <tr><td>Fig S1</td><td>KM bootstrap validation curves</td><td>results/03_survival/ (supplementary)</td></tr>
+    </tbody>
+  </table>
+  <p style="font-size:12px;color:#e07b39;margin-top:-10px;margin-bottom:24px;">⚠ Figures at 150 dpi — MDPI requires ≥ 300 dpi. Add dpi=300 to all savefig() calls and rerun run_all.sh.</p>
+
+  <h2>Peer-review history (4 rounds completed)</h2>
+  <table>
+    <thead><tr><th>Round</th><th>Tag</th><th>Key change</th></tr></thead>
+    <tbody>
+      <tr><td>Round 1</td><td>c15-v1r2</td><td>n corrected; bootstrap CI added; cluster labels fixed; incremental C-index test added</td></tr>
+      <tr><td>Round 2</td><td>c15-v1r3</td><td>MICE promoted to PRIMARY analysis; CCRT HR revised 0.76 → 0.97 NS</td></tr>
+      <tr><td>Round 3.2</td><td>c15-v1r3.2</td><td>Complete-case sensitivity added; CCRT uncertainty explicitly disclosed</td></tr>
+      <tr><td>Round 4</td><td>c15-v1r4</td><td>Limitations §5 fixed; n discrepancy clarified</td></tr>
+      <tr><td>Self-audit</td><td>c15-v1r4.1</td><td>Abstract 288→183w; HR corrections; figure captions audited</td></tr>
+      <tr><td>Post-R4</td><td>current</td><td>AJCC sensitivity added (Stage IV 7th-only HR=2.17); Shiny data editor v2 built</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Submission checklist</h2>
+  <p style="font-size:13.5px;margin-bottom:12px;">
+    <span class="who author">Author</span> = only authors can supply &nbsp;
+    <span class="who tech">Technical</span> = code/compilation &nbsp;
+    <span class="who verify">Verify</span> = needs confirmation &nbsp;
+    <span class="who mdpi">MDPI</span> = MDPI-specific requirement
+  </p>
+
+  <div class="checklist">
+    <div class="checklist-header">STEP 1 — Author information (tex lines 59–70)</div>
+    <div class="check-item"><div class="check-box"></div><div class="item-label"><strong>Author 1 full name</strong><br><span class="item-note">Line 59: [Author 1 Name]</span></div><div class="who author">Author</div></div>
+    <div class="check-item"><div class="check-box"></div><div class="item-label"><strong>Author 2 full name</strong><br><span class="item-note">Line 60: [Author 2 Name] (affiliations 1+2 — delete \textsuperscript{2} if only one affiliation)</span></div><div class="who author">Author</div></div>
+    <div class="check-item"><div class="check-box"></div><div class="item-label"><strong>Author 3 full name</strong> (corresponding)<br><span class="item-note">Line 61: [Author 3 Name]</span></div><div class="who author">Author</div></div>
+    <div class="check-item"><div class="check-box"></div><div class="item-label"><strong>Affiliation 1</strong> — department + institution + city<br><span class="item-note">Lines 66–67: [Department of Surgery / Oncology], [Institution Name], [City], Taiwan</span></div><div class="who author">Author</div></div>
+    <div class="check-item"><div class="check-box"></div><div class="item-label"><strong>Affiliation 2</strong> — or delete line<br><span class="item-note">Line 68: [Second Affiliation, if applicable] — delete entire line if Author 2 has only one affiliation</span></div><div class="who author">Author</div></div>
+    <div class="check-item"><div class="check-box"></div><div class="item-label"><strong>Corresponding author email</strong><br><span class="item-note">Line 69: [email@institution.edu.tw]</span></div><div class="who author">Author</div></div>
+    <div class="check-item"><div class="check-box"></div><div class="item-label"><strong>Corresponding author telephone</strong><br><span class="item-note">Line 70: +886-X-XXXX-XXXX</span></div><div class="who author">Author</div></div>
+  </div>
+
+  <div class="checklist" style="margin-top:12px;">
+    <div class="checklist-header">STEP 2 — Remove MDPI post-acceptance placeholders (tex lines 74–79)</div>
+    <div class="check-item"><div class="check-box"></div><div class="item-label"><strong>Delete Received / Accepted / Published date placeholders</strong><br><span class="item-note">Lines 74–75: \textbf{Received:} [Date]; \textbf{Accepted:} [Date]; \textbf{Published:} [Date] — MDPI fills these after acceptance. Delete for initial submission.</span></div><div class="who mdpi">MDPI</div></div>
+    <div class="check-item"><div class="check-box"></div><div class="item-label"><strong>Delete Publisher's Note placeholder</strong><br><span class="item-note">Line 78: [Standard MDPI disclaimer] — MDPI inserts this post-acceptance. Delete for initial submission.</span></div><div class="who mdpi">MDPI</div></div>
+    <div class="check-item"><div class="check-box"></div><div class="item-label"><strong>Remove supplementary URL placeholder</strong><br><span class="item-note">Line 664: https://www.mdpi.com/article/XXX/s1 — URL assigned post-acceptance. Change to "(Supplementary Materials)" for initial submission.</span></div><div class="who mdpi">MDPI</div></div>
+  </div>
+
+  <div class="checklist" style="margin-top:12px;">
+    <div class="checklist-header">STEP 3 — IRB and ethics (tex lines 286, 682–683)</div>
+    <div class="check-item"><div class="check-box"></div><div class="item-label"><strong>IRB institution + approval number — first occurrence</strong><br><span class="item-note">Line 286: "Ethical approval was obtained from the Institutional Review Board of [Institution] (approval no. [IRB-XXXX-XXXX])"</span></div><div class="who author">Author</div></div>
+    <div class="check-item"><div class="check-box"></div><div class="item-label"><strong>IRB institution + approval number — second occurrence</strong><br><span class="item-note">Lines 682–683: same information repeated in Declarations section</span></div><div class="who author">Author</div></div>
+    <div class="check-item"><div class="check-box"></div><div class="item-label"><strong>Confirm CRediT author contributions</strong><br><span class="item-note">Lines 670–673 — pre-written: Author 1 (Conceptualisation, Methodology, Software, Formal analysis, Writing — original draft) · Author 2 (Data curation, Validation) · Author 3 (Supervision, Writing — review and editing). Adjust if needed.</span></div><div class="who author">Author</div></div>
+  </div>
+
+  <div class="checklist" style="margin-top:12px;">
+    <div class="checklist-header">STEP 4 — Cover letter (results/cover_letter_Cancers.md)</div>
+    <div class="check-item"><div class="check-box"></div><div class="item-label"><strong>Fix "single-center" → "population-based"</strong><br><span class="item-note">Cover letter paragraph 2: "single-center Taiwan Cancer Registry" — should be "population-based" if data is national. Verify and correct.</span></div><div class="who verify">Verify</div></div>
+    <div class="check-item"><div class="check-box"></div><div class="item-label"><strong>Remove "largest cohort" claim</strong><br><span class="item-note">Cheng 2018 (Cancer Medicine, same registry) had n=14,394. Revise to: "a large, population-based cohort of 2,367 consecutive esophageal cancer cases".</span></div><div class="who verify">Verify</div></div>
+    <div class="check-item"><div class="check-box"></div><div class="item-label"><strong>Header block</strong> — name, department, institution, address, email, phone<br><span class="item-note">Cover letter lines 1–6</span></div><div class="who author">Author</div></div>
+    <div class="check-item"><div class="check-box"></div><div class="item-label"><strong>IRB + data release agreement number</strong><br><span class="item-note">Cover letter line 54: [Institution Name], [IRB-XXXX-XXXX] + line 56: registry data release agreement no. [XXXX]</span></div><div class="who author">Author</div></div>
+    <div class="check-item"><div class="check-box"></div><div class="item-label"><strong>Sign-off block</strong> — name, title, department, institution, email<br><span class="item-note">Cover letter lines 67–70</span></div><div class="who author">Author</div></div>
+    <div class="check-item"><div class="check-box"></div><div class="item-label"><strong>Suggested reviewers × 3</strong><br><span class="item-note">Lines 76–78: esophageal surgery/outcomes · GI oncology registry · deep learning in clinical oncology</span></div><div class="who author">Author</div></div>
+  </div>
+
+  <div class="checklist" style="margin-top:12px;">
+    <div class="checklist-header">STEP 5 — MDPI-specific requirements</div>
+    <div class="check-item"><div class="check-box"></div><div class="item-label"><strong>Collect ORCID iDs for all 3 authors</strong><br><span class="item-note">MDPI requires ORCID at submission. Enter during SUSY portal upload.</span></div><div class="who mdpi">MDPI</div></div>
+    <div class="check-item"><div class="check-box"></div><div class="item-label"><strong>Confirm APC payment or institutional waiver</strong><br><span class="item-note">Cancers APC is ~2200 CHF. Check if institution has MDPI agreement. Arrange before submitting.</span></div><div class="who author">Author</div></div>
+    <div class="check-item"><div class="check-box"></div><div class="item-label"><strong>Confirm section: Gastrointestinal Cancers</strong><br><span class="item-note">MDPI Cancers has multiple sections. Gastrointestinal Cancers is correct for C15.</span></div><div class="who verify">Verify</div></div>
+  </div>
+
+  <div class="checklist" style="margin-top:12px;">
+    <div class="checklist-header">STEP 6 — Technical tasks</div>
+    <div class="check-item"><div class="check-box"></div><div class="item-label"><strong>Regenerate all figures at 300 dpi</strong><br><span class="item-note">Add dpi=300 to savefig() in scripts 02, 03, 04, 06; rerun bash analysis/run_all.sh</span></div><div class="who tech">Technical</div></div>
+    <div class="check-item"><div class="check-box"></div><div class="item-label"><strong>Recompile LaTeX PDF</strong><br><span class="item-note">xelatex c15_manuscript.tex (twice for cross-references)</span></div><div class="who tech">Technical</div></div>
+    <div class="check-item"><div class="check-box"></div><div class="item-label"><strong>Upload to MDPI SUSY portal</strong><br><span class="item-note">https://susy.mdpi.com/user/manuscripts/upload · Manuscript PDF + .tex · Cover letter · Figures separately · Supplementary Fig S1</span></div><div class="who tech">Technical</div></div>
+  </div>
+
+  <h2>Timeline</h2>
+  <div class="timeline">
+    <div class="tl-item"><div class="tl-week">This week</div><div class="tl-text">Authors reply: names / affiliations / ORCID / IRB / data release no. / APC status / reviewers</div></div>
+    <div class="tl-item"><div class="tl-week">Day 1–2</div><div class="tl-text">Fill all placeholders · Fix cover letter errors · Delete MDPI post-acceptance stubs · Regenerate figures 300 dpi · Recompile PDF</div></div>
+    <div class="tl-item"><div class="tl-week">Day 3</div><div class="tl-text">Final read-through by all authors · Confirm APC arrangement</div></div>
+    <div class="tl-item"><div class="tl-week">Day 4</div><div class="tl-text"><strong>Submit via MDPI SUSY portal</strong></div></div>
+  </div>
+
+  <h2>Manuscript details</h2>
+  <table>
+    <thead><tr><th>Item</th><th>Value</th></tr></thead>
+    <tbody>
+      <tr><td>Title</td><td>Surgical Margin Status and Deep Learning–Identified Patient Subtypes as Prognostic Determinants in Esophageal Cancer: A Registry-Based Analysis with Multiple Imputation</td></tr>
+      <tr><td>Journal</td><td>Cancers (MDPI, ISSN 2072-6694) · Section: Gastrointestinal Cancers</td></tr>
+      <tr><td>Current version</td><td>c15-v1r4.1 (31 pages, 4 review rounds completed)</td></tr>
+      <tr><td>Abstract</td><td>183 words (structured)</td></tr>
+      <tr><td>Keywords</td><td>esophageal cancer · SCC · R0 margin · CCRT · deep learning · MICE · Taiwan Cancer Registry</td></tr>
+      <tr><td>Figures / Tables</td><td>7 main figures (Fig 1–7) · 3 tables · Figure S1 (supplementary)</td></tr>
+      <tr><td>Software cited in cover letter</td><td>Python 3.11 · PyTorch 2.5 · lifelines 0.28 · UMAP-learn 0.5</td></tr>
+      <tr><td>Funding</td><td>No external funding</td></tr>
+      <tr><td>Conflicts</td><td>None declared</td></tr>
+      <tr><td>MDPI portal</td><td>https://susy.mdpi.com/user/manuscripts/upload</td></tr>
+      <tr><td>Manuscript file</td><td>C15_esophageal/manuscript/c15_manuscript.tex</td></tr>
+      <tr><td>Cover letter</td><td>C15_esophageal/results/cover_letter_Cancers.md</td></tr>
+      <tr><td>Full checklist</td><td>C15_esophageal/SUBMIT_CHECKLIST.md</td></tr>
+    </tbody>
+  </table>
+
+  <div class="page-footer">
+    Generated 2026-06-03 &nbsp;·&nbsp; Taiwan Cancer Registry — C15 Esophageal Cancer &nbsp;·&nbsp; v1r4.1 &nbsp;·&nbsp; For internal author communication only
+  </div>
+</div>
+
+<!-- Progress bar -->
+<div id="progress-bar-wrap" style="position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #ddd;padding:10px 24px;display:flex;align-items:center;gap:16px;box-shadow:0 -2px 8px rgba(0,0,0,0.08);z-index:999;font-size:13px;">
+  <span style="font-weight:700;color:#14304a;white-space:nowrap;">Submission progress</span>
+  <div style="flex:1;background:#eee;border-radius:20px;height:10px;overflow:hidden;">
+    <div id="progress-fill" style="height:100%;background:#d62728;border-radius:20px;width:0%;transition:width 0.3s;"></div>
+  </div>
+  <span id="progress-label" style="white-space:nowrap;color:#555;min-width:60px;text-align:right;">0 / 22</span>
+  <button onclick="resetAll()" style="font-size:11px;padding:4px 10px;border:1px solid #ccc;border-radius:4px;background:#fff;cursor:pointer;color:#888;white-space:nowrap;">Reset all</button>
+</div>
+<div style="height:46px;"></div>
+
+<script>
+(function(){
+  const STORAGE_KEY = "c15_checklist_v1";
+  const items = Array.from(document.querySelectorAll(".check-item"));
+  items.forEach((item,i) => { item.dataset.cid = "item_"+i; });
+
+  function loadState(){ try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)||"{}"); }catch(e){ return {}; } }
+  function saveState(s){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); }catch(e){} }
+  function applyState(state){
+    items.forEach(item => {
+      const box = item.querySelector(".check-box"); if(!box) return;
+      const checked = !!state[item.dataset.cid];
+      box.classList.toggle("checked", checked); item.classList.toggle("done", checked);
+    }); updateProgress();
+  }
+  function toggle(item){
+    const box = item.querySelector(".check-box"); if(!box) return;
+    const nowChecked = !box.classList.contains("checked");
+    box.classList.toggle("checked", nowChecked); item.classList.toggle("done", nowChecked);
+    const s = loadState(); s[item.dataset.cid] = nowChecked; saveState(s); updateProgress();
+  }
+  function updateProgress(){
+    const total = items.length, done = items.filter(i=>i.classList.contains("done")).length;
+    const pct = total ? Math.round((done/total)*100) : 0;
+    document.getElementById("progress-fill").style.width = pct+"%";
+    document.getElementById("progress-label").textContent = done+" / "+total;
+    const fill = document.getElementById("progress-fill");
+    if(pct===100) fill.style.background="#2ca02c";
+    else if(pct>=60) fill.style.background="#5bb85d";
+    else if(pct>=30) fill.style.background="#e07b39";
+    else fill.style.background="#d62728";
+  }
+  window.resetAll = function(){ if(!confirm("Reset all checkboxes?")) return; saveState({}); applyState({}); };
+  items.forEach(item => {
+    item.addEventListener("click", ()=>toggle(item));
+    const box = item.querySelector(".check-box");
+    if(box){ box.addEventListener("click", e=>e.stopPropagation()); box.addEventListener("click", ()=>toggle(item)); }
+  });
+  applyState(loadState());
+})();
+</script>
+</body>
+</html>

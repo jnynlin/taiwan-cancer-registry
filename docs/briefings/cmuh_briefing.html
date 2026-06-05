@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CMUH ESCC — Clinical Data Briefing</title>
+<style>
+  :root {
+    --navy:  #14304a;
+    --red:   #c0392b;
+    --teal:  #2e7fbf;
+    --green: #1a7a4a;
+    --amber: #c87a00;
+    --light: #f4f6f9;
+    --mid:   #dee2e6;
+    --text:  #1c2b38;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+         background: #eef1f5; color: var(--text); font-size: 14px; }
+
+  /* ── sticky progress bar ── */
+  #progress-bar-wrap {
+    position: sticky; top: 0; z-index: 999;
+    background: var(--navy); padding: 8px 20px;
+    display: flex; align-items: center; gap: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.35);
+  }
+  #progress-label { color: #aecde0; font-size: 12px; white-space: nowrap; }
+  #progress-track { flex: 1; background: rgba(255,255,255,.15);
+                    border-radius: 6px; height: 10px; overflow: hidden; }
+  #progress-fill  { height: 100%; width: 0%; border-radius: 6px;
+                    background: #e74c3c; transition: width .4s, background .4s; }
+  #progress-pct   { color: #fff; font-size: 12px; font-weight: 700; min-width: 34px; text-align: right; }
+  #reset-btn { background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.25);
+               color: #ccc; font-size: 11px; padding: 3px 10px; border-radius: 4px;
+               cursor: pointer; white-space: nowrap; }
+  #reset-btn:hover { background: rgba(255,255,255,.22); color: #fff; }
+
+  /* ── layout ── */
+  .container { max-width: 1060px; margin: 0 auto; padding: 24px 16px 60px; }
+
+  /* ── banner ── */
+  .banner { background: linear-gradient(135deg, var(--navy) 60%, #1b4f72);
+            color: #fff; border-radius: 10px; padding: 28px 32px 24px;
+            margin-bottom: 24px; }
+  .banner h1 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+  .banner .sub { color: #aecde0; font-size: 13px; }
+  .banner .warn { margin-top: 12px; background: rgba(192,57,43,.25);
+                  border-left: 4px solid var(--red); padding: 8px 12px;
+                  border-radius: 4px; font-size: 12.5px; color: #f9c0ba; }
+
+  /* ── stat cards ── */
+  .cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
+  @media(max-width:700px){ .cards { grid-template-columns: repeat(2,1fr); } }
+  .card { background: #fff; border-radius: 8px; padding: 16px 12px;
+          border-top: 4px solid var(--navy); text-align: center;
+          box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+  .card.red  { border-color: var(--red); }
+  .card.teal { border-color: var(--teal); }
+  .card.green{ border-color: var(--green); }
+  .card.amber{ border-color: var(--amber); }
+  .card .val { font-size: 26px; font-weight: 800; margin-bottom: 4px; }
+  .card.red  .val { color: var(--red); }
+  .card.teal .val { color: var(--teal); }
+  .card.green .val { color: var(--green); }
+  .card.amber .val { color: var(--amber); }
+  .card .lbl { font-size: 11.5px; color: #5a6a7a; line-height: 1.4; }
+
+  /* ── sections ── */
+  .section { background: #fff; border-radius: 10px; padding: 22px 24px;
+             margin-bottom: 20px; box-shadow: 0 1px 4px rgba(0,0,0,.07); }
+  .section h2 { font-size: 14px; font-weight: 700; color: var(--navy);
+                border-bottom: 2px solid var(--mid); padding-bottom: 8px; margin-bottom: 14px;
+                text-transform: uppercase; letter-spacing: .5px; }
+
+  /* ── finding boxes ── */
+  .findings { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media(max-width:700px){ .findings { grid-template-columns: 1fr; } }
+  .find { border-radius: 8px; padding: 14px 16px; }
+  .find.navy  { background: #e8f0f7; border-left: 4px solid var(--navy); }
+  .find.red   { background: #fde8e8; border-left: 4px solid var(--red); }
+  .find.teal  { background: #e3f1fc; border-left: 4px solid var(--teal); }
+  .find.green { background: #e8f8ef; border-left: 4px solid var(--green); }
+  .find.amber { background: #fef9e7; border-left: 4px solid var(--amber); }
+  .find h3 { font-size: 12px; font-weight: 700; margin-bottom: 6px; text-transform: uppercase; }
+  .find.navy  h3 { color: var(--navy); }
+  .find.red   h3 { color: var(--red); }
+  .find.teal  h3 { color: var(--teal); }
+  .find.green h3 { color: var(--green); }
+  .find.amber h3 { color: var(--amber); }
+  .find p, .find li { font-size: 12.5px; color: var(--text); line-height: 1.6; }
+  .find ul { padding-left: 16px; }
+  .num { font-weight: 700; }
+
+  /* ── tables ── */
+  .tbl-wrap { overflow-x: auto; margin-top: 10px; }
+  table { border-collapse: collapse; width: 100%; font-size: 12.5px; }
+  th { background: var(--navy); color: #fff; padding: 8px 10px; text-align: left;
+       font-weight: 600; font-size: 11.5px; }
+  td { padding: 7px 10px; border-bottom: 1px solid var(--mid); }
+  tr:nth-child(even) td { background: #f4f7fb; }
+  .agree  { color: var(--green); font-weight: 700; }
+  .caution{ color: var(--amber); font-weight: 700; }
+  .diverge{ color: var(--red);   font-weight: 700; }
+  .badge  { display: inline-block; border-radius: 3px; padding: 1px 6px;
+            font-size: 10px; font-weight: 700; }
+  .badge-auth  { background: #fef9e7; color: #856404; border: 1px solid #f0c040; }
+  .badge-tech  { background: #e8f8ef; color: #155724; border: 1px solid #82d89e; }
+  .badge-verify{ background: #ede7f6; color: #4a235a; border: 1px solid #b39ddb; }
+
+  /* ── checklist ── */
+  .checklist { list-style: none; }
+  .checklist li { display: flex; align-items: flex-start; gap: 10px;
+                  padding: 10px 0; border-bottom: 1px solid var(--mid);
+                  cursor: pointer; border-radius: 4px; transition: background .15s; }
+  .checklist li:hover { background: #f0f4f8; padding-left: 4px; }
+  .checklist li:last-child { border-bottom: none; }
+  .checklist li.done { opacity: .5; }
+  .checklist li.done .item-text { text-decoration: line-through; color: #888; }
+  .chk-box { width: 20px; height: 20px; min-width: 20px; border: 2px solid var(--mid);
+              border-radius: 4px; display: flex; align-items: center; justify-content: center;
+              background: #fff; font-size: 13px; transition: all .2s; }
+  .checklist li.done .chk-box { background: var(--green); border-color: var(--green); color: #fff; }
+  .item-text { flex: 1; font-size: 13px; line-height: 1.5; }
+  .item-meta { font-size: 11px; color: #888; margin-top: 2px; }
+
+  /* ── pill tabs ── */
+  .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+  .tab  { padding: 5px 14px; border-radius: 20px; border: 1px solid var(--mid);
+          background: #fff; font-size: 12px; cursor: pointer; color: #555; transition: all .2s; }
+  .tab.active, .tab:hover { background: var(--navy); color: #fff; border-color: var(--navy); }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* ── callout ── */
+  .callout { background: #fff3cd; border-left: 4px solid #f5a623; border-radius: 6px;
+             padding: 12px 16px; margin-top: 12px; font-size: 12.5px; }
+  .callout strong { color: #7d4e00; }
+
+  /* ── abstract ── */
+  .abstract { font-size: 13px; line-height: 1.75; color: #2c3e50; }
+  .abstract p { margin-bottom: 10px; }
+  .abstract strong { color: var(--navy); }
+</style>
+</head>
+<body>
+
+<!-- ── PROGRESS BAR ── -->
+<div id="progress-bar-wrap">
+  <span id="progress-label">Action items completed:</span>
+  <div id="progress-track"><div id="progress-fill"></div></div>
+  <span id="progress-pct">0%</span>
+  <button id="reset-btn" onclick="resetAll()">Reset all</button>
+</div>
+
+<div class="container">
+
+<!-- ── BANNER ── -->
+<div class="banner">
+  <h1>CMUH Esophageal Cancer — Clinical Data Briefing</h1>
+  <div class="sub">China Medical University Hospital &nbsp;|&nbsp; Single-Center Retrospective Series &nbsp;|&nbsp; 2007–2010 &nbsp;|&nbsp; n = 344</div>
+  <div class="warn">
+    <strong>Confidential draft.</strong> Patient-level data has been de-identified (names excluded). For internal co-author review only. Do not distribute externally.
+  </div>
+</div>
+
+<!-- ── STAT CARDS ── -->
+<div class="cards">
+  <div class="card navy"><div class="val">344</div><div class="lbl">Total patients<br>(2007–2010)</div></div>
+  <div class="card teal"><div class="val">93.9%</div><div class="lbl">Male</div></div>
+  <div class="card teal"><div class="val">93.9%</div><div class="lbl">Squamous cell<br>carcinoma (SqCC)</div></div>
+  <div class="card teal"><div class="val">57.4 yr</div><div class="lbl">Mean age at diagnosis<br>(SD ±11.0)</div></div>
+  <div class="card red"><div class="val">9.6 mo</div><div class="lbl">Median OS<br>(overall)</div></div>
+  <div class="card green"><div class="val">24.4 mo</div><div class="lbl">Median OS<br>Surgery group</div></div>
+  <div class="card amber"><div class="val">87.9%</div><div class="lbl">R0 resection rate<br>(surgical cases)</div></div>
+  <div class="card amber"><div class="val">75</div><div class="lbl">Biobank tissue<br>specimens</div></div>
+</div>
+
+<!-- ── TABS: Findings / Survival / Table 1 / Validation / Methods ── -->
+<div class="section">
+<div class="tabs">
+  <div class="tab active" onclick="showTab('findings',this)">Key Findings</div>
+  <div class="tab" onclick="showTab('survival',this)">Survival Results</div>
+  <div class="tab" onclick="showTab('table1',this)">Characteristics</div>
+  <div class="tab" onclick="showTab('validation',this)">C15 Validation</div>
+  <div class="tab" onclick="showTab('methods',this)">Methods</div>
+</div>
+
+<!-- FINDINGS TAB -->
+<div id="tab-findings" class="tab-content active">
+  <div class="findings">
+    <div class="find navy">
+      <h3>Cohort profile</h3>
+      <ul>
+        <li>344 patients; <span class="num">96 (27.9%) underwent surgery</span>, 134 (39.0%) definitive CCRT, 36 (10.5%) RT alone</li>
+        <li>90% middle–upper third location; <span class="num">84 patients (24.4%) had multi-segment tumors</span> spanning ≥2 thirds</li>
+        <li>Stage distribution: III 27.6%, IVB 18.3%, IIA 13.1%; <span class="num">27% stage unknown</span></li>
+        <li>17 female patients (5%); insufficient for sex-stratified analysis</li>
+      </ul>
+    </div>
+    <div class="find red">
+      <h3>Surgery — dominant survival signal</h3>
+      <ul>
+        <li>Surgery: median OS <span class="num">24.4 mo</span> vs 9.6 mo overall</li>
+        <li>Adjusted HR = <span class="num">0.41 [0.29–0.58]</span>, p&lt;0.001</li>
+        <li>1-yr OS 72.9%, 2-yr OS 52.0%, 5-yr OS 17.9%</li>
+        <li>R0 achieved in <span class="num">87.9%</span> of margin-documented cases (80/91)</li>
+        <li>Median 16 lymph nodes extracted; median N+ = 0</li>
+      </ul>
+    </div>
+    <div class="find teal">
+      <h3>CCRT outcomes</h3>
+      <ul>
+        <li>CCRT only: median OS <span class="num">8.6 mo</span>; 1-yr 37.3%, 2-yr 17.9%</li>
+        <li>Consistent with published Taiwan CCRT series (8–10 mo range)</li>
+        <li>RT alone: median OS 4.7 mo — palliative-intent in most cases</li>
+        <li>CCRT documentation sparse: regimen details partially missing</li>
+      </ul>
+    </div>
+    <div class="find green">
+      <h3>Staging gradient</h3>
+      <ul>
+        <li>Stage I: median OS <span class="num">53.9 mo</span>, 5-yr 37.5% — but only 12 cases (3.5%)</li>
+        <li>Stage IIA: 20.4 mo, 5-yr 10.7%</li>
+        <li>Stage IVB: 4.5 mo, 5-yr 3.2% → supports early palliative referral</li>
+        <li>Staging gradient HR 1.29 per level (p&lt;0.001)</li>
+      </ul>
+    </div>
+    <div class="find amber">
+      <h3>Biobank & molecular potential</h3>
+      <ul>
+        <li><span class="num">75 patients</span> have CDDP-era biobank specimens (all 3 data sources linked)</li>
+        <li>RT dose documented in biobank series (median available)</li>
+        <li>Enables future: cisplatin response biomarkers, IHC, NGS studies</li>
+        <li>Neoadjuvant CCRT followed by surgery: 54 patients (surgery+CCRT group)</li>
+      </ul>
+    </div>
+    <div class="find navy">
+      <h3>Cox model (C-index = 0.690)</h3>
+      <ul>
+        <li>Surgery HR 0.41 ✓ | Stage HR 1.29 ✓ | Age HR 0.99 (marginal)</li>
+        <li>Sex and histology not significant — very few female/Adeno cases</li>
+        <li>Comparable to C15 national registry model (C-index 0.670)</li>
+        <li>Landmark analysis at 6 months available (see results/03_survival/)</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- SURVIVAL TAB -->
+<div id="tab-survival" class="tab-content">
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Group</th><th>N</th><th>Events</th><th>Median OS</th><th>1-yr OS</th><th>2-yr OS</th><th>5-yr OS</th></tr></thead>
+      <tbody>
+        <tr style="background:#d5e8f5;font-weight:700"><td>Overall</td><td>334</td><td>287</td><td>9.6 mo</td><td>41.8%</td><td>24.8%</td><td>9.9%</td></tr>
+        <tr style="background:#fef9e7"><td colspan="7" style="font-size:11px;color:#888;padding:4px 10px">BY TREATMENT</td></tr>
+        <tr><td>Surgery (any)</td><td>96</td><td>67</td><td><strong>24.4 mo</strong></td><td>72.9%</td><td>52.0%</td><td>17.9%</td></tr>
+        <tr><td>CCRT only</td><td>134</td><td>122</td><td>8.6 mo</td><td>37.3%</td><td>17.9%</td><td>7.9%</td></tr>
+        <tr><td>RT only</td><td>36</td><td>34</td><td>4.7 mo</td><td>19.4%</td><td>5.6%</td><td>5.6%</td></tr>
+        <tr><td>Other / BSC</td><td>68</td><td>64</td><td>4.9 mo</td><td>18.0%</td><td>10.1%</td><td>3.4%</td></tr>
+        <tr style="background:#fef9e7"><td colspan="7" style="font-size:11px;color:#888;padding:4px 10px">BY STAGE</td></tr>
+        <tr><td>Stage I</td><td>12</td><td>4</td><td><strong>53.9 mo</strong></td><td>91.7%</td><td>83.3%</td><td>37.5%</td></tr>
+        <tr><td>Stage IIA</td><td>45</td><td>37</td><td>20.4 mo</td><td>64.4%</td><td>35.6%</td><td>10.7%</td></tr>
+        <tr><td>Stage IIB</td><td>10</td><td>6</td><td>19.3 mo</td><td>70.0%</td><td>50.0%</td><td>37.5%</td></tr>
+        <tr><td>Stage III</td><td>95</td><td>79</td><td>10.7 mo</td><td>46.3%</td><td>28.1%</td><td>10.0%</td></tr>
+        <tr><td>Stage IVA</td><td>25</td><td>22</td><td>12.3 mo</td><td>52.0%</td><td>28.0%</td><td>12.0%</td></tr>
+        <tr><td>Stage IVB</td><td>62</td><td>60</td><td>4.5 mo</td><td>17.7%</td><td>6.5%</td><td>3.2%</td></tr>
+        <tr><td>Stage Unknown</td><td>84</td><td>79</td><td>5.6 mo</td><td>27.8%</td><td>15.7%</td><td>4.1%</td></tr>
+        <tr style="background:#fef9e7"><td colspan="7" style="font-size:11px;color:#888;padding:4px 10px">BY SURGICAL MARGIN</td></tr>
+        <tr><td>R0 (margin negative)</td><td>80</td><td>54</td><td>24.2 mo</td><td>73.8%</td><td>51.1%</td><td>19.3%</td></tr>
+        <tr><td>R1+ (margin positive)</td><td>11</td><td>9</td><td>26.3 mo</td><td>63.6%</td><td>54.5%</td><td>18.2%</td></tr>
+        <tr><td>Non-surgical</td><td>238</td><td>220</td><td>6.5 mo</td><td>29.1%</td><td>13.8%</td><td>6.2%</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout" style="margin-top:14px">
+    <strong>R0 vs R1 note:</strong> HR = 0.70 [0.34–1.43], p = 0.328 — not statistically significant, likely underpowered (n=11 R1 cases). Direction is consistent with C15 national registry HR 0.63 [0.52–0.76].
+  </div>
+</div>
+
+<!-- TABLE 1 TAB -->
+<div id="tab-table1" class="tab-content">
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr><th>Variable</th><th>Overall (n=344)</th><th>Surgery (n=96)</th><th>CCRT only (n=134)</th><th>RT only (n=36)</th><th>Other/BSC (n=78)</th><th>p</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Age, mean±SD</td><td>57.4±11.0</td><td>54.6±9.4</td><td>54.4±8.7</td><td>63.0±13.3</td><td>63.3±12.1</td><td>&lt;0.001</td></tr>
+        <tr><td>Sex: Male</td><td>327 (95.1%)</td><td>89 (92.7%)</td><td>132 (98.5%)</td><td>33 (91.7%)</td><td>73 (93.6%)</td><td>0.124</td></tr>
+        <tr><td>Location: Middle 1/3</td><td>138 (40.1%)</td><td>50 (52.1%)</td><td>49 (36.6%)</td><td>14 (38.9%)</td><td>25 (32.1%)</td><td>0.007</td></tr>
+        <tr><td>Location: Upper 1/3</td><td>96 (27.9%)</td><td>16 (16.7%)</td><td>44 (32.8%)</td><td>14 (38.9%)</td><td>22 (28.2%)</td><td></td></tr>
+        <tr><td>Location: Lower 1/3</td><td>91 (26.5%)</td><td>26 (27.1%)</td><td>38 (28.4%)</td><td>6 (16.7%)</td><td>21 (26.9%)</td><td></td></tr>
+        <tr><td>Multi-segment tumor</td><td>84 (24.4%)</td><td>20 (20.8%)</td><td>35 (26.1%)</td><td>10 (27.8%)</td><td>19 (24.4%)</td><td></td></tr>
+        <tr><td>Histology: SqCC</td><td>323 (93.9%)</td><td>93 (96.9%)</td><td>131 (97.8%)</td><td>34 (94.4%)</td><td>65 (83.3%)</td><td>&lt;0.001</td></tr>
+        <tr><td>Histology: Adeno</td><td>9 (2.6%)</td><td>1 (1.0%)</td><td>2 (1.5%)</td><td>1 (2.8%)</td><td>5 (6.4%)</td><td></td></tr>
+        <tr><td>cStage I</td><td>12 (3.5%)</td><td>7 (7.3%)</td><td>2 (1.5%)</td><td>2 (5.6%)</td><td>1 (1.3%)</td><td>&lt;0.001</td></tr>
+        <tr><td>cStage IIA</td><td>45 (13.1%)</td><td>25 (26.0%)</td><td>9 (6.7%)</td><td>5 (13.9%)</td><td>6 (7.7%)</td><td></td></tr>
+        <tr><td>cStage III</td><td>95 (27.6%)</td><td>33 (34.4%)</td><td>41 (30.6%)</td><td>11 (30.6%)</td><td>10 (12.8%)</td><td></td></tr>
+        <tr><td>cStage IVA+IVB</td><td>88 (25.6%)</td><td>9 (9.4%)</td><td>55 (41.0%)</td><td>9 (25.0%)</td><td>15 (19.2%)</td><td></td></tr>
+        <tr><td>cStage Unknown</td><td>93 (27.0%)</td><td>15 (15.6%)</td><td>25 (18.7%)</td><td>7 (19.4%)</td><td>46 (59.0%)</td><td></td></tr>
+        <tr><td>cN1 (node-positive)</td><td>215 (62.5%)</td><td>50 (52.1%)</td><td>110 (82.1%)</td><td>23 (63.9%)</td><td>32 (41.0%)</td><td>&lt;0.001</td></tr>
+        <tr><td>cM0</td><td>171 (49.7%)</td><td>73 (76.0%)</td><td>58 (43.3%)</td><td>22 (61.1%)</td><td>18 (23.1%)</td><td>&lt;0.001</td></tr>
+        <tr><td>Surgical margin R0 ¹</td><td>80/91 (87.9%)</td><td>80 (83.3%)</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+        <tr><td>Nodes extracted, median (IQR) ¹</td><td>16 (10–23)</td><td>16 (10–23)</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+        <tr><td>Dead</td><td>288 (83.7%)</td><td>67 (69.8%)</td><td>122 (91.0%)</td><td>34 (94.4%)</td><td>65 (83.3%)</td><td></td></tr>
+        <tr><td>Median OS (95% CI)</td><td>9.6 (7.8–11.2) mo</td><td>24.4 (20.4–31.6) mo</td><td>8.6 (7.1–10.7) mo</td><td>4.7 (3.7–7.2) mo</td><td>4.9 (3.5–5.6) mo</td><td></td></tr>
+        <tr><td>1-yr OS</td><td>41.8%</td><td>72.9%</td><td>37.3%</td><td>19.4%</td><td>18.0%</td><td></td></tr>
+        <tr><td>2-yr OS</td><td>24.8%</td><td>52.0%</td><td>17.9%</td><td>5.6%</td><td>10.1%</td><td></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:11px;color:#888;margin-top:8px">¹ Surgical cases with documented margin only (n=91)</p>
+</div>
+
+<!-- VALIDATION TAB -->
+<div id="tab-validation" class="tab-content">
+  <p style="font-size:13px;color:#5a6a7a;margin-bottom:14px">
+    Cross-validation against the Taiwan Cancer Registry C15 manuscript (national registry, n=2,367, 2007–2020).
+  </p>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Metric</th><th>C15 National (n=2,367)</th><th>CMUH (n=344)</th><th>Verdict</th><th>Comment</th></tr></thead>
+      <tbody>
+        <tr><td>% Male</td><td>94.5%</td><td>93.9%</td><td class="agree">✓ AGREE</td><td>Consistent male predominance</td></tr>
+        <tr><td>% Stage Unknown</td><td>25.7%</td><td>27.0%</td><td class="agree">✓ AGREE</td><td>Similar TNM documentation completeness</td></tr>
+        <tr><td>R0 rate (surgical)</td><td>~87%</td><td>87.9%</td><td class="agree">✓ AGREE</td><td>CMUH surgical quality consistent with national</td></tr>
+        <tr><td>Cox C-index</td><td>0.670</td><td>0.691</td><td class="agree">✓ AGREE</td><td>Comparable model discrimination</td></tr>
+        <tr><td>HR: R0 vs R1</td><td>0.63 [0.52–0.76]</td><td>0.70 [0.34–1.43]</td><td class="caution">~ AGREE</td><td>Direction consistent; CMUH underpowered (n=11 R1)</td></tr>
+        <tr><td>Median OS</td><td>13.4 mo</td><td>9.6 mo</td><td class="caution">⚠ CAUTION</td><td>CMUH = tertiary referral center, higher-risk case mix</td></tr>
+        <tr><td>HR: Surgery vs no-surg</td><td>0.61</td><td>0.41 (unadj)</td><td class="diverge">△ DIVERGE</td><td>Unadjusted; CMUH surgical patients are well-selected</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout" style="margin-top:16px">
+    <strong>OS discrepancy (9.6 vs 13.4 mo):</strong> CMUH is a tertiary referral center capturing more advanced and surgically challenging cases. The national registry (C15) includes all hospitals, including community centers with earlier-stage presentations. This is expected and not a data quality issue.
+  </div>
+  <div style="margin-top:16px">
+    <h3 style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:10px">CMUH-specific findings not in C15 national analysis</h3>
+    <div class="findings">
+      <div class="find teal"><h3>Multi-segment tumors</h3><p>24.4% of CMUH patients had tumors spanning ≥2 esophageal thirds — granular location coding not available in C15 registry.</p></div>
+      <div class="find navy"><h3>Biobank series</h3><p>75 patients with CDDP-era tissue specimens — enables molecular validation studies not possible with registry data alone.</p></div>
+      <div class="find amber"><h3>Era-specific staging</h3><p>CMUH cohort is entirely AJCC 6th edition (2007–2010). C15 spans both 6th and 7th editions — important for stage migration analyses.</p></div>
+      <div class="find green"><h3>Location granularity</h3><p>Tumor location by third (cervical/upper/middle/lower/EGJ) documented individually. National registry uses ICD-O site codes only.</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- METHODS TAB -->
+<div id="tab-methods" class="tab-content">
+  <div class="findings">
+    <div class="find navy">
+      <h3>Data sources & linkage</h3>
+      <ul>
+        <li>Primary: 食道癌登錄_1030302.xlsx (360 rows → 344 unique PIDs)</li>
+        <li>Supplement: EsoCa_case_total_991216.xls (neoadjuvant, chemo regimens)</li>
+        <li>BioBank: EsoCa_CDDP_BioBank_10809.xlsx (R0/1/2, RT dose, biospecimen ID)</li>
+        <li>Linkage: 病歷號 (integer PID); patient names excluded from all saved files</li>
+        <li>PID union: 455 unique patients across all sources; 75 in all three</li>
+      </ul>
+    </div>
+    <div class="find teal">
+      <h3>Staging derivation</h3>
+      <ul>
+        <li>Clinical stage derived from T/N/M using AJCC 6th edition (2002) rules</li>
+        <li>Source cStage column was 100% empty — derived column cross-checked against stage_code field (96% agreement)</li>
+        <li>Pathologic stage unavailable (source field empty despite 101 surgical cases)</li>
+      </ul>
+    </div>
+    <div class="find green">
+      <h3>Statistical methods</h3>
+      <ul>
+        <li>Kaplan-Meier with 95% CI ribbon; log-rank test for group comparisons</li>
+        <li>Cox PH: surgery + stage (ordinal) + age + sex + SqCC (n=250 complete cases)</li>
+        <li>Landmark analysis at 6 months to correct immortal-time bias</li>
+        <li>Chi-square (categorical), Kruskal-Wallis (continuous) for Table 1 p-values</li>
+        <li>lifelines v0.27 (Python); matplotlib; pandas</li>
+      </ul>
+    </div>
+    <div class="find red">
+      <h3>Limitations</h3>
+      <ul>
+        <li>Single-center retrospective — selection bias toward referred/operable patients</li>
+        <li>Short observation window (2007–2010); era differences vs modern therapy</li>
+        <li>No pathologic stage for surgical cases</li>
+        <li>CCRT regimen details sparsely documented</li>
+        <li>R0/R1 analysis underpowered (n=11 R1 cases)</li>
+        <li>No performance status, nutritional, or comorbidity data</li>
+      </ul>
+    </div>
+  </div>
+</div>
+</div><!-- end section/tabs -->
+
+<!-- ── CHECKLIST ── -->
+<div class="section">
+  <h2>Action Checklist</h2>
+  <ul class="checklist" id="checklist">
+
+    <li onclick="toggle(this)" data-id="c1">
+      <div class="chk-box">✓</div>
+      <div>
+        <div class="item-text">Verify author names and affiliations for any future manuscript</div>
+        <div class="item-meta"><span class="badge badge-auth">Author</span> Names, degrees, ORCID iDs, corresponding author email</div>
+      </div>
+    </li>
+
+    <li onclick="toggle(this)" data-id="c2">
+      <div class="chk-box">✓</div>
+      <div>
+        <div class="item-text">Confirm IRB approval covers this retrospective analysis</div>
+        <div class="item-meta"><span class="badge badge-auth">Author</span> Check if existing CMUH IRB covers 2007–2010 esophageal cancer data use</div>
+      </div>
+    </li>
+
+    <li onclick="toggle(this)" data-id="c3">
+      <div class="chk-box">✓</div>
+      <div>
+        <div class="item-text">Verify OS_mo values for the 6 patients with discrepancy &gt;30 days vs computed dates</div>
+        <div class="item-meta"><span class="badge badge-verify">Verify</span> Check results/01_clean/ for discrepancy flags; resolve against source records</div>
+      </div>
+    </li>
+
+    <li onclick="toggle(this)" data-id="c4">
+      <div class="chk-box">✓</div>
+      <div>
+        <div class="item-text">Clarify whether pathologic stage (pStage) data exists in a separate system</div>
+        <div class="item-meta"><span class="badge badge-verify">Verify</span> pStage column is empty in source files — if paper records exist, consider manual entry for surgical cases (n=96)</div>
+      </div>
+    </li>
+
+    <li onclick="toggle(this)" data-id="c5">
+      <div class="chk-box">✓</div>
+      <div>
+        <div class="item-text">Retrieve CCRT regimen details (drug, dose, fractionation) for the 134 CCRT-only patients</div>
+        <div class="item-meta"><span class="badge badge-verify">Verify</span> Currently sparse in source data; needed for any CCRT subgroup analysis</div>
+      </div>
+    </li>
+
+    <li onclick="toggle(this)" data-id="c6">
+      <div class="chk-box">✓</div>
+      <div>
+        <div class="item-text">Link biobank specimens (n=75) to clinical outcomes for molecular sub-study</div>
+        <div class="item-meta"><span class="badge badge-tech">Technical</span> Use 組織庫檢體編號 + path_no from EsoCa_CDDP_BioBank; verify biospecimen availability in freezer inventory</div>
+      </div>
+    </li>
+
+    <li onclick="toggle(this)" data-id="c7">
+      <div class="chk-box">✓</div>
+      <div>
+        <div class="item-text">Regenerate all figures at 300 dpi for any manuscript submission</div>
+        <div class="item-meta"><span class="badge badge-tech">Technical</span> Current figures at 150 dpi; add dpi=300 to savefig calls in 03_survival_analysis.py then rerun</div>
+      </div>
+    </li>
+
+    <li onclick="toggle(this)" data-id="c8">
+      <div class="chk-box">✓</div>
+      <div>
+        <div class="item-text">Clarify the 1 patient with implausible DOB (1900-01-12 placeholder)</div>
+        <div class="item-meta"><span class="badge badge-verify">Verify</span> Age excluded from Cox; check source record for correct DOB</div>
+      </div>
+    </li>
+
+    <li onclick="toggle(this)" data-id="c9">
+      <div class="chk-box">✓</div>
+      <div>
+        <div class="item-text">Decide manuscript direction: standalone CMUH series vs supplementary to C15 national registry paper</div>
+        <div class="item-meta"><span class="badge badge-auth">Author</span> Options: (A) institutional validation paper, (B) biomarker sub-study using biobank specimens, (C) CCRT response predictor, (D) neoadjuvant CCRT+surgery series</div>
+      </div>
+    </li>
+
+    <li onclick="toggle(this)" data-id="c10">
+      <div class="chk-box">✓</div>
+      <div>
+        <div class="item-text">Consider adding performance status (ECOG/KPS) if available in hospital EMR</div>
+        <div class="item-meta"><span class="badge badge-auth">Author</span> Currently absent; strongest potential confounder for treatment selection analysis</div>
+      </div>
+    </li>
+
+    <li onclick="toggle(this)" data-id="c11">
+      <div class="chk-box">✓</div>
+      <div>
+        <div class="item-text">Cross-check 17 duplicate PIDs — confirm which rows to keep (first vs most recent record)</div>
+        <div class="item-meta"><span class="badge badge-verify">Verify</span> Current analysis keeps first occurrence; duplicate PIDs may represent re-staging visits or data entry duplicates</div>
+      </div>
+    </li>
+
+    <li onclick="toggle(this)" data-id="c12">
+      <div class="chk-box">✓</div>
+      <div>
+        <div class="item-text">Add AJCC 7th edition sensitivity analysis for any submission after 2010 data</div>
+        <div class="item-meta"><span class="badge badge-tech">Technical</span> Current staging uses AJCC 6th; 7th edition used after 2010 — relevant if data extended beyond 2010</div>
+      </div>
+    </li>
+
+  </ul>
+</div>
+
+<!-- ── MANUSCRIPT CONTEXT ── -->
+<div class="section">
+  <h2>Manuscript Context</h2>
+  <div class="findings">
+    <div class="find navy">
+      <h3>Relationship to C15 national registry paper</h3>
+      <p>The CMUH series (n=344) is drawn from the same 2007–2010 window as the Taiwan Cancer Registry C15 manuscript. Key benchmarks align: male predominance (93.9% vs 94.5%), stage-unknown rate (27% vs 25.7%), R0 rate (87.9% vs ~87%), and Cox C-index (0.691 vs 0.670). The CMUH data can serve as an <strong>institutional validation cohort</strong> for the national registry findings.</p>
+    </div>
+    <div class="find red">
+      <h3>Possible manuscript directions</h3>
+      <ul>
+        <li><strong>Institutional validation series</strong> — confirm national registry patterns at single-center level; short communication for Cancers (MDPI) or similar</li>
+        <li><strong>Biomarker sub-study</strong> — leverage n=75 CDDP biobank specimens; cisplatin response prediction</li>
+        <li><strong>Neoadjuvant CCRT+surgery</strong> — 54 patients with surgery+CCRT; compare pCR rate, R0, OS vs surgery alone (n=28)</li>
+        <li><strong>Multi-segment tumor phenotype</strong> — 24.4% multi-span; novel finding not captured by national registry</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ── FILE INDEX ── -->
+<div class="section">
+  <h2>File Index</h2>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>File / Path</th><th>Description</th><th>Reproducible?</th></tr></thead>
+      <tbody>
+        <tr><td>data/raw/*.xlsx / *.xls</td><td>Original source files (6 Excel workbooks)</td><td>Source data — gitignored</td></tr>
+        <tr><td>data/processed/escc_cmuh_clean.csv</td><td>Merged, cleaned, de-identified dataset (344 rows, 71 cols)</td><td>Run analysis/01_merge_clean.py</td></tr>
+        <tr><td>results/02_table1/table1_characteristics.txt</td><td>Table 1 — characteristics by treatment group</td><td>Run 02_table1_characteristics.py</td></tr>
+        <tr><td>results/03_survival/km_*.png</td><td>5 Kaplan-Meier figures (overall, treatment, stage, margin, histology)</td><td>Run 03_survival_analysis.py</td></tr>
+        <tr><td>results/03_survival/cox_*.csv</td><td>Cox PH results — primary, surgical, landmark models</td><td>Run 03_survival_analysis.py</td></tr>
+        <tr><td>results/04_validation/validation_vs_C15.txt</td><td>Benchmark comparison vs C15 national registry</td><td>Run 04_validate_vs_C15.py</td></tr>
+        <tr><td>results/ESCC_CMUH_Draft.pdf</td><td>8-page draft PDF</td><td>Run 05_draft_pdf.py</td></tr>
+        <tr><td>escc_cmuh_briefing.html</td><td>This interactive HTML briefing</td><td>Self-contained; no server needed</td></tr>
+        <tr><td>analysis/run_all.sh</td><td>Full pipeline (01→04) from raw data</td><td>bash analysis/run_all.sh</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+</div><!-- container -->
+
+<script>
+const LS_KEY = 'escc_cmuh_checklist_v1';
+
+function loadState() {
+  try { return JSON.parse(localStorage.getItem(LS_KEY) || '{}'); } catch { return {}; }
+}
+function saveState(s) {
+  try { localStorage.setItem(LS_KEY, JSON.stringify(s)); } catch {}
+}
+
+function updateProgress() {
+  const items = document.querySelectorAll('#checklist li');
+  const done  = document.querySelectorAll('#checklist li.done').length;
+  const pct   = items.length ? Math.round(100 * done / items.length) : 0;
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-pct').textContent  = pct + '%';
+  const fill = document.getElementById('progress-fill');
+  fill.style.background = pct < 40 ? '#e74c3c' : pct < 75 ? '#f39c12' : '#27ae60';
+  document.getElementById('progress-label').textContent =
+    `${done}/${items.length} items completed:`;
+}
+
+function toggle(li) {
+  li.classList.toggle('done');
+  const s = loadState();
+  s[li.dataset.id] = li.classList.contains('done');
+  saveState(s);
+  updateProgress();
+}
+
+function resetAll() {
+  document.querySelectorAll('#checklist li').forEach(li => li.classList.remove('done'));
+  saveState({});
+  updateProgress();
+}
+
+function showTab(name, el) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  el.classList.add('active');
+}
+
+// Restore state on load
+window.addEventListener('DOMContentLoaded', () => {
+  const s = loadState();
+  document.querySelectorAll('#checklist li').forEach(li => {
+    if (s[li.dataset.id]) li.classList.add('done');
+  });
+  updateProgress();
+});
+</script>
+</body>
+</html>

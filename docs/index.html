@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cancer Research Portal — Taiwan Registry & TCGA 2026</title>
+<style>
+:root{
+  --sidebar-w:228px;
+  --topbar-h:48px;
+  --bg:#080d17;
+  --bg2:#0f172a;
+  --bg3:#1e293b;
+  --bg4:#243044;
+  --border:#1e3050;
+  --border2:#2d4060;
+  --text:#e2e8f0;
+  --muted:#64748b;
+  --muted2:#94a3b8;
+  --accent:#38bdf8;
+
+  --c-ready:   #22c55e; --c-ready-d:  #052e16;
+  --c-issues:  #fbbf24; --c-issues-d: #292103;
+  --c-rerun:   #60a5fa; --c-rerun-d:  #0d1f4a;
+  --c-undecided:#a78bfa;--c-undecided-d:#1a0c38;
+  --c-closed:  #4b5563; --c-closed-d: #0f172a;
+  --c-pipeline:#38bdf8; --c-pipeline-d:#071e30;
+  --c-suggest: #fb923c; --c-suggest-d: #2d1206;
+
+  --font:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--bg);color:var(--text)}
+
+/* ── LAYOUT ──────────────────────────────────────────────────────────── */
+#layout{display:flex;height:100vh;overflow:hidden}
+
+/* ── SIDEBAR ─────────────────────────────────────────────────────────── */
+#sidebar{
+  width:var(--sidebar-w);min-width:var(--sidebar-w);
+  background:var(--bg2);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;overflow:hidden;z-index:10
+}
+#sidebar-logo{
+  padding:16px 16px 14px;border-bottom:1px solid var(--border);flex-shrink:0
+}
+#sidebar-logo h1{
+  font-size:14px;font-weight:800;color:#f1f5f9;letter-spacing:-.2px;line-height:1.2
+}
+#sidebar-logo p{font-size:10px;color:var(--muted);margin-top:3px}
+#sidebar-logo .dot-row{display:flex;gap:5px;margin-top:10px}
+.dot-stat{
+  padding:2px 7px;border-radius:10px;font-size:9px;font-weight:800;
+  display:flex;align-items:center;gap:3px
+}
+.dot-stat::before{content:'';width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.ds-ready    {background:var(--c-ready-d);   color:var(--c-ready);   }
+.ds-ready::before    {background:var(--c-ready)}
+.ds-issues   {background:var(--c-issues-d);  color:var(--c-issues);  }
+.ds-issues::before   {background:var(--c-issues)}
+.ds-undecided{background:var(--c-undecided-d);color:var(--c-undecided);}
+.ds-undecided::before{background:var(--c-undecided)}
+
+#sidebar-nav{overflow-y:auto;flex:1;padding:8px 0 16px}
+.nav-section{padding:12px 14px 4px}
+.nav-section-label{
+  font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:1px;
+  color:var(--muted);margin-bottom:6px
+}
+.nav-item{
+  display:flex;align-items:center;gap:9px;padding:7px 14px;
+  cursor:pointer;border-radius:0;transition:all .12s;
+  font-size:12px;color:var(--muted2);position:relative;
+  text-decoration:none
+}
+.nav-item:hover{background:var(--bg3);color:var(--text)}
+.nav-item.active{
+  background:var(--bg3);color:#f1f5f9;font-weight:600
+}
+.nav-item.active::before{
+  content:'';position:absolute;left:0;top:4px;bottom:4px;
+  width:2.5px;border-radius:0 2px 2px 0;background:var(--c-dot,var(--accent))
+}
+.nav-icon{width:14px;text-align:center;flex-shrink:0;font-size:12px}
+.nav-label{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nav-dot{
+  width:7px;height:7px;border-radius:50%;flex-shrink:0;
+  background:var(--c-dot,var(--muted))
+}
+.nav-badge{
+  padding:1px 5px;border-radius:3px;font-size:8.5px;font-weight:800;
+  background:var(--c-badge-bg,var(--bg4));color:var(--c-badge,var(--muted));
+  flex-shrink:0
+}
+
+/* ── TOPBAR ───────────────────────────────────────────────────────────── */
+#topbar{
+  height:var(--topbar-h);min-height:var(--topbar-h);
+  background:var(--bg2);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 24px;gap:12px;flex-shrink:0
+}
+#topbar-crumb{
+  font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px
+}
+#topbar-crumb .crumb-sep{color:var(--border2)}
+#topbar-title{font-size:13px;font-weight:700;color:#f1f5f9}
+#topbar-badge{margin-left:auto}
+.tb-badge{
+  padding:3px 10px;border-radius:12px;font-size:10px;font-weight:700;
+  border:1px solid;white-space:nowrap
+}
+
+/* ── CONTENT AREA ─────────────────────────────────────────────────────── */
+#right{flex:1;display:flex;flex-direction:column;overflow:hidden}
+#content{flex:1;overflow:hidden;position:relative}
+
+/* iframes */
+.page-frame{
+  position:absolute;inset:0;width:100%;height:100%;
+  border:none;display:none;background:var(--bg)
+}
+.page-frame.active{display:block}
+
+/* ── HOME DASHBOARD ───────────────────────────────────────────────────── */
+#home{
+  position:absolute;inset:0;overflow-y:auto;
+  padding:28px 32px;display:none
+}
+#home.active{display:block}
+
+.home-hero{
+  background:linear-gradient(135deg,#0c1829 0%,#0f1f38 100%);
+  border:1px solid var(--border2);border-radius:12px;padding:24px 28px;
+  margin-bottom:24px;display:flex;gap:32px;align-items:center;flex-wrap:wrap
+}
+.home-hero-text h2{font-size:20px;font-weight:800;color:#f1f5f9;margin-bottom:6px}
+.home-hero-text p{font-size:13px;color:var(--muted2);line-height:1.5;max-width:600px}
+.home-stats{display:flex;gap:16px;flex-wrap:wrap;margin-left:auto}
+.hstat{text-align:center;padding:10px 16px;background:var(--bg);border-radius:8px;
+  border:1px solid var(--border);min-width:80px}
+.hstat-n{font-size:24px;font-weight:800;line-height:1}
+.hstat-l{font-size:10px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:.5px}
+
+.home-section-hdr{
+  display:flex;align-items:center;gap:10px;margin-bottom:14px;margin-top:24px
+}
+.home-section-hdr h3{font-size:11px;font-weight:800;text-transform:uppercase;
+  letter-spacing:1px;color:var(--muted)}
+.home-section-hdr::after{content:'';flex:1;height:1px;background:var(--border)}
+
+.home-grid{display:grid;gap:12px}
+.hg-2{grid-template-columns:repeat(2,1fr)}
+.hg-3{grid-template-columns:repeat(3,1fr)}
+@media(max-width:1100px){.hg-3{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:750px){.hg-3,.hg-2{grid-template-columns:1fr}}
+
+.page-card{
+  background:var(--bg2);border:1px solid var(--border);border-radius:9px;
+  padding:16px;cursor:pointer;transition:all .15s;
+  display:flex;flex-direction:column;gap:8px;position:relative;overflow:hidden
+}
+.page-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:var(--c-top,var(--border))
+}
+.page-card:hover{border-color:var(--c-top,var(--border2));
+  transform:translateY(-2px);box-shadow:0 6px 24px rgba(0,0,0,.4)}
+.pc-top{display:flex;align-items:flex-start;gap:10px}
+.pc-icon{
+  width:32px;height:32px;border-radius:7px;flex-shrink:0;
+  font-size:16px;display:flex;align-items:center;justify-content:center;
+  background:var(--c-icon-bg,var(--bg3))
+}
+.pc-titles{flex:1}
+.pc-title{font-size:13px;font-weight:700;color:#f1f5f9;line-height:1.3;margin-bottom:2px}
+.pc-sub{font-size:11px;color:var(--muted);line-height:1.4}
+.pc-desc{font-size:11px;color:var(--muted2);line-height:1.45}
+.pc-footer{display:flex;align-items:center;justify-content:space-between;
+  padding-top:6px;border-top:1px solid var(--border)}
+.pc-badge{
+  padding:2px 8px;border-radius:3px;font-size:9.5px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.4px
+}
+.pc-open{font-size:11px;color:var(--accent);font-weight:600}
+
+/* scrollbar */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--bg4)}
+</style>
+</head>
+<body>
+<div id="layout">
+
+<!-- ── SIDEBAR ──────────────────────────────────────────────────────── -->
+<div id="sidebar">
+  <div id="sidebar-logo">
+    <h1>Cancer Research<br>Portal</h1>
+    <p>Taiwan Registry · TCGA · CMUH · 2026</p>
+    <div class="dot-row">
+      <div class="dot-stat ds-ready">4 Ready</div>
+      <div class="dot-stat ds-issues">8 Issues</div>
+      <div class="dot-stat ds-undecided">1 Undecided</div>
+    </div>
+  </div>
+
+  <nav id="sidebar-nav">
+
+    <!-- HOME -->
+    <div class="nav-item active" data-target="home"
+         style="--c-dot:#38bdf8">
+      <span class="nav-icon">🏠</span>
+      <span class="nav-label">Overview Dashboard</span>
+    </div>
+
+    <!-- PIPELINE -->
+    <div class="nav-section">
+      <div class="nav-section-label">Pipeline &amp; Strategy</div>
+    </div>
+
+    <div class="nav-item" data-target="future-flow"
+         style="--c-dot:#38bdf8;--c-badge-bg:#071e30;--c-badge:#38bdf8">
+      <span class="nav-icon">🗺</span>
+      <span class="nav-label">Future Study Flow</span>
+      <span class="nav-badge">13 projects</span>
+    </div>
+
+    <div class="nav-item" data-target="suggestions"
+         style="--c-dot:#fb923c;--c-badge-bg:#2d1206;--c-badge:#fb923c">
+      <span class="nav-icon">💡</span>
+      <span class="nav-label">Research Suggestions</span>
+      <span class="nav-badge">8 ideas</span>
+    </div>
+
+    <!-- SUBMISSION READY -->
+    <div class="nav-section">
+      <div class="nav-section-label">Submission-Ready</div>
+    </div>
+
+    <div class="nav-item" data-target="brca-memo"
+         style="--c-dot:#22c55e">
+      <span class="nav-icon">📄</span>
+      <span class="nav-label">TCGA-BRCA Memo</span>
+      <div class="nav-dot" style="background:var(--c-ready)"></div>
+    </div>
+
+    <div class="nav-item" data-target="c15-brief"
+         style="--c-dot:#22c55e">
+      <span class="nav-icon">📄</span>
+      <span class="nav-label">C15 Esophageal</span>
+      <div class="nav-dot" style="background:var(--c-ready)"></div>
+    </div>
+
+    <div class="nav-item" data-target="uadt-brief"
+         style="--c-dot:#22c55e">
+      <span class="nav-icon">📄</span>
+      <span class="nav-label">UADT Field</span>
+      <div class="nav-dot" style="background:var(--c-ready)"></div>
+    </div>
+
+    <div class="nav-item" data-target="coexist-brief"
+         style="--c-dot:#22c55e">
+      <span class="nav-icon">📄</span>
+      <span class="nav-label">Co-existing Cancers</span>
+      <div class="nav-dot" style="background:var(--c-ready)"></div>
+    </div>
+
+    <!-- CLINICAL -->
+    <div class="nav-section">
+      <div class="nav-section-label">Clinical Datasets</div>
+    </div>
+
+    <div class="nav-item" data-target="cmuh-brief"
+         style="--c-dot:#a78bfa">
+      <span class="nav-icon">🏥</span>
+      <span class="nav-label">CMUH ESCC Briefing</span>
+      <div class="nav-dot" style="background:var(--c-undecided)"></div>
+    </div>
+
+  </nav>
+</div><!-- /sidebar -->
+
+<!-- ── RIGHT COLUMN ─────────────────────────────────────────────────── -->
+<div id="right">
+  <div id="topbar">
+    <div id="topbar-crumb">
+      <span>Research Portal</span>
+      <span class="crumb-sep">›</span>
+      <span id="topbar-title">Overview Dashboard</span>
+    </div>
+    <div id="topbar-badge"></div>
+  </div>
+
+  <div id="content">
+
+    <!-- HOME DASHBOARD -->
+    <div id="home" class="active">
+      <div class="home-hero">
+        <div class="home-hero-text">
+          <h2>Cancer Research Portal — June 2026</h2>
+          <p>Unified access to all study roadmaps, submission memos, and briefings across
+             Taiwan Cancer Registry, TCGA, and CMUH ESCC datasets. Select a page in the
+             sidebar to view it full-screen, or click any card below to navigate directly.</p>
+        </div>
+        <div class="home-stats">
+          <div class="hstat">
+            <div class="hstat-n" style="color:var(--c-ready)">4</div>
+            <div class="hstat-l">Ready</div>
+          </div>
+          <div class="hstat">
+            <div class="hstat-n" style="color:var(--c-issues)">6</div>
+            <div class="hstat-l">Open Issues</div>
+          </div>
+          <div class="hstat">
+            <div class="hstat-n" style="color:var(--c-rerun)">1</div>
+            <div class="hstat-l">Re-run</div>
+          </div>
+          <div class="hstat">
+            <div class="hstat-n" style="color:var(--c-undecided)">1</div>
+            <div class="hstat-l">Undecided</div>
+          </div>
+          <div class="hstat">
+            <div class="hstat-n" style="color:var(--muted)">8</div>
+            <div class="hstat-l">Pages</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PIPELINE SECTION -->
+      <div class="home-section-hdr">
+        <h3 style="color:#38bdf8">Pipeline &amp; Strategy</h3>
+      </div>
+      <div class="home-grid hg-2">
+
+        <div class="page-card" data-target="future-flow"
+             style="--c-top:#38bdf8;--c-icon-bg:#071e30">
+          <div class="pc-top">
+            <div class="pc-icon">🗺</div>
+            <div class="pc-titles">
+              <div class="pc-title">Future Study Flow</div>
+              <div class="pc-sub">Interactive swimlane diagram · 13 active projects</div>
+            </div>
+          </div>
+          <div class="pc-desc">Full project roadmap across Taiwan Registry Epidemiology, DL Sequence, DL Analysis, and External Cohorts. Click any node for pending items and target journal.</div>
+          <div class="pc-footer">
+            <span class="pc-badge" style="background:#071e30;color:#38bdf8">13 Projects · 4 Swimlanes</span>
+            <span class="pc-open">Open →</span>
+          </div>
+        </div>
+
+        <div class="page-card" data-target="suggestions"
+             style="--c-top:#fb923c;--c-icon-bg:#2d1206">
+          <div class="pc-top">
+            <div class="pc-icon">💡</div>
+            <div class="pc-titles">
+              <div class="pc-title">Research Suggestions</div>
+              <div class="pc-sub">TCGA &amp; Patient Database · 8 ranked directions</div>
+            </div>
+          </div>
+          <div class="pc-desc">Ranked study suggestions based on existing infrastructure: TCGA-HNSC APOBEC validation, causal Transformer retrain, Taiwan vs SEER comparison, HBV vaccination APC, and more.</div>
+          <div class="pc-footer">
+            <span class="pc-badge" style="background:#2d1206;color:#fb923c">8 Suggestions · 3 Categories</span>
+            <span class="pc-open">Open →</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- SUBMISSION READY -->
+      <div class="home-section-hdr">
+        <h3 style="color:var(--c-ready)">Submission-Ready — Fill Placeholders &amp; Submit</h3>
+      </div>
+      <div class="home-grid hg-3">
+
+        <div class="page-card" data-target="brca-memo"
+             style="--c-top:var(--c-ready);--c-icon-bg:var(--c-ready-d)">
+          <div class="pc-top">
+            <div class="pc-icon">🧬</div>
+            <div class="pc-titles">
+              <div class="pc-title">TCGA-BRCA Submission Memo</div>
+              <div class="pc-sub">Breast Cancer Research (BMC)</div>
+            </div>
+          </div>
+          <div class="pc-desc">VAE phenotyping + XGBoost C=0.727. Basal split C5 (614d) vs C6 (1,093d). HOXB5/6/3/4 fingerprint validated in METABRIC + GSE96058. 7 placeholders.</div>
+          <div class="pc-footer">
+            <span class="pc-badge" style="background:var(--c-ready-d);color:var(--c-ready)">● Ready</span>
+            <span class="pc-open">Open →</span>
+          </div>
+        </div>
+
+        <div class="page-card" data-target="c15-brief"
+             style="--c-top:var(--c-ready);--c-icon-bg:var(--c-ready-d)">
+          <div class="pc-top">
+            <div class="pc-icon">🫁</div>
+            <div class="pc-titles">
+              <div class="pc-title">C15 Esophageal Cancer</div>
+              <div class="pc-sub">Cancers (MDPI) · Taiwan Registry</div>
+            </div>
+          </div>
+          <div class="pc-desc">n=2,367; MICE Cox C-index=0.670; Surgery HR=0.61; CCRT HR=0.97 NS. AJCC sensitivity added. Version c15-v1r4.1. 4 author placeholders.</div>
+          <div class="pc-footer">
+            <span class="pc-badge" style="background:var(--c-ready-d);color:var(--c-ready)">● Ready</span>
+            <span class="pc-open">Open →</span>
+          </div>
+        </div>
+
+        <div class="page-card" data-target="uadt-brief"
+             style="--c-top:var(--c-ready);--c-icon-bg:var(--c-ready-d)">
+          <div class="pc-top">
+            <div class="pc-icon">🔗</div>
+            <div class="pc-titles">
+              <div class="pc-title">UADT Field Cancerization</div>
+              <div class="pc-sub">Cancer Epidemiology · Taiwan Registry</div>
+            </div>
+          </div>
+          <div class="pc-desc">n=10,113; C12+C15 co-occurrence 24.2%; TV Cox HR=2.14. Bidirectional field effect confirmed. §3.3 site-swap fixed. Abstract 232w. 5 placeholders.</div>
+          <div class="pc-footer">
+            <span class="pc-badge" style="background:var(--c-ready-d);color:var(--c-ready)">● Ready</span>
+            <span class="pc-open">Open →</span>
+          </div>
+        </div>
+
+        <div class="page-card" data-target="coexist-brief"
+             style="--c-top:var(--c-ready);--c-icon-bg:var(--c-ready-d)">
+          <div class="pc-top">
+            <div class="pc-icon">🕸</div>
+            <div class="pc-titles">
+              <div class="pc-title">Co-existing Cancer Patterns</div>
+              <div class="pc-sub">Cancer Epidemiology · Taiwan Registry</div>
+            </div>
+          </div>
+          <div class="pc-desc">n=78,621; NMF k=7; SIR 12.2 (Eso→Lar); AE k=3 clusters; SIR+trajectory in Figs 6–7. 3 biological domains. 4 author placeholders.</div>
+          <div class="pc-footer">
+            <span class="pc-badge" style="background:var(--c-ready-d);color:var(--c-ready)">● Ready</span>
+            <span class="pc-open">Open →</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- CLINICAL -->
+      <div class="home-section-hdr">
+        <h3 style="color:var(--c-undecided)">Clinical Datasets — Direction Pending</h3>
+      </div>
+      <div class="home-grid hg-3">
+
+        <div class="page-card" data-target="cmuh-brief"
+             style="--c-top:var(--c-undecided);--c-icon-bg:var(--c-undecided-d)">
+          <div class="pc-top">
+            <div class="pc-icon">🏥</div>
+            <div class="pc-titles">
+              <div class="pc-title">CMUH ESCC Briefing</div>
+              <div class="pc-sub">Single-center · n=344 · 2007–2010</div>
+            </div>
+          </div>
+          <div class="pc-desc">4 DL methods complete. SHAP top driver: Age (non-linear). k=5 phenotypes p&lt;0.001. Transfer learning fails (domain shift). IRB + direction decision needed.</div>
+          <div class="pc-footer">
+            <span class="pc-badge" style="background:var(--c-undecided-d);color:var(--c-undecided)">● Decide Direction</span>
+            <span class="pc-open">Open →</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- QUICK LINKS -->
+      <div class="home-section-hdr" style="margin-top:28px">
+        <h3>Quick References</h3>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;padding-bottom:24px">
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:7px;
+          padding:10px 16px;font-size:12px;color:var(--muted2)">
+          <strong style="color:#f1f5f9;display:block;margin-bottom:3px">Script 25 bugs fixed</strong>
+          norm_first + age_norm + site_dedup · 2026-06-05
+        </div>
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:7px;
+          padding:10px 16px;font-size:12px;color:var(--muted2)">
+          <strong style="color:#f1f5f9;display:block;margin-bottom:3px">Surveillance R@1=0.232</strong>
+          Confirmed accurate · Script 25 artifact resolved
+        </div>
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:7px;
+          padding:10px 16px;font-size:12px;color:var(--muted2)">
+          <strong style="color:#f1f5f9;display:block;margin-bottom:3px">Taxonomy C3 HR=44</strong>
+          Schoenfeld residuals required before submission
+        </div>
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:7px;
+          padding:10px 16px;font-size:12px;color:var(--muted2)">
+          <strong style="color:#f1f5f9;display:block;margin-bottom:3px">New skill: /dl-db-study</strong>
+          DL medical database audit checklist · Claude Code
+        </div>
+      </div>
+    </div><!-- /home -->
+
+    <!-- IFRAMES (created lazily by JS) -->
+
+  </div><!-- /content -->
+</div><!-- /right -->
+</div><!-- /layout -->
+
+<script>
+// ─── PAGE REGISTRY ────────────────────────────────────────────────
+const PAGES = {
+  'future-flow': {
+    src:   'future_study_flow.html',
+    title: 'Future Study Flow',
+    crumb: 'Pipeline & Strategy',
+    badge: { text:'13 Projects', bg:'#071e30', color:'#38bdf8' },
+  },
+  'suggestions': {
+    src:   'study_suggestions.html',
+    title: 'Research Suggestions',
+    crumb: 'Pipeline & Strategy',
+    badge: { text:'8 Directions', bg:'#2d1206', color:'#fb923c' },
+  },
+  'brca-memo': {
+    src:   'briefings/brca_memo.html',
+    title: 'TCGA-BRCA Submission Memo',
+    crumb: 'Submission-Ready',
+    badge: { text:'● Ready to Submit', bg:'#052e16', color:'#22c55e' },
+  },
+  'c15-brief': {
+    src:   'briefings/c15_briefing.html',
+    title: 'C15 Esophageal — Co-Author Briefing',
+    crumb: 'Submission-Ready',
+    badge: { text:'● Ready to Submit', bg:'#052e16', color:'#22c55e' },
+  },
+  'uadt-brief': {
+    src:   'briefings/uadt_briefing.html',
+    title: 'UADT Field Cancerization — Co-Author Briefing',
+    crumb: 'Submission-Ready',
+    badge: { text:'● Ready to Submit', bg:'#052e16', color:'#22c55e' },
+  },
+  'coexist-brief': {
+    src:   'briefings/coexist_briefing.html',
+    title: 'Co-existing Cancer Patterns — Co-Author Briefing',
+    crumb: 'Submission-Ready',
+    badge: { text:'● Ready to Submit', bg:'#052e16', color:'#22c55e' },
+  },
+  'cmuh-brief': {
+    src:   'briefings/cmuh_briefing.html',
+    title: 'CMUH ESCC — Clinical Data Briefing',
+    crumb: 'Clinical Datasets',
+    badge: { text:'● Decide Direction', bg:'#1a0c38', color:'#a78bfa' },
+  },
+};
+
+// ─── STATE ────────────────────────────────────────────────────────
+let currentTarget = 'home';
+const iframes = {};
+
+// ─── NAVIGATION ───────────────────────────────────────────────────
+function navigate(target) {
+  if (target === currentTarget) return;
+
+  // deactivate all nav items
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const navEl = document.querySelector(`[data-target="${target}"]`);
+  if (navEl) navEl.classList.add('active');
+
+  // hide current
+  if (currentTarget === 'home') {
+    document.getElementById('home').classList.remove('active');
+  } else if (iframes[currentTarget]) {
+    iframes[currentTarget].classList.remove('active');
+  }
+
+  currentTarget = target;
+
+  if (target === 'home') {
+    document.getElementById('home').classList.add('active');
+    setTopbar('Overview Dashboard', 'Portal', null);
+    return;
+  }
+
+  // create iframe if not exists
+  if (!iframes[target]) {
+    const pg = PAGES[target];
+    const frame = document.createElement('iframe');
+    frame.className = 'page-frame';
+    frame.src = pg.src;
+    frame.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms');
+    document.getElementById('content').appendChild(frame);
+    iframes[target] = frame;
+    // small delay to let it register before showing
+    requestAnimationFrame(() => frame.classList.add('active'));
+  } else {
+    iframes[target].classList.add('active');
+  }
+
+  const pg = PAGES[target];
+  setTopbar(pg.title, pg.crumb, pg.badge);
+}
+
+function setTopbar(title, crumb, badge) {
+  document.getElementById('topbar-title').textContent = title;
+  document.querySelector('#topbar-crumb .crumb-sep').previousSibling.textContent = 'Portal';
+  const tb = document.getElementById('topbar-badge');
+  if (badge) {
+    tb.innerHTML = `<span class="tb-badge" style="background:${badge.bg};color:${badge.color};border-color:${badge.color}40">${badge.text}</span>`;
+  } else {
+    tb.innerHTML = '';
+  }
+}
+
+// ─── WIRE UP CLICKS ───────────────────────────────────────────────
+document.querySelectorAll('[data-target]').forEach(el => {
+  el.addEventListener('click', () => navigate(el.dataset.target));
+});
+
+// keyboard shortcut: Escape → home
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && currentTarget !== 'home') navigate('home');
+});
+</script>
+</body>
+</html>

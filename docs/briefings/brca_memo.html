@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TCGA-BRCA — Submission Memo &amp; Checklist</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 15px; line-height: 1.65; color: #222; background: #f4f6f9;
+  }
+  a { color: #2e7fbf; }
+  .page-wrap { max-width: 960px; margin: 0 auto; padding: 0 20px 60px; }
+
+  /* Header */
+  .site-header { background: #14304a; color: #fff; padding: 36px 40px 28px; margin-bottom: 32px; }
+  .site-header .tag { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #7db9e2; margin-bottom: 10px; }
+  .site-header h1 { font-size: 22px; font-weight: 700; line-height: 1.35; margin-bottom: 12px; }
+  .site-header .meta { font-size: 13px; color: #a8c4d9; }
+  .site-header .meta span { margin-right: 20px; }
+  .badge { display: inline-block; background: #2e7fbf; color: #fff; font-size: 11px; font-weight: 700; letter-spacing: 0.8px; padding: 3px 10px; border-radius: 20px; text-transform: uppercase; margin-left: 8px; vertical-align: middle; }
+  .badge.green  { background: #2ca02c; }
+  .badge.orange { background: #e07b39; }
+  .badge.red    { background: #d62728; }
+
+  /* Sections */
+  h2 { font-size: 17px; font-weight: 700; color: #14304a; border-left: 4px solid #2e7fbf; padding-left: 12px; margin: 36px 0 14px; }
+  h3 { font-size: 14px; font-weight: 700; color: #333; margin: 20px 0 8px; }
+  p  { margin-bottom: 10px; }
+
+  /* Action banner */
+  .action-banner { background: #fff3cd; border: 1.5px solid #e6b800; border-radius: 8px; padding: 18px 24px; margin: 24px 0; }
+  .action-banner .title { font-weight: 700; font-size: 14px; color: #7a5600; margin-bottom: 8px; }
+  .action-banner ul { padding-left: 20px; }
+  .action-banner li { margin-bottom: 4px; font-size: 14px; }
+
+  /* Stat cards */
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 14px; margin: 18px 0 24px; }
+  .card { background: #fff; border-radius: 8px; padding: 18px 16px; border-top: 3px solid #2e7fbf; box-shadow: 0 1px 4px rgba(0,0,0,0.07); text-align: center; }
+  .card.red-top    { border-top-color: #d62728; }
+  .card.green-top  { border-top-color: #2ca02c; }
+  .card.navy-top   { border-top-color: #14304a; }
+  .card.orange-top { border-top-color: #e07b39; }
+  .card.purple-top { border-top-color: #9467bd; }
+  .card .num   { font-size: 26px; font-weight: 800; color: #14304a; line-height: 1; margin-bottom: 4px; }
+  .card .label { font-size: 11.5px; color: #666; line-height: 1.35; }
+
+  /* Finding boxes */
+  .findings { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 18px 0; }
+  @media (max-width: 640px) { .findings { grid-template-columns: 1fr; } }
+  .finding { background: #fff; border-radius: 8px; padding: 18px 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
+  .finding .f-title { font-size: 13px; font-weight: 700; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 2px solid #eee; }
+  .finding ul { padding-left: 16px; font-size: 13px; }
+  .finding ul li { margin-bottom: 4px; }
+  .finding.f1 .f-title { color: #d62728; border-color: #d62728; }
+  .finding.f2 .f-title { color: #2ca02c; border-color: #2ca02c; }
+  .finding.f3 .f-title { color: #2e7fbf; border-color: #2e7fbf; }
+  .finding.f4 .f-title { color: #9467bd; border-color: #9467bd; }
+
+  /* Key finding */
+  .key-finding { background: #fff8f0; border: 2px solid #e07b39; border-radius: 8px; padding: 18px 22px; margin: 14px 0 24px; font-size: 14px; }
+  .key-finding .kf-title { font-weight: 700; color: #c05000; margin-bottom: 8px; font-size: 15px; }
+
+  /* Tables */
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.07); margin: 14px 0 24px; }
+  thead { background: #14304a; color: #fff; }
+  thead th { padding: 10px 14px; text-align: left; font-size: 12px; letter-spacing: 0.5px; }
+  tbody tr:nth-child(even) { background: #f8f9fb; }
+  tbody td { padding: 9px 14px; border-bottom: 1px solid #eee; }
+  td.hi       { font-weight: 700; color: #d62728; }
+  td.hi-green { font-weight: 700; color: #2ca02c; }
+  td.hi-blue  { font-weight: 700; color: #2e7fbf; }
+  td.muted    { color: #888; font-style: italic; }
+
+  /* Pipeline steps */
+  .pipeline { margin: 14px 0 24px; }
+  .pl-item { display: flex; gap: 14px; margin-bottom: 8px; align-items: flex-start; }
+  .pl-num { min-width: 28px; height: 28px; background: #14304a; color: #fff; border-radius: 50%; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+  .pl-num.done-bg { background: #2ca02c; }
+  .pl-text { font-size: 13.5px; }
+  .pl-text strong { display: block; margin-bottom: 2px; }
+  .pl-text span { color: #666; font-size: 13px; }
+
+  /* Checklist */
+  .checklist { background: #fff; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); overflow: hidden; margin: 14px 0 12px; }
+  .checklist-header { background: #14304a; color: #fff; padding: 10px 18px; font-size: 13px; font-weight: 700; letter-spacing: 0.5px; }
+  .check-item { display: flex; align-items: flex-start; padding: 12px 18px; border-bottom: 1px solid #eee; gap: 14px; cursor: pointer; transition: background 0.12s; }
+  .check-item:last-child { border-bottom: none; }
+  .check-item:hover { background: #f8fdf8; }
+  .check-item.done { background: #f6fff6; }
+  .check-item.done .item-label { opacity: 0.55; }
+  .check-item.done .item-label strong { text-decoration: line-through; }
+  .check-box { width: 18px; height: 18px; border: 2px solid #aaa; border-radius: 4px; flex-shrink: 0; margin-top: 2px; display: flex; align-items: center; justify-content: center; transition: background 0.15s, border-color 0.15s; user-select: none; }
+  .check-box.checked { background: #2ca02c; border-color: #2ca02c; }
+  .check-box.checked::after { content: "✓"; color: #fff; font-size: 12px; font-weight: 700; line-height: 1; }
+  .item-label { font-size: 13.5px; flex: 1; }
+  .item-label strong { display: block; margin-bottom: 2px; }
+  .item-label .sub { font-size: 12.5px; color: #666; }
+  .item-tag { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 12px; text-transform: uppercase; flex-shrink: 0; margin-top: 3px; }
+  .tag-done   { background: #d4edda; color: #155724; }
+  .tag-author { background: #fff3cd; color: #856404; }
+  .tag-must   { background: #f8d7da; color: #721c24; }
+
+  /* File box */
+  .file-box { background: #1e1e2e; border-radius: 8px; padding: 16px 20px; font-family: "SF Mono", Consolas, monospace; font-size: 12.5px; color: #cdd6f4; margin: 14px 0 24px; }
+  .file-box .f-dir { color: #89b4fa; margin-bottom: 4px; }
+  .file-box .f-file { color: #a6e3a1; padding-left: 20px; margin-bottom: 2px; }
+  .file-box .f-note { color: #6c7086; padding-left: 20px; font-style: italic; }
+
+  /* Portal box */
+  .portal-box { background: #e8f4fd; border: 1.5px solid #2e7fbf; border-radius: 8px; padding: 20px 24px; margin: 14px 0 24px; }
+  .portal-box .p-title { font-weight: 700; font-size: 15px; color: #14304a; margin-bottom: 12px; }
+  .portal-box ol { padding-left: 20px; font-size: 14px; }
+  .portal-box ol li { margin-bottom: 6px; }
+  .portal-box .url { font-family: monospace; font-size: 13px; background: #fff; padding: 2px 8px; border-radius: 4px; border: 1px solid #c8dff4; }
+
+  /* Limitation box */
+  .limit-box { background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 16px 20px; margin: 14px 0 24px; font-size: 13.5px; }
+  .limit-box strong { color: #495057; }
+</style>
+</head>
+<body>
+<div class="site-header">
+  <div class="tag">TCGA-BRCA · Deep Learning · Breast Cancer Research</div>
+  <h1>Variational Autoencoder Reveals HOXB-Driven Transcriptomic<br>Heterogeneity in Basal Breast Cancer</h1>
+  <div class="meta">
+    <span>📅 Prepared 2026-06-05</span>
+    <span>📁 /home/jnynlin/coding/tcga-brca/</span>
+    <span>🔗 github.com/jnynlin/TCGA-analysis</span>
+    <span class="badge green">Manuscript Ready</span>
+    <span class="badge orange">Author Info Pending</span>
+  </div>
+</div>
+
+<div class="page-wrap">
+
+<!-- ACTION BANNER -->
+<div class="action-banner">
+  <div class="title">⚠ Before submitting — fill these 7 placeholders in BRCA_manuscript.tex</div>
+  <ul>
+    <li>Lines 17–19: First Author, Second Author, Corresponding Author (Name, Degree)</li>
+    <li>Line 20: Department, Institution, City, Country</li>
+    <li>Lines 27–28: Corresponding author name, department, email, phone</li>
+    <li>Line 38: Funding source (or "This research received no external funding.")</li>
+    <li>Cover letter: same author/affiliation block in <code>cover_letter_BCR.md</code></li>
+  </ul>
+</div>
+
+<!-- KEY NUMBERS -->
+<h2>Cohort &amp; Model Summary</h2>
+<div class="cards">
+  <div class="card navy-top"><div class="num">1,072</div><div class="label">TCGA-BRCA patients (RNA-seq)</div></div>
+  <div class="card"><div class="num">k = 7</div><div class="label">VAE clusters, log-rank p = 0.018</div></div>
+  <div class="card red-top"><div class="num">62</div><div class="label">Basal C5 — poor prognosis (614d median OS)</div></div>
+  <div class="card green-top"><div class="num">130</div><div class="label">Basal C6 — better prognosis (1,093d median OS)</div></div>
+  <div class="card orange-top"><div class="num">0.727</div><div class="label">XGBoost C-index (±0.047) vs Cox 0.649</div></div>
+  <div class="card purple-top"><div class="num">750</div><div class="label">DEGs FDR &lt;0.05 (C5 vs C6)</div></div>
+</div>
+
+<!-- KEY FINDING -->
+<div class="key-finding">
+  <div class="kf-title">🔑 Central Finding</div>
+  PAM50-Basal patients segregate into two transcriptomically distinct clusters (C5 vs C6) with a 1.8-fold difference in median OS (614 vs 1,093 days). HOXB3, HOXB4, HOXB5, and HOXB6 are the dominant genomic drivers by gene-SHAP analysis, and this signature is confirmed in two external cohorts (METABRIC n=2,000 and SCAN-B/GSE96058 n=3,273) on independent platforms. Overall cluster survival separation replicates strongly in METABRIC (p=1.28×10⁻¹²). Basal-specific OS did not replicate (insufficient power; n=209–325 Basal per external cohort), and cluster assignment adds ΔC=+0.005 over PAM50+stage. Findings are hypothesis-generating; HOXB is nominated as a candidate stratifier for future Basal/TNBC studies.
+</div>
+
+<!-- 4 KEY FINDINGS -->
+<div class="findings">
+  <div class="finding f1">
+    <div class="f-title">VAE Phenotyping</div>
+    <ul>
+      <li>64-dim latent, k-means k=7</li>
+      <li>ARI=0.301, NMI=0.449 vs PAM50</li>
+      <li>Log-rank p=0.018 (all clusters)</li>
+      <li>Basal splits C5 (poor) / C6 (better)</li>
+    </ul>
+  </div>
+  <div class="finding f2">
+    <div class="f-title">Survival Models</div>
+    <ul>
+      <li>Cox baseline C=0.649</li>
+      <li>DeepSurv C=0.683±0.043</li>
+      <li><strong>XGBoost C=0.727±0.047</strong></li>
+      <li>ΔC vs PAM50+stage Cox: +0.005 (not incremental)</li>
+    </ul>
+  </div>
+  <div class="finding f3">
+    <div class="f-title">HOXB Gene Signature</div>
+    <ul>
+      <li>HOXB5 rank 1 by gene-SHAP score</li>
+      <li>HOXB3/4/5/6 ranks 3–6 overall</li>
+      <li>Higher in C6 (better prognosis)</li>
+      <li>HOXB4 FDR=0.0007 in TCGA DEG</li>
+    </ul>
+  </div>
+  <div class="finding f4">
+    <div class="f-title">External Validation</div>
+    <ul>
+      <li>METABRIC overall: p=1.28×10⁻¹² ✓</li>
+      <li>METABRIC Basal OS: p=0.152 (n=209)</li>
+      <li>GSE96058 Basal OS: p=0.593 (n=325)</li>
+      <li>HOXB fingerprint: all cohorts p&lt;0.001 ✓</li>
+    </ul>
+  </div>
+</div>
+
+<!-- EXTERNAL VALIDATION TABLE -->
+<h2>External Validation Summary</h2>
+<table>
+  <thead>
+    <tr><th>Cohort</th><th>n (Basal)</th><th>Overall cluster OS</th><th>Basal-specific OS</th><th>HOXB3</th><th>HOXB4</th><th>HOXB5</th><th>HOXB6</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>TCGA</strong> (training)</td>
+      <td>192</td>
+      <td class="hi-green">p=0.018</td>
+      <td>—</td>
+      <td>0.12</td>
+      <td class="hi-green">0.00016</td>
+      <td>0.29</td>
+      <td>0.11</td>
+    </tr>
+    <tr>
+      <td><strong>METABRIC</strong></td>
+      <td>209</td>
+      <td class="hi-green">p=1.28×10⁻¹²</td>
+      <td class="muted">p=0.152 (n.s.)</td>
+      <td class="hi-green">1.4×10⁻⁷</td>
+      <td class="hi-green">7.5×10⁻⁵</td>
+      <td class="hi-green">7.4×10⁻¹²</td>
+      <td class="hi-green">0.015</td>
+    </tr>
+    <tr>
+      <td><strong>GSE96058</strong> (SCAN-B)</td>
+      <td>325</td>
+      <td class="muted">—</td>
+      <td class="muted">p=0.593 (n.s.)*</td>
+      <td class="hi-green">9×10⁻⁴</td>
+      <td class="hi-green">4.4×10⁻⁷</td>
+      <td class="hi-green">&lt;10⁻⁴</td>
+      <td class="hi-green">&lt;10⁻⁴</td>
+    </tr>
+  </tbody>
+</table>
+<p style="font-size:12.5px;color:#666">*GSE96058 follow-up median 52 months; event rate 10.5% — heavily censored. HOXB p-values are uncorrected Mann-Whitney U.</p>
+
+<!-- PIPELINE SUMMARY -->
+<h2>Analysis Pipeline</h2>
+<div class="pipeline">
+  <div class="pl-item">
+    <div class="pl-num done-bg">1</div>
+    <div class="pl-text"><strong>BRCA_download.R + BRCA_build_tpm.py</strong><span>TCGAbiolinks: clinical + PAM50. Python GDC API: 1,111 TSVs → TPM parquet (bypasses GDCprepare timeout)</span></div>
+  </div>
+  <div class="pl-item">
+    <div class="pl-num done-bg">2</div>
+    <div class="pl-text"><strong>01_vae_phenotype.py</strong><span>VAE (2000→512→256→64μ/σ), k-means k=7, UMAP, PAM50 ARI/NMI, Kaplan-Meier, Cox</span></div>
+  </div>
+  <div class="pl-item">
+    <div class="pl-num done-bg">3</div>
+    <div class="pl-text"><strong>02_deepsurv_shap.py</strong><span>Full-batch DeepSurv + XGBoost:cox + SHAP TreeExplainer. 5-fold CV C-indices.</span></div>
+  </div>
+  <div class="pl-item">
+    <div class="pl-num done-bg">4</div>
+    <div class="pl-text"><strong>05_basal_characterize.py</strong><span>C5 vs C6 DEG (Mann-Whitney, BH-FDR); 750 sig genes; volcano + heatmap + immune markers</span></div>
+  </div>
+  <div class="pl-item">
+    <div class="pl-num done-bg">5</div>
+    <div class="pl-text"><strong>06_gene_shap.py</strong><span>Gene-SHAP back-projection: gene_score[g] = Σ|SHAP[k]|×|PC_k[g]|. HOXB3–6 top ranks.</span></div>
+  </div>
+  <div class="pl-item">
+    <div class="pl-num done-bg">6</div>
+    <div class="pl-text"><strong>07_metabric_validate.py</strong><span>cBioPortal API download → VAE transfer encode → k=7 KM. p=1.28×10⁻¹². VAE weight remapping applied (mu_layer→fc_mu bug fixed).</span></div>
+  </div>
+  <div class="pl-item">
+    <div class="pl-num done-bg">7</div>
+    <div class="pl-text"><strong>08_metabric_basal.py + 08b_metabric_basal_rfs.py</strong><span>METABRIC Basal-specific k=2 KM. OS p=0.152, RFS p=0.447 (not significant). HOXB all p&lt;0.001.</span></div>
+  </div>
+  <div class="pl-item">
+    <div class="pl-num done-bg">8</div>
+    <div class="pl-text"><strong>09_gse96058_validate.py</strong><span>GEO GSE96058 download → encode → Basal k=2. OS p=0.593 (censored). HOXB5 p=5×10⁻¹⁰.</span></div>
+  </div>
+</div>
+
+<!-- MANUSCRIPT EDITS LOG -->
+<h2>Manuscript Pipeline — Fixes Applied</h2>
+<table>
+  <thead><tr><th>Session</th><th>Fix</th><th>Location</th></tr></thead>
+  <tbody>
+    <tr><td>pipeline</td><td>Abstract direction: "poorer-prognosis" → "better-prognosis" (HOXB higher in C6)</td><td>Abstract</td></tr>
+    <tr><td>pipeline</td><td>HOXB5 medians filled: C6=0.77, C5=0.56 (log₂ TPM+1)</td><td>Results §3.2</td></tr>
+    <tr><td>pipeline</td><td>Table 2 TCGA row: 0.12 / 0.00016 / 0.29 / 0.11</td><td>Table 2</td></tr>
+    <tr><td>pipeline</td><td>Table 2 GSE96058: n=197 vs 128, HOXB4=4.4×10⁻⁷</td><td>Table 2</td></tr>
+    <tr><td>pipeline</td><td>Figure refs: C-index=Fig 4, external validation=Fig 5</td><td>Results §3.2–3.3</td></tr>
+    <tr><td>pipeline</td><td>Word count: ~2,100 words</td><td>Title page</td></tr>
+    <tr><td>final audit</td><td>Figure Legends: split Fig 3 (SHAP only) / Fig 4 (C-index) / Fig 5 (external); added Fig 5</td><td>Figure Legends</td></tr>
+    <tr><td>final audit</td><td>"Significantly higher" → "consistently higher; HOXB4 FDR&lt;0.001"</td><td>Results §3.2</td></tr>
+    <tr><td>fill figures</td><td>All 5 figures embedded (18-page PDF); graphicspath + subcaption packages</td><td>Figures section</td></tr>
+    <tr><td>fill figures</td><td>Fig 2A ref updated: no standalone Basal KM → points to Fig 1C</td><td>Results §3.1</td></tr>
+  </tbody>
+</table>
+
+<!-- FIGURES MAP -->
+<h2>Figures in Submitted PDF</h2>
+<table>
+  <thead><tr><th>Figure</th><th>Panels</th><th>Files Used</th><th>Caption key point</th></tr></thead>
+  <tbody>
+    <tr><td><strong>1</strong></td><td>A–D (2×2)</td><td>VAE_training_loss, VAE_k_selection, VAE_km, VAE_umap</td><td>C5/C6 Basal visible in Fig 1C KM</td></tr>
+    <tr><td><strong>2</strong></td><td>A–C (2+1)</td><td>basal_volcano, basal_heatmap, basal_immune</td><td>750 DEGs; HOXB4 FDR&lt;0.001</td></tr>
+    <tr><td><strong>3</strong></td><td>single</td><td>gene_shap</td><td>HOXB3–6 ranks 3–6</td></tr>
+    <tr><td><strong>4</strong></td><td>single</td><td>DL_cindex</td><td>XGBoost 0.727 vs Cox 0.649</td></tr>
+    <tr><td><strong>5</strong></td><td>A–C (2+1)</td><td>metabric_km, metabric_basal_km, gse96058_basal_km</td><td>METABRIC overall p=1.28×10⁻¹²</td></tr>
+  </tbody>
+</table>
+
+<!-- KNOWN LIMITATIONS -->
+<h2>Known Limitations (in Manuscript)</h2>
+<div class="limit-box">
+  <ul style="padding-left:18px">
+    <li><strong>ΔC=+0.005</strong> — clusters do not add survival information beyond PAM50+stage+age; prognostic claim is molecular, not independently prognostic.</li>
+    <li><strong>Basal OS not replicated</strong> in external cohorts (insufficient n; GSE96058 heavily censored at 52 months).</li>
+    <li><strong>HOXB5 p=0.289 in TCGA</strong> — not significant in training cohort DEG; only HOXB4 (FDR=0.0007) is significant in TCGA. All four genes are significant in METABRIC and GSE96058.</li>
+    <li><strong>Bulk RNA-seq only</strong> — no single-cell resolution; HOXB gradient may reflect tumour microenvironment composition.</li>
+    <li><strong>25.6% gene dropout</strong> — METABRIC microarray missing 25.6% of TCGA HVGs; zero-imputed.</li>
+  </ul>
+</div>
+
+<!-- SUBMISSION CHECKLIST -->
+<h2>Submission Checklist</h2>
+
+<div class="checklist">
+  <div class="checklist-header">ANALYSIS &amp; MANUSCRIPT — all complete</div>
+  <div class="check-item done" onclick="toggle(this)">
+    <div class="check-box checked"></div>
+    <div class="item-label"><strong>VAE + k-means phenotyping (k=7)</strong><span class="sub">01_vae_phenotype.py — log-rank p=0.018, ARI=0.301</span></div>
+    <div class="item-tag tag-done">DONE</div>
+  </div>
+  <div class="check-item done" onclick="toggle(this)">
+    <div class="check-box checked"></div>
+    <div class="item-label"><strong>DeepSurv + XGBoost survival models + SHAP</strong><span class="sub">02_deepsurv_shap.py — XGBoost C=0.727</span></div>
+    <div class="item-tag tag-done">DONE</div>
+  </div>
+  <div class="check-item done" onclick="toggle(this)">
+    <div class="check-box checked"></div>
+    <div class="item-label"><strong>Basal C5/C6 characterization</strong><span class="sub">05_basal_characterize.py — 750 DEGs, HOXB4 FDR&lt;0.001</span></div>
+    <div class="item-tag tag-done">DONE</div>
+  </div>
+  <div class="check-item done" onclick="toggle(this)">
+    <div class="check-box checked"></div>
+    <div class="item-label"><strong>Gene-SHAP back-projection</strong><span class="sub">06_gene_shap.py — HOXB5 rank 1 among named genes</span></div>
+    <div class="item-tag tag-done">DONE</div>
+  </div>
+  <div class="check-item done" onclick="toggle(this)">
+    <div class="check-box checked"></div>
+    <div class="item-label"><strong>METABRIC + GSE96058 external validation (3 scripts)</strong><span class="sub">07/08/08b/09 — HOXB confirmed all cohorts; OS non-sig (expected)</span></div>
+    <div class="item-tag tag-done">DONE</div>
+  </div>
+  <div class="check-item done" onclick="toggle(this)">
+    <div class="check-box checked"></div>
+    <div class="item-label"><strong>LaTeX manuscript — all data-derived fields filled</strong><span class="sub">HOXB5 medians, Table 2 p-values, figure legends, word count</span></div>
+    <div class="item-tag tag-done">DONE</div>
+  </div>
+  <div class="check-item done" onclick="toggle(this)">
+    <div class="check-box checked"></div>
+    <div class="item-label"><strong>All 5 figures embedded in PDF (18 pages)</strong><span class="sub">Fig 1–5 with subcaption layouts; graphicspath configured</span></div>
+    <div class="item-tag tag-done">DONE</div>
+  </div>
+  <div class="check-item done" onclick="toggle(this)">
+    <div class="check-box checked"></div>
+    <div class="item-label"><strong>Cover letter drafted</strong><span class="sub">cover_letter_BCR.md — Breast Cancer Research format</span></div>
+    <div class="item-tag tag-done">DONE</div>
+  </div>
+</div>
+
+<div class="checklist" style="margin-top:14px">
+  <div class="checklist-header">AUTHOR TO COMPLETE — before upload</div>
+  <div class="check-item" onclick="toggle(this)">
+    <div class="check-box"></div>
+    <div class="item-label"><strong>Author names &amp; degrees (lines 17–19)</strong><span class="sub">First Author, Second Author, Corresponding Author</span></div>
+    <div class="item-tag tag-author">AUTHOR</div>
+  </div>
+  <div class="check-item" onclick="toggle(this)">
+    <div class="check-box"></div>
+    <div class="item-label"><strong>Affiliation (line 20)</strong><span class="sub">Department, Institution, City, Country</span></div>
+    <div class="item-tag tag-author">AUTHOR</div>
+  </div>
+  <div class="check-item" onclick="toggle(this)">
+    <div class="check-box"></div>
+    <div class="item-label"><strong>Corresponding author contact (lines 27–28)</strong><span class="sub">Name, department, email, phone</span></div>
+    <div class="item-tag tag-author">AUTHOR</div>
+  </div>
+  <div class="check-item" onclick="toggle(this)">
+    <div class="check-box"></div>
+    <div class="item-label"><strong>Funding statement (line 38)</strong><span class="sub">e.g. "This research received no external funding." or grant number</span></div>
+    <div class="item-tag tag-author">AUTHOR</div>
+  </div>
+  <div class="check-item" onclick="toggle(this)">
+    <div class="check-box"></div>
+    <div class="item-label"><strong>Cover letter author block</strong><span class="sub">cover_letter_BCR.md — name, address, institution, email, phone</span></div>
+    <div class="item-tag tag-author">AUTHOR</div>
+  </div>
+  <div class="check-item" onclick="toggle(this)">
+    <div class="check-box"></div>
+    <div class="item-label"><strong>Recompile PDF after filling placeholders</strong><span class="sub">cd manuscript &amp;&amp; xelatex BRCA_manuscript.tex (×2)</span></div>
+    <div class="item-tag tag-must">MUST</div>
+  </div>
+  <div class="check-item" onclick="toggle(this)">
+    <div class="check-box"></div>
+    <div class="item-label"><strong>Upload to ScholarOne</strong><span class="sub">mc.manuscriptcentral.com/bcr — main PDF + 5 figure PNGs + cover letter text</span></div>
+    <div class="item-tag tag-must">MUST</div>
+  </div>
+</div>
+
+<!-- FILE LOCATIONS -->
+<h2>File Locations</h2>
+<div class="file-box">
+  <div class="f-dir">tcga-brca/manuscript/</div>
+  <div class="f-file">BRCA_manuscript.tex   ← main LaTeX (7 yellow placeholders remain)</div>
+  <div class="f-file">BRCA_manuscript.pdf   ← 18 pages, 1.3 MB, all figures embedded</div>
+  <div class="f-file">cover_letter_BCR.md   ← cover letter (fill author block)</div>
+  <div class="f-file">references.bib        ← 17 references (Parker 2009 → Baidoo 2025)</div>
+  <div class="f-dir" style="margin-top:8px">tcga-brca/results/figures/   ← submit these 5 as separate figure files</div>
+  <div class="f-file">BRCA_VAE_*.png        → Figure 1 panels (training_loss, k_selection, km, umap)</div>
+  <div class="f-file">BRCA_basal_*.png      → Figure 2 panels (volcano, heatmap, immune)</div>
+  <div class="f-file">BRCA_gene_shap.png    → Figure 3</div>
+  <div class="f-file">BRCA_DL_cindex.png    → Figure 4</div>
+  <div class="f-file">BRCA_metabric_km.png, BRCA_metabric_basal_km.png, BRCA_gse96058_basal_km.png → Figure 5</div>
+  <div class="f-dir" style="margin-top:8px">tcga-brca/results/tables/   ← source data (all gitignored)</div>
+  <div class="f-note">BRCA_gene_shap.csv, BRCA_basal_DEG.csv, BRCA_metabric_metrics.json …</div>
+</div>
+
+<!-- PORTAL -->
+<h2>Submission Portal</h2>
+<div class="portal-box">
+  <div class="p-title">Breast Cancer Research — ScholarOne Manuscripts</div>
+  <ol>
+    <li>Go to <span class="url">mc.manuscriptcentral.com/bcr</span></li>
+    <li>Select <strong>Original Research</strong> article type</li>
+    <li>Upload <strong>main manuscript PDF</strong> (BRCA_manuscript.pdf)</li>
+    <li>Upload <strong>figures as separate files</strong> (5 PNGs listed above)</li>
+    <li>Paste cover letter text from <strong>cover_letter_BCR.md</strong></li>
+    <li>Confirm: IRB exemption applies (TCGA data is publicly available)</li>
+    <li>Confirm: code available at <span class="url">github.com/jnynlin/TCGA-analysis</span></li>
+  </ol>
+</div>
+
+<!-- KNOWN BUGS LOG -->
+<h2>Technical Notes (for reproducibility)</h2>
+<table>
+  <thead><tr><th>Bug / Fix</th><th>Script</th><th>Details</th></tr></thead>
+  <tbody>
+    <tr><td>VAE weight key mismatch</td><td>07, 08, 08b, 09</td><td>Saved keys: <code>mu_layer.weight</code> → remap to <code>fc_mu.weight</code> on load</td></tr>
+    <tr><td>GDCprepare timeout</td><td>BRCA_build_tpm.py</td><td>Bypassed: reads TSVs directly via GDC Files API barcode map</td></tr>
+    <tr><td>DeepHit overflow</td><td>02_deepsurv_shap.py</td><td>LabTransDiscreteTime fails at 16% event rate; skipped (DeepSurv used instead)</td></tr>
+    <tr><td>XGBoost v3 API</td><td>02_deepsurv_shap.py</td><td><code>early_stopping_rounds</code> is constructor param, not <code>fit()</code> param</td></tr>
+    <tr><td>VAE input dim mismatch</td><td>07–09</td><td>VAE_input.csv has 2005 ENSG cols; always slice <code>[:2000]</code></td></tr>
+    <tr><td>pycox callbacks removed</td><td>02</td><td><code>pycox.callbacks</code> does not exist in current version; use fixed epochs</td></tr>
+  </tbody>
+</table>
+
+</div><!-- /page-wrap -->
+
+<script>
+function toggle(item) {
+  const box = item.querySelector('.check-box');
+  const isDone = box.classList.contains('checked');
+  if (isDone) {
+    box.classList.remove('checked');
+    item.classList.remove('done');
+  } else {
+    box.classList.add('checked');
+    item.classList.add('done');
+  }
+}
+// Persist state in sessionStorage
+document.querySelectorAll('.check-item').forEach((item, i) => {
+  const saved = sessionStorage.getItem('brca_check_' + i);
+  if (saved === '1') {
+    item.classList.add('done');
+    item.querySelector('.check-box').classList.add('checked');
+  }
+  item.addEventListener('click', () => {
+    const checked = item.querySelector('.check-box').classList.contains('checked');
+    sessionStorage.setItem('brca_check_' + i, checked ? '1' : '0');
+  });
+});
+</script>
+</body>
+</html>

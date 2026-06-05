@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Co-Author Briefing — UADT Field Cancerization in Taiwan</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.65;
+    color: #222;
+    background: #f4f6f9;
+  }
+  a { color: #2e7fbf; }
+  .page-wrap { max-width: 960px; margin: 0 auto; padding: 0 20px 60px; }
+
+  /* ── Header ── */
+  .site-header {
+    background: #14304a;
+    color: #fff;
+    padding: 36px 40px 28px;
+    margin-bottom: 32px;
+  }
+  .site-header .tag {
+    font-size: 11px; font-weight: 700; letter-spacing: 1.5px;
+    text-transform: uppercase; color: #7db9e2; margin-bottom: 10px;
+  }
+  .site-header h1 { font-size: 22px; font-weight: 700; line-height: 1.35; margin-bottom: 12px; }
+  .site-header .meta { font-size: 13px; color: #a8c4d9; }
+  .site-header .meta span { margin-right: 20px; }
+  .badge {
+    display: inline-block; background: #2e7fbf; color: #fff;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.8px;
+    padding: 3px 10px; border-radius: 20px; text-transform: uppercase;
+    margin-left: 8px; vertical-align: middle;
+  }
+  .badge.green  { background: #2ca02c; }
+  .badge.orange { background: #e07b39; }
+
+  /* ── Sections ── */
+  h2 {
+    font-size: 17px; font-weight: 700; color: #14304a;
+    border-left: 4px solid #2e7fbf; padding-left: 12px;
+    margin: 36px 0 14px;
+  }
+  h3 { font-size: 14px; font-weight: 700; color: #333; margin: 20px 0 8px; }
+  p { margin-bottom: 10px; }
+
+  /* ── Action banner ── */
+  .action-banner {
+    background: #fff3cd; border: 1.5px solid #e6b800;
+    border-radius: 8px; padding: 18px 24px; margin: 24px 0;
+  }
+  .action-banner .title { font-weight: 700; font-size: 14px; color: #7a5600; margin-bottom: 8px; }
+  .action-banner ul { padding-left: 20px; }
+  .action-banner li { margin-bottom: 4px; font-size: 14px; }
+
+  /* ── Stat cards ── */
+  .cards {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 14px; margin: 18px 0 24px;
+  }
+  .card {
+    background: #fff; border-radius: 8px; padding: 18px 16px;
+    border-top: 3px solid #2e7fbf;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.07); text-align: center;
+  }
+  .card.red-top    { border-top-color: #d62728; }
+  .card.green-top  { border-top-color: #2ca02c; }
+  .card.navy-top   { border-top-color: #14304a; }
+  .card.orange-top { border-top-color: #e07b39; }
+  .card.purple-top { border-top-color: #9467bd; }
+  .card .num   { font-size: 28px; font-weight: 800; color: #14304a; line-height: 1; margin-bottom: 4px; }
+  .card .label { font-size: 11.5px; color: #666; line-height: 1.35; }
+
+  /* ── Finding boxes ── */
+  .findings { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 18px 0; }
+  @media (max-width: 640px) { .findings { grid-template-columns: 1fr; } }
+  .finding {
+    background: #fff; border-radius: 8px; padding: 18px 16px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+  }
+  .finding .f-title { font-size: 13px; font-weight: 700; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 2px solid #eee; }
+  .finding ul { padding-left: 16px; font-size: 13px; }
+  .finding ul li { margin-bottom: 4px; }
+  .finding.f1 .f-title { color: #d62728; border-color: #d62728; }
+  .finding.f2 .f-title { color: #2ca02c; border-color: #2ca02c; }
+  .finding.f3 .f-title { color: #e07b39; border-color: #e07b39; }
+  .finding.f4 .f-title { color: #9467bd; border-color: #9467bd; }
+
+  /* ── Highlight box (key finding) ── */
+  .key-finding {
+    background: #fff8f0; border: 2px solid #e07b39; border-radius: 8px;
+    padding: 18px 22px; margin: 14px 0 24px; font-size: 14px;
+  }
+  .key-finding .kf-title { font-weight: 700; color: #c05000; margin-bottom: 8px; font-size: 15px; }
+
+  /* ── Tables ── */
+  table {
+    width: 100%; border-collapse: collapse; font-size: 13.5px;
+    background: #fff; border-radius: 8px; overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.07); margin: 14px 0 24px;
+  }
+  thead { background: #14304a; color: #fff; }
+  thead th { padding: 10px 14px; text-align: left; font-size: 12px; letter-spacing: 0.5px; }
+  tbody tr:nth-child(even) { background: #f8f9fb; }
+  tbody td { padding: 9px 14px; border-bottom: 1px solid #eee; }
+  td.hi { font-weight: 700; color: #d62728; }
+  td.hi-green { font-weight: 700; color: #2ca02c; }
+  td.italic { font-style: italic; color: #888; }
+
+  /* ── Abstract box ── */
+  .abstract-box {
+    background: #fff; border-radius: 8px; padding: 20px 24px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.07); font-size: 13.5px;
+    margin: 14px 0 24px; border-left: 4px solid #14304a;
+  }
+  .abstract-box p { margin-bottom: 10px; }
+  .abstract-box p:last-child { margin-bottom: 0; }
+  .abstract-box strong { color: #14304a; }
+
+  /* ── Methods grid ── */
+  .methods-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 14px 0 24px; }
+  @media (max-width: 560px) { .methods-grid { grid-template-columns: 1fr; } }
+  .method-box {
+    background: #fff; border-radius: 8px; padding: 14px 16px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.07); border-left: 3px solid #2e7fbf; font-size: 13.5px;
+  }
+  .method-box h4 { font-size: 13px; font-weight: 700; margin-bottom: 6px; color: #14304a; }
+
+  /* ── Timeline ── */
+  .timeline { margin: 14px 0 24px; }
+  .tl-item { display: flex; gap: 16px; margin-bottom: 10px; }
+  .tl-week { min-width: 80px; font-size: 12px; font-weight: 700; color: #2e7fbf; padding-top: 2px; }
+  .tl-text { font-size: 13.5px; }
+
+  /* ── Checklist ── */
+  .checklist { background: #fff; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); overflow: hidden; margin: 14px 0 12px; }
+  .checklist-header { background: #14304a; color: #fff; padding: 10px 18px; font-size: 13px; font-weight: 700; letter-spacing: 0.5px; }
+  .check-item {
+    display: flex; align-items: flex-start; padding: 12px 18px;
+    border-bottom: 1px solid #eee; gap: 14px; cursor: pointer;
+    transition: background 0.12s;
+  }
+  .check-item:last-child { border-bottom: none; }
+  .check-item:hover { background: #f8fdf8; }
+  .check-item.done { background: #f6fff6; }
+  .check-item.done .item-label { opacity: 0.55; }
+  .check-item.done .item-label strong { text-decoration: line-through; }
+  .check-box {
+    width: 18px; height: 18px; border: 2px solid #aaa; border-radius: 4px;
+    flex-shrink: 0; margin-top: 2px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s, border-color 0.15s; user-select: none;
+  }
+  .check-box.checked { background: #2ca02c; border-color: #2ca02c; }
+  .check-box.checked::after { content: "✓"; color: #fff; font-size: 12px; font-weight: 700; line-height: 1; }
+  .item-label { font-size: 13.5px; flex: 1; }
+  .item-label strong { color: #14304a; }
+  .item-note { font-size: 12px; color: #888; margin-top: 2px; }
+  .who {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.5px;
+    text-transform: uppercase; padding: 2px 8px; border-radius: 12px;
+    flex-shrink: 0; margin-top: 2px;
+  }
+  .who.author { background: #fff3cd; color: #7a5600; }
+  .who.tech   { background: #d4edda; color: #155724; }
+  .who.verify { background: #e8d5f5; color: #5a1a8a; }
+
+  /* ── Footer ── */
+  .page-footer {
+    margin-top: 48px; padding-top: 18px; border-top: 1px solid #ddd;
+    font-size: 12px; color: #888; text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<div class="site-header">
+  <div class="page-wrap" style="padding:0;">
+    <div class="tag">Co-Author Briefing &nbsp;·&nbsp; Manuscript in Preparation</div>
+    <h1>Field Cancerization in the Upper Aerodigestive Tract:<br>
+        Co-occurrence Patterns, Bidirectional Transitions, and Survival Impact<br>
+        in a Population-Based Taiwanese Cohort</h1>
+    <div class="meta">
+      <span>Taiwan Cancer Registry 2003–2020</span>
+      <span>n = 10,113 UADT patients</span>
+      <span>Target: <em>Oral Oncology</em> (Elsevier)</span>
+      <span class="badge orange">Ready for submission</span>
+    </div>
+  </div>
+</div>
+
+<div class="page-wrap">
+
+  <!-- ── Action required ── -->
+  <div class="action-banner">
+    <div class="title">⚠ Action required from all authors before submission</div>
+    <ul>
+      <li><strong>Author information</strong> — full name, department, institution, city for each of the 3 authors</li>
+      <li><strong>Corresponding author</strong> — name and email address</li>
+      <li><strong>Registry source</strong> — confirm the institution/region name for the data source description (line 150)</li>
+      <li><strong>IRB approval number</strong> — appears in two places (lines 162 and 410)</li>
+      <li><strong>Funding statement</strong> — confirm "no external funding" or provide grant details (line 411)</li>
+      <li><strong>GitHub repository</strong> — confirm the repo URL is public and the code is accessible before submission</li>
+    </ul>
+    <p style="margin-top:10px;font-size:13px;color:#666;">
+      Please reply to the corresponding author with these details.<br>
+      Once received, the PDF can be recompiled and uploaded to Elsevier the same day.
+    </p>
+  </div>
+
+  <!-- ── Key findings callout ── -->
+  <div class="key-finding">
+    <div class="kf-title">The headline finding in one sentence</div>
+    One in four pyriform sinus cancer patients in Taiwan develops a second esophageal
+    primary — and the survival penalty of multi-site disease is 2.14-fold, an effect
+    that is completely masked (and reversed to HR = 0.86) by the immortal-time bias
+    present in conventional landmark analyses.
+  </div>
+
+  <!-- ── Key stats ── -->
+  <h2>Key statistics at a glance</h2>
+  <div class="cards">
+    <div class="card">
+      <div class="num">10,113</div>
+      <div class="label">UADT field patients<br>(2003–2020)</div>
+    </div>
+    <div class="card navy-top">
+      <div class="num">10.6%</div>
+      <div class="label">developed ≥ 2 field sites<br>(n = 1,067)</div>
+    </div>
+    <div class="card red-top">
+      <div class="num">24.2%</div>
+      <div class="label">pyriform sinus patients<br>→ esophageal cancer</div>
+    </div>
+    <div class="card red-top">
+      <div class="num">SIR 4.67</div>
+      <div class="label">esophagus → hypopharynx<br>(highest in cohort)</div>
+    </div>
+    <div class="card orange-top">
+      <div class="num">HR 2.14</div>
+      <div class="label">multi-site mortality excess<br>(time-varying Cox)</div>
+    </div>
+    <div class="card green-top">
+      <div class="num">60%</div>
+      <div class="label">transitions synchronous<br>(&lt; 6 months)</div>
+    </div>
+    <div class="card purple-top">
+      <div class="num">0.879</div>
+      <div class="label">bidirectionality symmetry<br>C13 ↔ C15 (binomial p = 0.70)</div>
+    </div>
+    <div class="card">
+      <div class="num">56.7%</div>
+      <div class="label">5-year all-cause mortality<br>(competing risks)</div>
+    </div>
+  </div>
+
+  <!-- ── Abstract ── -->
+  <h2>Abstract</h2>
+  <div class="abstract-box">
+    <p><strong>Objectives.</strong>
+    The upper aerodigestive tract (UADT) is exposed to shared carcinogens — betel nut,
+    tobacco, and alcohol — creating conditions for field cancerization, in which mucosal
+    exposure produces independent primary tumours at multiple sites. Taiwan's high prevalence
+    of betel nut chewing offers a unique population to study field cancerization epidemiology.
+    We aimed to quantify UADT co-occurrence rates, characterise the directionality of
+    site-to-site transitions, determine the survival impact of multi-site UADT disease, and
+    demonstrate the magnitude of immortal-time bias as a methodological warning for
+    retrospective multi-primary cancer analyses.</p>
+
+    <p><strong>Materials and Methods.</strong>
+    We analysed a population-based cancer registry spanning 2003–2020 comprising 10,113
+    patients with at least one cancer at a predefined UADT field site (ICD-O C02–C06, C09–C10,
+    C12–C13, C15). Standardised incidence ratios (SIR) quantified the elevation in
+    second-primary risk. Synchronous versus metachronous transitions were characterised by a
+    symmetry score. Survival impact was estimated using time-varying Cox regression to
+    eliminate immortal-time bias, and validated with a competing-risks DeepHit neural
+    network model.</p>
+
+    <p><strong>Results.</strong>
+    Among 10,113 UADT field patients, 1,067 (10.6%) developed ≥ 2 field sites. Pyriform
+    sinus patients had the highest absolute second-primary rate (24.2% co-occurring with
+    esophagus; SIR = 3.78, 95% CI 2.40–5.68) followed by hypopharynx–esophagus (16.4%;
+    SIR = 2.86, 95% CI 1.96–4.04). Transitions were bidirectional and predominantly
+    synchronous (60% within 6 months; symmetry score 0.879, binomial p = 0.70), consistent
+    with shared field exposure rather than metastasis. After immortal-time correction,
+    multi-site disease carried a hazard ratio for death of 2.14 (95% CI 1.97–2.33, p &lt; 0.001).
+    Competing-risks analysis confirmed 5-year cumulative incidence of second UADT cancer of
+    10.4% against a backdrop of 56.7% all-cause mortality, underscoring the urgency of
+    early surveillance.</p>
+
+    <p><strong>Conclusions.</strong>
+    One in four pyriform sinus patients develops a second esophageal primary. Bidirectional,
+    predominantly synchronous transitions and a 2.14-fold mortality excess confirm a field
+    cancerization mechanism. Routine early esophagoscopic surveillance within 1–2 years of a
+    UADT diagnosis is warranted, particularly for pyriform sinus and hypopharynx primaries.</p>
+  </div>
+
+  <!-- ── Four key findings ── -->
+  <h2>Four core findings</h2>
+  <div class="findings">
+    <div class="finding f1">
+      <div class="f-title">① Co-occurrence &amp; SIR</div>
+      <ul>
+        <li>24.2% pyriform → esophagus (SIR 3.78)</li>
+        <li>16.4% hypopharynx → esophagus (SIR 2.86)</li>
+        <li>Reverse: esoph → hypopharynx SIR <strong>4.67</strong> (highest)</li>
+        <li>All four C12/C13↔C15 pairs FDR &lt; 0.001</li>
+        <li>Western rates: 3–8% — Taiwan 3–5× higher</li>
+      </ul>
+    </div>
+    <div class="finding f2">
+      <div class="f-title">② Bidirectionality (field, not metastasis)</div>
+      <ul>
+        <li>C13 → C15: n = 74 forward, 60 reverse</li>
+        <li>Symmetry score = 0.879</li>
+        <li>Binomial test p = 0.70 (not directional)</li>
+        <li>60% synchronous (&lt; 6 months)</li>
+        <li>Stable: 57% at 3 mo, 61% at 9 mo</li>
+        <li>Rules out loco-regional spread mechanism</li>
+      </ul>
+    </div>
+    <div class="finding f3">
+      <div class="f-title">③ Immortal-time bias: ΔHR = 1.28</div>
+      <ul>
+        <li>Landmark Cox HR = 0.86 <em>(artifact)</em></li>
+        <li>Time-varying Cox HR = <strong>2.14</strong> [1.97–2.33]</li>
+        <li>ΔHR = 1.28 — direction reversed by bias</li>
+        <li>Methodological warning for registry studies</li>
+        <li>Age &lt; 55: log-rank p = 0.267 (null)</li>
+        <li>Age ≥ 55: significant (main driver)</li>
+      </ul>
+    </div>
+    <div class="finding f4">
+      <div class="f-title">④ Competing risks (DeepHit)</div>
+      <ul>
+        <li>1-year: death 25.8% vs 2nd cancer 4.8%</li>
+        <li>5-year: death 56.7% vs 2nd cancer 10.4%</li>
+        <li>Death dominates at all time horizons</li>
+        <li>→ Surveillance must start immediately</li>
+        <li>Highest-yield window: 1–2 years post-diagnosis</li>
+        <li>C-index for death 0.595, 2nd cancer 0.600</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ── SIR table ── -->
+  <h2>Top SIR pairs — Table 1 (reproduction)</h2>
+  <table>
+    <thead>
+      <tr><th>Index site</th><th>Second site</th><th>Observed</th><th>Expected</th><th>SIR</th><th>95% CI</th><th>FDR</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Esophagus (C15)</td><td>Hypopharynx (C13)</td><td>30</td><td>6.43</td><td class="hi">4.67</td><td>3.15–6.66</td><td>&lt; 0.001</td></tr>
+      <tr><td>Floor of mouth (C04)</td><td>Hypopharynx (C13)</td><td>5</td><td>1.17</td><td class="hi">4.27</td><td>1.39–9.96</td><td>0.040</td></tr>
+      <tr><td>Pyriform (C12)</td><td>Esophagus (C15)</td><td>23</td><td>6.08</td><td class="hi">3.78</td><td>2.40–5.68</td><td>&lt; 0.001</td></tr>
+      <tr><td>Esophagus (C15)</td><td>Pyriform (C12)</td><td>12</td><td>3.34</td><td class="hi">3.59</td><td>1.85–6.27</td><td>0.002</td></tr>
+      <tr><td>Gum (C03)</td><td>Oral NOS (C06)</td><td>38</td><td>11.25</td><td>3.38</td><td>2.39–4.64</td><td>&lt; 0.001</td></tr>
+      <tr><td>Oropharynx (C10)</td><td>Esophagus (C15)</td><td>14</td><td>4.36</td><td>3.21</td><td>1.76–5.39</td><td>0.002</td></tr>
+      <tr><td>Palate (C05)</td><td>Oral NOS (C06)</td><td>23</td><td>7.22</td><td>3.18</td><td>2.02–4.78</td><td>&lt; 0.001</td></tr>
+      <tr><td>Hypopharynx (C13)</td><td>Esophagus (C15)</td><td>32</td><td>11.20</td><td>2.86</td><td>1.96–4.04</td><td>&lt; 0.001</td></tr>
+      <tr><td>Tonsil (C09)</td><td>Esophagus (C15)</td><td>28</td><td>11.85</td><td>2.36</td><td>1.57–3.41</td><td>&lt; 0.001</td></tr>
+    </tbody>
+  </table>
+  <p style="font-size:12px;color:#888;margin-top:-12px;margin-bottom:24px;">
+    Internal-reference SIR · sex × age stratified · FDR: Benjamini–Hochberg
+  </p>
+
+  <!-- ── Cox table ── -->
+  <h2>Cox regression — Table 2 (landmark vs time-varying)</h2>
+  <table>
+    <thead>
+      <tr><th>Model</th><th>HR</th><th>95% CI</th><th>p</th><th>Interpretation</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>6-month landmark Cox</td>
+        <td class="italic">0.86</td>
+        <td class="italic">0.79–0.93</td>
+        <td class="italic">&lt; 0.001</td>
+        <td class="italic">Artifact — immortal-time bias</td>
+      </tr>
+      <tr>
+        <td><strong>Time-varying Cox</strong></td>
+        <td class="hi">2.14</td>
+        <td class="hi">1.97–2.33</td>
+        <td class="hi">&lt; 0.001</td>
+        <td><strong>True estimate — use this</strong></td>
+      </tr>
+      <tr>
+        <td colspan="4" style="font-size:12px;color:#888;padding:6px 14px;">
+          ΔHR = 1.28 quantifies the immortal-time distortion · Both models adjusted for age + sex
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- ── Methods ── -->
+  <h2>Methods overview</h2>
+  <div class="methods-grid">
+    <div class="method-box">
+      <h4>Co-occurrence &amp; SIR</h4>
+      90 ordered site pairs · Poisson person-years model · Sex × 5-year age-band stratification ·
+      Expected counts from general registry (excluding UADT patients) · BH FDR correction
+    </div>
+    <div class="method-box">
+      <h4>Transition directionality</h4>
+      Synchronous = ≤ 6 months (sensitivity: 3 mo, 9 mo) ·
+      Symmetry score = min/max of forward/reverse counts ·
+      Binomial test for directional departure · Pairs with n ≥ 10 transitions
+    </div>
+    <div class="method-box">
+      <h4>Survival — Time-varying Cox</h4>
+      lifelines package · multi_field = 0 before 2nd dx date, 1 after ·
+      Eliminates immortal-time bias by construction ·
+      6-month landmark retained for comparison (ΔHR reported)
+    </div>
+    <div class="method-box">
+      <h4>Competing risks — DeepHit</h4>
+      Neural network, 2 cause-specific heads (death / 2nd UADT cancer) ·
+      Shared trunk d = 64, 2 layers · NLL + ranking loss (α = 0.2) ·
+      30 percentile-based time bins · C-index ≈ 0.60
+    </div>
+  </div>
+
+  <!-- ── Figures ── -->
+  <h2>Figures in the manuscript</h2>
+  <table>
+    <thead><tr><th>Figure</th><th>Content</th><th>File path</th></tr></thead>
+    <tbody>
+      <tr><td>Fig 1a–c</td><td>Cohort: site prevalence, 2003–2020 temporal trend, age/sex violin</td><td>results/01_cohort/fig1[a-c]_*.png</td></tr>
+      <tr><td>Fig 2a–c</td><td>Co-occurrence heatmap, lift heatmap, OR forest plot (45 pairs)</td><td>results/02_pairs/fig2[a-c]_*.png</td></tr>
+      <tr><td>Fig 3a–b</td><td>SIR forest plot (top 20), SIR heatmap (10 × 10)</td><td>results/03_sir/fig3[a-b]_*.png</td></tr>
+      <tr><td>Fig 4a–c</td><td>Trajectory network graph, directionality bars, synchronous heatmap</td><td>results/04_trajectories/fig4[a-c]_*.png</td></tr>
+      <tr><td>Fig 5a–c</td><td>KM landmark curves, Cox HR forest, time-varying comparison</td><td>results/05_survival/fig5[a-c]_*.png</td></tr>
+      <tr><td>Suppl 1–2</td><td>DeepHit CIF curves, covariate effects, risk groups</td><td>results/07_deephit/fig_*.png</td></tr>
+    </tbody>
+  </table>
+  <p style="font-size:12px;color:#e07b39;margin-top:-10px;margin-bottom:24px;">
+    ⚠ Figures generated at 150 dpi. Oral Oncology requires ≥ 300 dpi for submission.
+    Add dpi=300 to savefig() in scripts 01–05, 07 and rerun bash analysis/run_all.sh.
+  </p>
+
+  <!-- ── Checklist ── -->
+  <h2>Submission checklist</h2>
+  <p style="font-size:13.5px;margin-bottom:12px;">
+    <span class="who author">Author</span> = only authors can supply &nbsp;
+    <span class="who tech">Technical</span> = code/compilation task &nbsp;
+    <span class="who verify">Verify</span> = needs confirmation before submission
+  </p>
+
+  <div class="checklist">
+    <div class="checklist-header">STEP 1 — Author information (manuscript lines 27–31)</div>
+    <div class="check-item">
+      <div class="check-box"></div>
+      <div class="item-label">
+        <strong>Author 1 full name</strong><br>
+        <span class="item-note">Replace [Author 1] in \newcommand{\AUTHOR} on line 27. First author is typically also the corresponding author.</span>
+      </div>
+      <div class="who author">Author</div>
+    </div>
+    <div class="check-item">
+      <div class="check-box"></div>
+      <div class="item-label">
+        <strong>Author 2 full name</strong><br>
+        <span class="item-note">Replace [Author 2] on line 27.</span>
+      </div>
+      <div class="who author">Author</div>
+    </div>
+    <div class="check-item">
+      <div class="check-box"></div>
+      <div class="item-label">
+        <strong>Author 3 full name</strong><br>
+        <span class="item-note">Replace [Author 3] on line 27. Listed as affiliation 2 — confirm or change superscript.</span>
+      </div>
+      <div class="who author">Author</div>
+    </div>
+    <div class="check-item">
+      <div class="check-box"></div>
+      <div class="item-label">
+        <strong>Affiliation 1</strong> — Department + Institution + City<br>
+        <span class="item-note">Line 29: $^1$[Department, Institution, City, Taiwan]. e.g. "Department of Oncology, China Medical University Hospital, Taichung, Taiwan"</span>
+      </div>
+      <div class="who author">Author</div>
+    </div>
+    <div class="check-item">
+      <div class="check-box"></div>
+      <div class="item-label">
+        <strong>Affiliation 2</strong> — Department + Institution + City<br>
+        <span class="item-note">Line 30: $^2$[Department, Institution, City, Taiwan]. Delete this line if Author 3 shares Affiliation 1.</span>
+      </div>
+      <div class="who author">Author</div>
+    </div>
+    <div class="check-item">
+      <div class="check-box"></div>
+      <div class="item-label">
+        <strong>Corresponding author name + email</strong><br>
+        <span class="item-note">Line 31: \newcommand{\CORRESPONDING}{[Corresponding Author], [email address]}</span>
+      </div>
+      <div class="who author">Author</div>
+    </div>
+  </div>
+
+  <div class="checklist" style="margin-top:12px;">
+    <div class="checklist-header">STEP 2 — Registry source and IRB (lines 150, 162, 410)</div>
+    <div class="check-item">
+      <div class="check-box"></div>
+      <div class="item-label">
+        <strong>Registry institution / region name</strong><br>
+        <span class="item-note">Line 150: "Data were derived from a population-based cancer registry covering [Institution/Region]…" — fill with the formal registry name, e.g. "Taiwan Cancer Registry (Health Promotion Administration, Ministry of Health and Welfare)"</span>
+      </div>
+      <div class="who author">Author</div>
+    </div>
+    <div class="check-item">
+      <div class="check-box"></div>
+      <div class="item-label">
+        <strong>IRB reference — Methods section</strong><br>
+        <span class="item-note">Line 162: "Ethics approval was obtained from [IRB reference]" — replace with full approval number and institution.</span>
+      </div>
+      <div class="who author">Author</div>
+    </div>
+    <div class="check-item">
+      <div class="check-box"></div>
+      <div class="item-label">
+        <strong>IRB reference — Declarations section</strong><br>
+        <span class="item-note">Line 410: \textbf{Ethics approval:} [IRB reference number] — same number, second occurrence.</span>
+      </div>
+      <div class="who author">Author</div>
+    </div>
+  </div>
+
+  <div class="checklist" style="margin-top:12px;">
+    <div class="checklist-header">STEP 3 — Funding statement (line 411)</div>
+    <div class="check-item">
+      <div class="check-box"></div>
+      <div class="item-label">
+        <strong>Confirm funding status</strong><br>
+        <span class="item-note">
+          Current placeholder: "This research received no specific funding from any agency in the public, commercial, or not-for-profit sectors."<br>
+          If no funding: keep as is. If funded: replace with grant number(s) and funder names.
+        </span>
+      </div>
+      <div class="who author">Author</div>
+    </div>
+  </div>
+
+  <div class="checklist" style="margin-top:12px;">
+    <div class="checklist-header">STEP 4 — GitHub repository verification (line 223)</div>
+    <div class="check-item">
+      <div class="check-box"></div>
+      <div class="item-label">
+        <strong>Confirm GitHub repo is public and accessible</strong><br>
+        <span class="item-note">
+          Manuscript states: "Code is publicly available at https://github.com/jnynlin/taiwan-cancer-registry"<br>
+          Action: Make the repository public before submission, or replace with a Zenodo DOI.
+          Patient-level data files are excluded via .gitignore — confirm only code is visible.
+        </span>
+      </div>
+      <div class="who verify">Verify</div>
+    </div>
+    <div class="check-item">
+      <div class="check-box"></div>
+      <div class="item-label">
+        <strong>Confirm lifelines version number</strong><br>
+        <span class="item-note">Line 198: "time-varying Cox regression implemented in the lifelines package (v [version])" — fill with actual version used. Run: python -c "import lifelines; print(lifelines.__version__)"</span>
+      </div>
+      <div class="who tech">Technical</div>
+    </div>
+  </div>
+
+  <div class="checklist" style="margin-top:12px;">
+    <div class="checklist-header">STEP 5 — Technical tasks (no author input needed)</div>
+    <div class="check-item">
+      <div class="check-box"></div>
+      <div class="item-label">
+        <strong>Regenerate all figures at 300 dpi</strong><br>
+        <span class="item-note">Add dpi=300 to all fig.savefig() calls in scripts 01–05, 07. Then: bash analysis/run_all.sh</span>
+      </div>
+      <div class="who tech">Technical</div>
+    </div>
+    <div class="check-item">
+      <div class="check-box"></div>
+      <div class="item-label">
+        <strong>Recompile LaTeX PDF</strong><br>
+        <span class="item-note">cd manuscript && pdflatex uadt_manuscript.tex && bibtex uadt_manuscript && pdflatex uadt_manuscript.tex && pdflatex uadt_manuscript.tex (3 passes for bibtex)</span>
+      </div>
+      <div class="who tech">Technical</div>
+    </div>
+    <div class="check-item">
+      <div class="check-box"></div>
+      <div class="item-label">
+        <strong>Write Highlights file</strong> (Elsevier requirement, ≤ 85 chars each)<br>
+        <span class="item-note">
+          Draft:<br>
+          • 1 in 4 pyriform sinus patients develops a second esophageal primary<br>
+          • Bidirectional, synchronous transitions confirm field cancerization mechanism<br>
+          • Time-varying Cox HR = 2.14; landmark HR = 0.86 (immortal-time artifact)<br>
+          • ΔHR = 1.28 quantifies immortal-time bias in retrospective multi-primary studies<br>
+          • Competing risks: 56.7% die at 5 yr — surveillance must begin immediately
+        </span>
+      </div>
+      <div class="who tech">Technical</div>
+    </div>
+    <div class="check-item">
+      <div class="check-box"></div>
+      <div class="item-label">
+        <strong>Verify word count</strong><br>
+        <span class="item-note">Manuscript targets ~3,500 body words. Oral Oncology limit: 3,500 words (Original Research). Check current count: texcount -sum uadt_manuscript.tex</span>
+      </div>
+      <div class="who tech">Technical</div>
+    </div>
+    <div class="check-item">
+      <div class="check-box"></div>
+      <div class="item-label">
+        <strong>Upload to Elsevier Editorial Manager</strong><br>
+        <span class="item-note">Manuscript PDF · .tex + .bib source · Cover letter · Each figure as separate TIFF/PNG (≥ 300 dpi) · Highlights file · Supplementary figures</span>
+      </div>
+      <div class="who tech">Technical</div>
+    </div>
+  </div>
+
+  <!-- ── Highlights draft ── -->
+  <h2>Highlights draft (Elsevier — ≤ 85 characters each)</h2>
+  <table>
+    <thead><tr><th>#</th><th>Highlight</th><th>Char count</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>1 in 4 pyriform sinus patients develops a second esophageal primary</td><td>66</td></tr>
+      <tr><td>2</td><td>Bidirectional, synchronous transitions confirm field cancerization</td><td>65</td></tr>
+      <tr><td>3</td><td>Time-varying Cox HR = 2.14; landmark HR = 0.86 (immortal-time artifact)</td><td>71</td></tr>
+      <tr><td>4</td><td>ΔHR = 1.28 quantifies immortal-time bias in multi-primary registry studies</td><td>74</td></tr>
+      <tr><td>5</td><td>5-year mortality 56.7% — surveillance must begin within 1–2 years</td><td>65</td></tr>
+    </tbody>
+  </table>
+
+  <!-- ── Timeline ── -->
+  <h2>Proposed submission timeline</h2>
+  <div class="timeline">
+    <div class="tl-item">
+      <div class="tl-week">This week</div>
+      <div class="tl-text">Authors reply: names / affiliations / IRB / funding confirmation / GitHub public status</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-week">Day 1–2</div>
+      <div class="tl-text">Fill all placeholders · Check lifelines version · Regenerate figures at 300 dpi · Recompile PDF</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-week">Day 3</div>
+      <div class="tl-text">Final read-through by all authors · Make GitHub repo public (or Zenodo archive)</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-week">Day 4</div>
+      <div class="tl-text"><strong>Submit to Oral Oncology via Elsevier Editorial Manager</strong></div>
+    </div>
+  </div>
+
+  <!-- ── Manuscript details ── -->
+  <h2>Manuscript details</h2>
+  <table>
+    <thead><tr><th>Item</th><th>Value</th></tr></thead>
+    <tbody>
+      <tr><td>Title</td><td>Field Cancerization in the Upper Aerodigestive Tract: Co-occurrence Patterns, Bidirectional Transitions, and Survival Impact in a Population-Based Taiwanese Cohort</td></tr>
+      <tr><td>Running title</td><td>UADT field cancerization in Taiwan</td></tr>
+      <tr><td>Journal</td><td>Oral Oncology (Elsevier, ISSN 1368-8375) — alternative: Head &amp; Neck (Wiley)</td></tr>
+      <tr><td>Article type</td><td>Original Research Article</td></tr>
+      <tr><td>Body word count</td><td>~3,500 (within Oral Oncology limit)</td></tr>
+      <tr><td>Keywords</td><td>field cancerization · upper aerodigestive tract · esophageal cancer · hypopharynx · standardised incidence ratio · competing risks</td></tr>
+      <tr><td>Tables</td><td>2 (SIR top-10; Cox landmark vs time-varying)</td></tr>
+      <tr><td>Figures</td><td>5 main + 2 supplementary (DeepHit)</td></tr>
+      <tr><td>References</td><td>~18 (BibTeX, references.bib)</td></tr>
+      <tr><td>Funding</td><td>No external funding (pending author confirmation)</td></tr>
+      <tr><td>Conflicts of interest</td><td>None declared</td></tr>
+      <tr><td>Data availability</td><td>Patient-level data under data-use agreement (cannot share); code at GitHub</td></tr>
+      <tr><td>Software</td><td>Python 3.11 · pandas · scipy · lifelines · PyTorch · numpy (all open-source)</td></tr>
+      <tr><td>Manuscript file</td><td>uadt_field/manuscript/uadt_manuscript.tex</td></tr>
+      <tr><td>References file</td><td>uadt_field/manuscript/references.bib</td></tr>
+      <tr><td>Full checklist</td><td>uadt_field/SUBMIT_CHECKLIST.md</td></tr>
+    </tbody>
+  </table>
+
+  <!-- ── Novelty context ── -->
+  <h2>Novelty context vs published literature</h2>
+  <p style="font-size:13.5px;">
+    Closest existing paper: <strong>Huang et al. 2009 (<em>BMC Cancer</em>)</strong> — SIR for second esophageal
+    primary in oral/pharyngeal patients, same Taiwan registry, earlier cohort (~1979–2003).
+    Our paper extends and differentiates in four ways:
+  </p>
+  <ul style="font-size:13.5px;padding-left:22px;margin:10px 0 14px;">
+    <li><strong>Post-betel-regulation cohort</strong> (2003–2020 vs pre-2003) — captures the regulatory era</li>
+    <li><strong>C12 pyriform sinus specificity</strong> — 24.2% is the headline number; Huang reports overall pharyngeal SIR, not C12-specific rates</li>
+    <li><strong>Survival modeling with immortal-time correction</strong> — ΔHR = 1.28 is a new methodological contribution not in Huang</li>
+    <li><strong>Competing-risks DeepHit</strong> — no prior Taiwan UADT study uses neural competing-risks to quantify the death-vs-surveillance race</li>
+  </ul>
+  <p style="font-size:13px;color:#888;">
+    Western comparators: Haughey 1992, Schwartz 2007 report 3–8% second esophageal primary rates in head &amp; neck cohorts.
+    Our 24.2% (3–5× higher) directly reflects betel nut triple-carcinogen exposure unique to Taiwan.
+  </p>
+
+  <div class="page-footer">
+    Generated 2026-06-03 &nbsp;·&nbsp;
+    Taiwan Cancer Registry — UADT Field Cancerization &nbsp;·&nbsp;
+    For internal author communication only — not for public distribution
+  </div>
+
+</div>
+
+<!-- ── Progress bar ── -->
+<div id="progress-bar-wrap" style="
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: #fff; border-top: 1px solid #ddd;
+  padding: 10px 24px;
+  display: flex; align-items: center; gap: 16px;
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.08);
+  z-index: 999; font-size: 13px;
+">
+  <span style="font-weight:700;color:#14304a;white-space:nowrap;">Submission progress</span>
+  <div style="flex:1;background:#eee;border-radius:20px;height:10px;overflow:hidden;">
+    <div id="progress-fill" style="height:100%;background:#d62728;border-radius:20px;width:0%;transition:width 0.3s;"></div>
+  </div>
+  <span id="progress-label" style="white-space:nowrap;color:#555;min-width:60px;text-align:right;">0 / 16</span>
+  <button onclick="resetAll()" style="
+    font-size:11px; padding:4px 10px; border:1px solid #ccc;
+    border-radius:4px; background:#fff; cursor:pointer; color:#888; white-space:nowrap;
+  ">Reset all</button>
+</div>
+<div style="height:46px;"></div>
+
+<script>
+(function () {
+  const STORAGE_KEY = "uadt_checklist_v1";
+  const items = Array.from(document.querySelectorAll(".check-item"));
+  items.forEach((item, i) => { item.dataset.cid = "item_" + i; });
+
+  function loadState() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}"); } catch(e) { return {}; }
+  }
+  function saveState(state) {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e) {}
+  }
+  function applyState(state) {
+    items.forEach(item => {
+      const box = item.querySelector(".check-box");
+      if (!box) return;
+      const checked = !!state[item.dataset.cid];
+      box.classList.toggle("checked", checked);
+      item.classList.toggle("done", checked);
+    });
+    updateProgress();
+  }
+  function toggle(item) {
+    const box = item.querySelector(".check-box");
+    if (!box) return;
+    const nowChecked = !box.classList.contains("checked");
+    box.classList.toggle("checked", nowChecked);
+    item.classList.toggle("done", nowChecked);
+    const state = loadState();
+    state[item.dataset.cid] = nowChecked;
+    saveState(state);
+    updateProgress();
+  }
+  function updateProgress() {
+    const total = items.length;
+    const done  = items.filter(i => i.classList.contains("done")).length;
+    const pct   = total ? Math.round((done / total) * 100) : 0;
+    document.getElementById("progress-fill").style.width = pct + "%";
+    document.getElementById("progress-label").textContent = done + " / " + total;
+    const fill = document.getElementById("progress-fill");
+    if      (pct === 100) fill.style.background = "#2ca02c";
+    else if (pct >= 60)   fill.style.background = "#5bb85d";
+    else if (pct >= 30)   fill.style.background = "#e07b39";
+    else                  fill.style.background = "#d62728";
+  }
+  window.resetAll = function () {
+    if (!confirm("Reset all checkboxes?")) return;
+    saveState({}); applyState({});
+  };
+  items.forEach(item => {
+    item.addEventListener("click", () => toggle(item));
+    const box = item.querySelector(".check-box");
+    if (box) { box.addEventListener("click", e => e.stopPropagation()); box.addEventListener("click", () => toggle(item)); }
+  });
+  applyState(loadState());
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Co-Author Briefing — Co-existing Cancer Patterns in Taiwan</title>
+<style>
+  /* ── Reset & base ─────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.65;
+    color: #222;
+    background: #f4f6f9;
+  }
+  a { color: #2e7fbf; }
+
+  /* ── Layout ───────────────────────────────────── */
+  .page-wrap { max-width: 960px; margin: 0 auto; padding: 0 20px 60px; }
+
+  /* ── Header ───────────────────────────────────── */
+  .site-header {
+    background: #14304a;
+    color: #fff;
+    padding: 36px 40px 28px;
+    margin-bottom: 32px;
+  }
+  .site-header .tag {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #7db9e2;
+    margin-bottom: 10px;
+  }
+  .site-header h1 {
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.35;
+    margin-bottom: 12px;
+  }
+  .site-header .meta {
+    font-size: 13px;
+    color: #a8c4d9;
+  }
+  .site-header .meta span { margin-right: 20px; }
+  .badge {
+    display: inline-block;
+    background: #2e7fbf;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+  .badge.green { background: #2ca02c; }
+  .badge.orange { background: #e07b39; }
+  .badge.red { background: #d62728; }
+
+  /* ── Section headings ─────────────────────────── */
+  h2 {
+    font-size: 17px;
+    font-weight: 700;
+    color: #14304a;
+    border-left: 4px solid #2e7fbf;
+    padding-left: 12px;
+    margin: 36px 0 14px;
+  }
+  h3 {
+    font-size: 14px;
+    font-weight: 700;
+    color: #333;
+    margin: 20px 0 8px;
+  }
+  p { margin-bottom: 10px; }
+
+  /* ── Action alert ─────────────────────────────── */
+  .action-banner {
+    background: #fff3cd;
+    border: 1.5px solid #e6b800;
+    border-radius: 8px;
+    padding: 18px 24px;
+    margin: 24px 0;
+  }
+  .action-banner .title {
+    font-weight: 700;
+    font-size: 14px;
+    color: #7a5600;
+    margin-bottom: 8px;
+  }
+  .action-banner ul { padding-left: 20px; }
+  .action-banner li { margin-bottom: 4px; font-size: 14px; }
+
+  /* ── Stat cards ───────────────────────────────── */
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 14px;
+    margin: 18px 0 24px;
+  }
+  .card {
+    background: #fff;
+    border-radius: 8px;
+    padding: 18px 16px;
+    border-top: 3px solid #2e7fbf;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+    text-align: center;
+  }
+  .card.red-top   { border-top-color: #d62728; }
+  .card.green-top { border-top-color: #2ca02c; }
+  .card.navy-top  { border-top-color: #14304a; }
+  .card.orange-top { border-top-color: #e07b39; }
+  .card .num {
+    font-size: 28px;
+    font-weight: 800;
+    color: #14304a;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .card .label {
+    font-size: 11.5px;
+    color: #666;
+    line-height: 1.35;
+  }
+
+  /* ── Domain boxes ─────────────────────────────── */
+  .domains { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin: 18px 0; }
+  @media (max-width: 680px) { .domains { grid-template-columns: 1fr; } }
+  .domain {
+    background: #fff;
+    border-radius: 8px;
+    padding: 18px 16px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+  }
+  .domain .dom-title {
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #eee;
+  }
+  .domain .dom-title .num { font-size: 22px; font-weight: 900; margin-right: 4px; }
+  .domain ul { padding-left: 16px; font-size: 13px; }
+  .domain ul li { margin-bottom: 4px; }
+  .domain.d1 .dom-title { color: #d62728; border-color: #d62728; }
+  .domain.d2 .dom-title { color: #9467bd; border-color: #9467bd; }
+  .domain.d3 .dom-title { color: #1f77b4; border-color: #1f77b4; }
+
+  /* ── SIR table ────────────────────────────────── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+    margin: 14px 0 24px;
+  }
+  thead { background: #14304a; color: #fff; }
+  thead th { padding: 10px 14px; text-align: left; font-size: 12px; letter-spacing: 0.5px; }
+  tbody tr:nth-child(even) { background: #f8f9fb; }
+  tbody td { padding: 9px 14px; border-bottom: 1px solid #eee; }
+  td.highlight { font-weight: 700; color: #d62728; }
+
+  /* ── Checklist ────────────────────────────────── */
+  .checklist { background: #fff; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); overflow: hidden; margin: 14px 0 24px; }
+  .checklist-header { background: #14304a; color: #fff; padding: 10px 18px; font-size: 13px; font-weight: 700; letter-spacing: 0.5px; }
+  .check-item {
+    display: flex;
+    align-items: flex-start;
+    padding: 12px 18px;
+    border-bottom: 1px solid #eee;
+    gap: 14px;
+  }
+  .check-item:last-child { border-bottom: none; }
+  .check-box {
+    width: 18px;
+    height: 18px;
+    border: 2px solid #aaa;
+    border-radius: 4px;
+    flex-shrink: 0;
+    margin-top: 2px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s, border-color 0.15s;
+    user-select: none;
+  }
+  .check-box.checked {
+    background: #2ca02c;
+    border-color: #2ca02c;
+  }
+  .check-box.checked::after {
+    content: "✓";
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1;
+  }
+  .check-item { cursor: pointer; transition: background 0.12s; }
+  .check-item:hover { background: #f8fdf8; }
+  .check-item.done { background: #f6fff6; }
+  .check-item.done .item-label { opacity: 0.55; }
+  .check-item.done .item-label strong { text-decoration: line-through; }
+  .check-item .item-label { font-size: 13.5px; flex: 1; }
+  .check-item .item-label strong { color: #14304a; }
+  .check-item .item-note { font-size: 12px; color: #888; margin-top: 2px; }
+  .check-item .who {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 12px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .who.author { background: #fff3cd; color: #7a5600; }
+  .who.tech   { background: #d4edda; color: #155724; }
+
+  /* ── Timeline ─────────────────────────────────── */
+  .timeline { margin: 14px 0 24px; }
+  .tl-item {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 10px;
+  }
+  .tl-week {
+    min-width: 80px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #2e7fbf;
+    padding-top: 2px;
+  }
+  .tl-text { font-size: 13.5px; }
+
+  /* ── Methods summary ──────────────────────────── */
+  .methods-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 14px 0 24px;
+  }
+  @media (max-width: 560px) { .methods-grid { grid-template-columns: 1fr; } }
+  .method-box {
+    background: #fff;
+    border-radius: 8px;
+    padding: 14px 16px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+    border-left: 3px solid #2e7fbf;
+    font-size: 13.5px;
+  }
+  .method-box h4 { font-size: 13px; font-weight: 700; margin-bottom: 6px; color: #14304a; }
+
+  /* ── Abstract box ─────────────────────────────── */
+  .abstract-box {
+    background: #fff;
+    border-radius: 8px;
+    padding: 20px 24px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+    font-size: 13.5px;
+    margin: 14px 0 24px;
+    border-left: 4px solid #14304a;
+  }
+  .abstract-box p { margin-bottom: 10px; }
+  .abstract-box p:last-child { margin-bottom: 0; }
+  .abstract-box strong { color: #14304a; }
+
+  /* ── Footer ───────────────────────────────────── */
+  .page-footer {
+    margin-top: 48px;
+    padding-top: 18px;
+    border-top: 1px solid #ddd;
+    font-size: 12px;
+    color: #888;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<div class="site-header">
+  <div class="page-wrap" style="padding:0;">
+    <div class="tag">Co-Author Briefing &nbsp;·&nbsp; Manuscript in Preparation</div>
+    <h1>Convergent Unsupervised Machine Learning Reveals an Aerodigestive<br>
+        Field-Cancerization Domain Driving Multiple Primary Cancers in Taiwan</h1>
+    <div class="meta">
+      <span>Taiwan Cancer Registry 2006–2020</span>
+      <span>n = 78,578 patients</span>
+      <span>Target: <em>Cancer Epidemiology</em> (Elsevier)</span>
+      <span class="badge orange">Ready for submission</span>
+    </div>
+  </div>
+</div>
+
+<div class="page-wrap">
+
+  <!-- ── Action required ──────────────────────────────────────────────── -->
+  <div class="action-banner">
+    <div class="title">⚠ Action required from all authors before submission</div>
+    <ul>
+      <li><strong>Author information</strong> — full name, department, institution, city for each author</li>
+      <li><strong>Corresponding author</strong> — email address and telephone number</li>
+      <li><strong>IRB approval number</strong> — format e.g. CMUH-REC-110-XXXX (appears in two places in the manuscript)</li>
+      <li><strong>Author contributions</strong> — confirm or revise the pre-written CRediT roles (see checklist below)</li>
+      <li><strong>Suggested reviewers</strong> — 3 names + institutions for the cover letter (optional but recommended)</li>
+    </ul>
+    <p style="margin-top:10px;font-size:13px;color:#666;">
+      Please reply to the corresponding author with these details.<br>
+      Once received, the manuscript PDF can be compiled and uploaded to Elsevier Editorial Manager the same day.
+    </p>
+  </div>
+
+  <!-- ── Key statistics ───────────────────────────────────────────────── -->
+  <h2>Key statistics at a glance</h2>
+  <div class="cards">
+    <div class="card">
+      <div class="num">78,578</div>
+      <div class="label">patients in cohort<br>(2006–2020)</div>
+    </div>
+    <div class="card">
+      <div class="num">84,157</div>
+      <div class="label">primary cancers<br>across 46 sites</div>
+    </div>
+    <div class="card navy-top">
+      <div class="num">5.2%</div>
+      <div class="label">multiple-primary rate<br>(n = 4,068 patients)</div>
+    </div>
+    <div class="card red-top">
+      <div class="num">12×</div>
+      <div class="label">excess second-primary risk<br>esophagus → larynx (SIR 12.2)</div>
+    </div>
+    <div class="card green-top">
+      <div class="num">60%</div>
+      <div class="label">aerodigestive pairs<br>synchronous (&lt; 6 months)</div>
+    </div>
+    <div class="card orange-top">
+      <div class="num">288,424</div>
+      <div class="label">person-years of<br>follow-up (SIR analysis)</div>
+    </div>
+  </div>
+
+  <!-- ── Abstract ─────────────────────────────────────────────────────── -->
+  <h2>Abstract</h2>
+  <div class="abstract-box">
+    <p><strong>Background:</strong>
+    Multiple primary cancers (MPC) are an increasingly common clinical problem,
+    yet the patterns by which specific cancers co-occur within a patient — and the shared
+    carcinogenic mechanisms they imply — remain poorly characterised in Asian populations,
+    where betel quid chewing, tobacco smoking, and alcohol consumption create a distinctive
+    mucosal field-cancerization risk. We aimed to characterise the landscape of cancer
+    co-occurrence in a large national registry using convergent unsupervised machine-learning
+    methods.</p>
+
+    <p><strong>Methods:</strong>
+    We analysed 78,578 patients (84,157 primary cancers) from the Taiwan Cancer Registry
+    (2006–2020). Three independent unsupervised methods were applied to a binary patient ×
+    cancer-site matrix: pairwise association rule mining (lift, odds ratio), non-negative
+    matrix factorisation (NMF, k = 7), and a deep binary-cross-entropy autoencoder followed
+    by UMAP and k-means clustering (k = 3). Concordance across methods was assessed.
+    Standardised incidence ratios (SIR) with Poisson exact confidence intervals (288,424
+    person-years, FDR-corrected) quantified second-primary risk, and directional trajectory
+    mining separated synchronous from metachronous second primaries.</p>
+
+    <p><strong>Results:</strong>
+    4,068 patients (5.2%) developed ≥ 2 distinct primary cancers. Sixty-nine
+    index → target pairs showed significantly elevated second-primary risk (FDR &lt; 0.05);
+    the highest were esophagus → larynx (SIR 12.2, 95% CI 5.6–23.2) and esophagus →
+    hypopharynx (SIR 12.0, 8.1–17.3). All three unsupervised methods converged on three
+    co-occurrence domains: (I) an upper aerodigestive squamous-cell-carcinoma (SCC) field —
+    96% male, median onset 55 years, 68.8% mortality, 13% third-cancer rate; (II) a female
+    reproductive-tract/breast cluster (49.1% mortality); and (III) an age-related
+    visceral/urological cluster. Trajectory mining revealed two temporal modes: upper
+    aerodigestive pairs were bidirectional and synchronous (60% within 6 months), whereas
+    breast and colorectal second primaries were unidirectional and metachronous
+    (10–24% synchronous, FDR &lt; 0.01).</p>
+
+    <p><strong>Conclusions:</strong>
+    Three orthogonal unsupervised methods independently identified the same upper aerodigestive
+    field-cancerization domain as the dominant driver of MPC in Taiwan. The synchronous,
+    bidirectional presentation of upper aerodigestive pairs supports systematic, simultaneous
+    pan-aerodigestive endoscopic surveillance in any patient presenting with one such SCC.</p>
+  </div>
+
+  <!-- ── Three domains ─────────────────────────────────────────────────── -->
+  <h2>Three co-occurrence domains — all three methods agree</h2>
+  <p style="font-size:13.5px;margin-bottom:14px;">
+    Association rule mining, NMF (k = 7), and the autoencoder (k = 3) all independently
+    recovered the same three patient clusters. Methodological convergence across three
+    distinct mathematical frameworks is the central strength of this paper.
+  </p>
+  <div class="domains">
+    <div class="domain d1">
+      <div class="dom-title">
+        <span class="num">I</span> Aerodigestive SCC Field
+      </div>
+      <ul>
+        <li>Esophagus, hypopharynx, oral cavity, larynx</li>
+        <li><strong>96%</strong> male</li>
+        <li>Median onset <strong>55 yr</strong> (youngest cluster)</li>
+        <li>Mortality <strong>68.8%</strong> (highest)</li>
+        <li>Third-cancer rate <strong>13%</strong></li>
+        <li>60% synchronous (&lt; 6 months)</li>
+        <li>Bidirectional — field effect, not seeding</li>
+      </ul>
+    </div>
+    <div class="domain d2">
+      <div class="dom-title">
+        <span class="num">II</span> Female Reproductive / Breast
+      </div>
+      <ul>
+        <li>Breast, corpus uteri, cervix, ovary</li>
+        <li>70% female</li>
+        <li>Median onset 61 yr</li>
+        <li>Mortality <strong>49.1%</strong> (lowest)</li>
+        <li>3% third-cancer rate</li>
+        <li>Unidirectional, metachronous</li>
+        <li>Hormonal / BRCA susceptibility pathway</li>
+      </ul>
+    </div>
+    <div class="domain d3">
+      <div class="dom-title">
+        <span class="num">III</span> Age-Related Visceral / Urological
+      </div>
+      <ul>
+        <li>Colon, liver, lung, prostate, bladder</li>
+        <li>76% male, median onset 61–72 yr</li>
+        <li>Mortality 58.8%</li>
+        <li>Age-related DNA repair / immunosenescence</li>
+        <li>Colon→liver: caution — may include metastases</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ── SIR table ─────────────────────────────────────────────────────── -->
+  <h2>Top second-primary SIR pairs (FDR &lt; 0.05)</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Index → Second primary</th>
+        <th>SIR</th>
+        <th>95% CI</th>
+        <th>n observed</th>
+        <th>Domain</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Esophagus → Larynx</td><td class="highlight">12.2</td><td>5.6–23.2</td><td>9</td><td>Aerodigestive</td></tr>
+      <tr><td>Esophagus → Hypopharynx</td><td class="highlight">12.0</td><td>8.1–17.3</td><td>29</td><td>Aerodigestive</td></tr>
+      <tr><td>Lip → Mouth</td><td class="highlight">11.5</td><td>—</td><td>—</td><td>Aerodigestive</td></tr>
+      <tr><td>Floor of mouth → Hypopharynx</td><td class="highlight">10.8</td><td>—</td><td>—</td><td>Aerodigestive</td></tr>
+      <tr><td>Hypopharynx → Esophagus</td><td>—</td><td>—</td><td>33 fwd / 29 rev</td><td>Aerodigestive (bidirectional)</td></tr>
+      <tr><td>Breast → Lung</td><td>—</td><td>—</td><td>90 fwd / 10 rev</td><td>Female (unidirectional)</td></tr>
+      <tr><td>Colon → Liver</td><td>—</td><td>—</td><td>57 fwd / 22 rev</td><td>Visceral (caution: metastases)</td></tr>
+    </tbody>
+  </table>
+  <p style="font-size:12px;color:#888;">288,424 person-years · 69 of 179 pairs FDR-significant · Internal-reference design (sex × age strata)</p>
+
+  <!-- ── Association rule highlights ───────────────────────────────────── -->
+  <h2>Top pairwise co-occurrence (association rules)</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Cancer pair</th>
+        <th>Lift</th>
+        <th>OR</th>
+        <th>n</th>
+        <th>Predominance</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Pyriform sinus + Esophagus</td><td class="highlight">8.11</td><td>10.87</td><td>118</td><td>Male / age &lt; 60</td></tr>
+      <tr><td>Lip + Gum</td><td class="highlight">9.12</td><td>10.28</td><td>28</td><td>Male</td></tr>
+      <tr><td>Hypopharynx + Esophagus</td><td>5.50</td><td>6.77</td><td>156</td><td>Male / age &lt; 60</td></tr>
+    </tbody>
+  </table>
+  <p style="font-size:12px;color:#888;">45 pairs with lift &gt; 1.5 · 29 male-predominant vs 5 female-predominant enriched pairs</p>
+
+  <!-- ── Methods ─────────────────────────────────────────────────────────── -->
+  <h2>Methods overview</h2>
+  <div class="methods-grid">
+    <div class="method-box">
+      <h4>Association Rule Mining</h4>
+      Support, confidence, lift, OR (Fisher exact) for all ordered cancer pairs.
+      Replicated by sex and age stratum. Lift &gt; 1.5 threshold for enrichment.
+    </div>
+    <div class="method-box">
+      <h4>NMF (k = 7)</h4>
+      Non-negative matrix factorisation on the multi-primary subset (n = 4,068).
+      Rank selected by silhouette + reconstruction error. Produces 7 interpretable latent programs.
+    </div>
+    <div class="method-box">
+      <h4>Autoencoder + UMAP + k-Means</h4>
+      Binary BCE autoencoder (64→32→12 dims, 150 epochs). UMAP for visualisation.
+      k-means on full 12-dim latent space (k = 3 by cosine silhouette). Applied to all 78,578 patients.
+    </div>
+    <div class="method-box">
+      <h4>SIR + Trajectory Mining</h4>
+      Internal-reference SIR (sex × age strata, 288,424 person-years).
+      Jensen 2014 directional trajectory method. Synchronous = ≤ 6 months.
+      FDR correction (Benjamini–Hochberg) throughout.
+    </div>
+  </div>
+
+  <!-- ── Figures ─────────────────────────────────────────────────────────── -->
+  <h2>Figures in the manuscript</h2>
+  <table>
+    <thead><tr><th>Figure</th><th>Content</th><th>File</th></tr></thead>
+    <tbody>
+      <tr><td>Fig 1</td><td>Cancer site prevalence bar chart + co-occurrence heatmap</td><td>results/01_matrix/</td></tr>
+      <tr><td>Fig 2</td><td>Lift heatmap (46 × 46 sites)</td><td>results/02_associations/lift_heatmap.png</td></tr>
+      <tr><td>Fig 3</td><td>Top association rules ranked by lift (forest-style bar chart)</td><td>results/02_associations/top_associations_lift.png</td></tr>
+      <tr><td>Fig 4</td><td>NMF program profiles (k = 7, multi-primary cohort)</td><td>results/03_nmf/nmf_programs_multiprimary.png</td></tr>
+      <tr><td>Fig 5</td><td>UMAP embedding coloured by k-means cluster (k = 3)</td><td>results/04_clustering/umap_kmeans_k3.png</td></tr>
+      <tr><td>Fig 6</td><td>SIR forest plot — top 20 FDR-significant pairs</td><td>results/05_sir_trajectories/sir_forest.png</td></tr>
+      <tr><td>Fig 7</td><td>Directional trajectory network graph</td><td>results/05_sir_trajectories/trajectory_graph.png</td></tr>
+    </tbody>
+  </table>
+  <p style="font-size:12px;color:#e07b39;margin-top:-10px;margin-bottom:24px;">
+    ⚠ Figures were generated at 150 dpi. Cancer Epidemiology requires ≥ 300 dpi.
+    Figures need regeneration before submission (technical task — no analysis changes required).
+  </p>
+
+  <!-- ── Submission checklist ─────────────────────────────────────────── -->
+  <h2>Submission checklist</h2>
+  <p style="font-size:13.5px;margin-bottom:12px;">
+    Items marked <span class="who author">Author</span> require information only the authors can supply.
+    Items marked <span class="who tech">Technical</span> are code/compilation tasks.
+  </p>
+
+  <div class="checklist">
+    <div class="checklist-header">STEP 1 — Author information (manuscript lines 42–51)</div>
+    <div class="check-item">
+      <div class="check-box"></div>
+      <div class="item-label">
+        <strong>Author 1 full name</strong><br>
+        <span class="item-note">Replace [Author 1 Name] on line 42 of the .tex file. This is also the corresponding author.</span>
+      </div>
+      <div class="who author">Author</div>
+    </div>
+    <div class="check-item">
+      <div class="check-box"></div>
+      <div class="item-label">
+        <strong>Corresponding author email</strong><br>
+        <span class="item-note">Replace [email@institution.edu.tw] — line 43.</span>
+      </div>
+      <div class="who author">Author</div>
+    </div>
+    <div class="check-item">
+      <div class="check-box"></div>
+      <div class="item-label">
+        <strong>Corresponding author telephone</strong><br>
+        <span class="item-note">Replace +886-X-XXXX-XXXX — line 51.</span>
+      </div>
+      <div class="who author">Author</div>
+    </div>
+    <div class="check-item">
+      <div class="check-box"></div>
+      <div class="item-label">
+        <strong>Author 2 and Author 3 full names</strong><br>
+        <span class="item-note">Lines 44–45. Note: Author 3 is listed with affiliation 1 + 2; delete aff2 tag if not applicable.</span>
+      </div>
+      <div class="who author">Author</div>
+    </div>
+    <div class="check-item">
+      <div class="check-box"></div>
+      <div class="item-label">
+        <strong>Affiliation 1</strong> — Department + Institution + City<br>
+        <span class="item-note">Lines 47–48. e.g. "Department of Oncology, China Medical University Hospital, Taichung, Taiwan"</span>
+      </div>
+      <div class="who author">Author</div>
+    </div>
+    <div class="check-item">
+      <div class="check-box"></div>
+      <div class="item-label">
+        <strong>Affiliation 2</strong> (if applicable)<br>
+        <span class="item-note">Line 49. Delete the entire \address[aff2]{…} line if Author 3 has only one affiliation.</span>
+      </div>
+      <div class="who author">Author</div>
+    </div>
+  </div>
+
+  <div class="checklist" style="margin-top:12px;">
+    <div class="checklist-header">STEP 2 — IRB and ethics (manuscript lines 269, 521–522)</div>
+    <div class="check-item">
+      <div class="check-box"></div>
+      <div class="item-label">
+        <strong>IRB institution name</strong><br>
+        <span class="item-note">Appears twice: line 269 and line 521. Replace [Institution] with the full IRB-issuing institution name.</span>
+      </div>
+      <div class="who author">Author</div>
+    </div>
+    <div class="check-item">
+      <div class="check-box"></div>
+      <div class="item-label">
+        <strong>IRB approval number</strong><br>
+        <span class="item-note">Appears twice: lines 269 and 522. Replace [IRB-XXXX-XXXX] with the actual approval number.</span>
+      </div>
+      <div class="who author">Author</div>
+    </div>
+  </div>
+
+  <div class="checklist" style="margin-top:12px;">
+    <div class="checklist-header">STEP 3 — Author contributions (lines 527–529)</div>
+    <div class="check-item">
+      <div class="check-box"></div>
+      <div class="item-label">
+        <strong>Confirm or revise CRediT roles</strong><br>
+        <span class="item-note">
+          Pre-written draft:<br>
+          • Author 1: Conceptualisation, Methodology, Software, Formal analysis, Writing — original draft<br>
+          • Author 2: Data curation, Validation<br>
+          • Author 3: Supervision, Writing — review and editing<br>
+          Please confirm this accurately reflects contributions, or provide corrections.
+        </span>
+      </div>
+      <div class="who author">Author</div>
+    </div>
+  </div>
+
+  <div class="checklist" style="margin-top:12px;">
+    <div class="checklist-header">STEP 4 — Cover letter (results/cover_letter_CancerEpidemiology.md)</div>
+    <div class="check-item">
+      <div class="check-box"></div>
+      <div class="item-label">
+        <strong>Header block</strong> — name, department, institution, address, city, email, phone<br>
+        <span class="item-note">Lines 1–6 of the cover letter.</span>
+      </div>
+      <div class="who author">Author</div>
+    </div>
+    <div class="check-item">
+      <div class="check-box"></div>
+      <div class="item-label">
+        <strong>Sign-off block</strong> — name, title, department, institution, email<br>
+        <span class="item-note">Lines 61–63 of the cover letter.</span>
+      </div>
+      <div class="who author">Author</div>
+    </div>
+    <div class="check-item">
+      <div class="check-box"></div>
+      <div class="item-label">
+        <strong>Suggested reviewers × 3</strong> (optional but recommended)<br>
+        <span class="item-note">
+          Suggest researchers in: (1) cancer registry / multiple primaries, (2) head &amp; neck / esophageal field cancerization, (3) ML in cancer epidemiology.<br>
+          Leave blank if you prefer the editor to choose.
+        </span>
+      </div>
+      <div class="who author">Author</div>
+    </div>
+  </div>
+
+  <div class="checklist" style="margin-top:12px;">
+    <div class="checklist-header">STEP 5 — Technical tasks (no author input needed)</div>
+    <div class="check-item">
+      <div class="check-box"></div>
+      <div class="item-label">
+        <strong>Regenerate all figures at 300 dpi</strong><br>
+        <span class="item-note">Add dpi=300 to savefig() in scripts 01, 02, 03, 04, 07; rerun bash analysis/run_all.sh</span>
+      </div>
+      <div class="who tech">Technical</div>
+    </div>
+    <div class="check-item">
+      <div class="check-box"></div>
+      <div class="item-label">
+        <strong>Recompile LaTeX PDF</strong><br>
+        <span class="item-note">xelatex coexist_cancers_manuscript.tex (run twice for cross-references)</span>
+      </div>
+      <div class="who tech">Technical</div>
+    </div>
+    <div class="check-item">
+      <div class="check-box"></div>
+      <div class="item-label">
+        <strong>Write Highlights file</strong> (required by Elsevier, ≤ 85 chars each)<br>
+        <span class="item-note">
+          Draft:<br>
+          • Three independent ML methods converge on the same cancer co-occurrence axes<br>
+          • Aerodigestive SCC field drives 13% third-primary rate (cohort-wide: 5.2%)<br>
+          • Esophagus→larynx SIR = 12.2: highest second-primary risk quantified<br>
+          • 60% of aerodigestive pairs are synchronous (&lt; 6 months)<br>
+          • Findings support pan-aerodigestive surveillance at first SCC diagnosis
+        </span>
+      </div>
+      <div class="who tech">Technical</div>
+    </div>
+    <div class="check-item">
+      <div class="check-box"></div>
+      <div class="item-label">
+        <strong>Upload to Elsevier Editorial Manager</strong><br>
+        <span class="item-note">Manuscript PDF · .tex source · Cover letter · Each figure as separate file · Highlights</span>
+      </div>
+      <div class="who tech">Technical</div>
+    </div>
+  </div>
+
+  <!-- ── Timeline ─────────────────────────────────────────────────────── -->
+  <h2>Proposed submission timeline</h2>
+  <div class="timeline">
+    <div class="tl-item">
+      <div class="tl-week">This week</div>
+      <div class="tl-text">Authors reply with name / affiliation / IRB / CRediT roles / reviewer suggestions</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-week">Day 1–2</div>
+      <div class="tl-text">Fill all placeholders · Regenerate figures at 300 dpi · Recompile PDF · Write highlights</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-week">Day 3</div>
+      <div class="tl-text">Final read-through by all authors · Confirm submission</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-week">Day 4</div>
+      <div class="tl-text"><strong>Submit to Cancer Epidemiology via Editorial Manager</strong></div>
+    </div>
+  </div>
+
+  <!-- ── Manuscript info ───────────────────────────────────────────────── -->
+  <h2>Manuscript details</h2>
+  <table>
+    <thead><tr><th>Item</th><th>Value</th></tr></thead>
+    <tbody>
+      <tr><td>Title</td><td>Convergent Unsupervised Machine Learning Reveals an Aerodigestive Field-Cancerization Domain Driving Multiple Primary Cancers in Taiwan</td></tr>
+      <tr><td>Journal</td><td>Cancer Epidemiology (Elsevier, ISSN 1877-7821)</td></tr>
+      <tr><td>Article type</td><td>Original Research Article</td></tr>
+      <tr><td>Abstract</td><td>252 words (structured: Background / Methods / Results / Conclusions)</td></tr>
+      <tr><td>Keywords</td><td>Multiple primary cancers · Field cancerization · Esophageal cancer · Association rule mining · NMF · Deep learning · Cancer registry · Taiwan</td></tr>
+      <tr><td>Figures</td><td>7</td></tr>
+      <tr><td>Tables</td><td>3</td></tr>
+      <tr><td>References</td><td>17</td></tr>
+      <tr><td>Funding</td><td>None (declare: "No external funding received")</td></tr>
+      <tr><td>Conflicts of interest</td><td>None (declare: "The authors declare no competing interests")</td></tr>
+      <tr><td>Data availability</td><td>Taiwan Cancer Registry — available from Health Promotion Administration subject to data-access governance</td></tr>
+      <tr><td>Software</td><td>Python 3.11 · pandas · scikit-learn · PyTorch · umap-learn · statsmodels · networkx · scipy (all open-source)</td></tr>
+      <tr><td>Manuscript file</td><td>coexist_cancers/manuscript/coexist_cancers_manuscript.tex</td></tr>
+      <tr><td>Cover letter</td><td>coexist_cancers/results/cover_letter_CancerEpidemiology.md</td></tr>
+      <tr><td>Full checklist</td><td>coexist_cancers/SUBMIT_CHECKLIST.md</td></tr>
+    </tbody>
+  </table>
+
+  <!-- ── Novelty context ───────────────────────────────────────────────── -->
+  <h2>Novelty context</h2>
+  <p style="font-size:13.5px;">
+    A systematic literature search confirmed <strong>no prior paper applies NMF or deep autoencoder clustering to a national cancer registry to extract pan-cancer co-occurrence domains</strong> in an Asian population. Existing work uses single-index-site SIR analyses (e.g. Huang et al. 2009,
+    <em>BMC Cancer</em>) or pairwise transition matrices. Our contribution is:
+  </p>
+  <ul style="font-size:13.5px;padding-left:22px;margin-top:8px;margin-bottom:12px;">
+    <li><strong>Methodological convergence</strong> — three independent algorithms, same result</li>
+    <li><strong>Pan-registry scope</strong> — all 46 sites simultaneously, not single-index analyses</li>
+    <li><strong>Temporal modes</strong> — synchronous/metachronous distinction with trajectory direction testing</li>
+    <li><strong>Taiwan-specific</strong> — betel quid + tobacco + alcohol synergy captured at population scale</li>
+    <li><strong>Actionable clinical output</strong> — systematic panendoscopy recommendation grounded in SIR + timing data</li>
+  </ul>
+  <p style="font-size:13px;color:#888;">
+    Closest existing literature: Huang et al. 2009 (<em>BMC Cancer</em>) — SIR for esophageal second primary in pharyngeal patients, same Taiwan registry, earlier cohort (does not overlap 2006–2020). Li et al. 2001 (<em>European J Cancer</em>) — Italian registry O/E ratio; no axis decomposition.
+  </p>
+
+  <div class="page-footer">
+    Generated 2026-06-03 &nbsp;·&nbsp;
+    Taiwan Cancer Registry analysis &nbsp;·&nbsp;
+    For internal author communication only — not for public distribution
+  </div>
+
+</div>
+
+<!-- ── Progress bar (sticky bottom) ──────────────────────────────────── -->
+<div id="progress-bar-wrap" style="
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: #fff; border-top: 1px solid #ddd;
+  padding: 10px 24px;
+  display: flex; align-items: center; gap: 16px;
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.08);
+  z-index: 999;
+  font-size: 13px;
+">
+  <span style="font-weight:700;color:#14304a;white-space:nowrap;">Submission progress</span>
+  <div style="flex:1;background:#eee;border-radius:20px;height:10px;overflow:hidden;">
+    <div id="progress-fill" style="height:100%;background:#2ca02c;border-radius:20px;width:0%;transition:width 0.3s;"></div>
+  </div>
+  <span id="progress-label" style="white-space:nowrap;color:#555;min-width:60px;text-align:right;">0 / 14</span>
+  <button onclick="resetAll()" style="
+    font-size:11px; padding:4px 10px; border:1px solid #ccc;
+    border-radius:4px; background:#fff; cursor:pointer; color:#888;
+    white-space:nowrap;
+  ">Reset all</button>
+</div>
+<div style="height:46px;"></div><!-- spacer for fixed bar -->
+
+<script>
+(function () {
+  const STORAGE_KEY = "coexist_checklist_v1";
+
+  // ── Gather all check-items ───────────────────────────────────────────
+  const items = Array.from(document.querySelectorAll(".check-item"));
+
+  // Give each item a stable id based on its label text
+  items.forEach((item, i) => {
+    item.dataset.cid = "item_" + i;
+  });
+
+  // ── Load saved state ────────────────────────────────────────────────
+  function loadState() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}"); }
+    catch (e) { return {}; }
+  }
+  function saveState(state) {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+    catch (e) {}
+  }
+
+  // ── Apply state to DOM ──────────────────────────────────────────────
+  function applyState(state) {
+    items.forEach(item => {
+      const box = item.querySelector(".check-box");
+      if (!box) return;
+      const checked = !!state[item.dataset.cid];
+      box.classList.toggle("checked", checked);
+      item.classList.toggle("done", checked);
+    });
+    updateProgress();
+  }
+
+  // ── Toggle a single item ────────────────────────────────────────────
+  function toggle(item) {
+    const box = item.querySelector(".check-box");
+    if (!box) return;
+    const nowChecked = !box.classList.contains("checked");
+    box.classList.toggle("checked", nowChecked);
+    item.classList.toggle("done", nowChecked);
+    const state = loadState();
+    state[item.dataset.cid] = nowChecked;
+    saveState(state);
+    updateProgress();
+  }
+
+  // ── Progress bar ────────────────────────────────────────────────────
+  function updateProgress() {
+    const total   = items.length;
+    const done    = items.filter(i => i.classList.contains("done")).length;
+    const pct     = total ? Math.round((done / total) * 100) : 0;
+    document.getElementById("progress-fill").style.width  = pct + "%";
+    document.getElementById("progress-label").textContent = done + " / " + total;
+    // colour shifts green as we approach 100%
+    const fill = document.getElementById("progress-fill");
+    if (pct === 100) fill.style.background = "#2ca02c";
+    else if (pct >= 60) fill.style.background = "#5bb85d";
+    else if (pct >= 30) fill.style.background = "#e07b39";
+    else fill.style.background = "#d62728";
+  }
+
+  // ── Reset ────────────────────────────────────────────────────────────
+  window.resetAll = function () {
+    if (!confirm("Reset all checkboxes?")) return;
+    saveState({});
+    applyState({});
+  };
+
+  // ── Wire click handlers ──────────────────────────────────────────────
+  items.forEach(item => {
+    item.addEventListener("click", () => toggle(item));
+    // prevent double-fire if user clicks directly on the box div
+    const box = item.querySelector(".check-box");
+    if (box) box.addEventListener("click", e => e.stopPropagation());
+    if (box) box.addEventListener("click", () => toggle(item));
+  });
+
+  // ── Init ─────────────────────────────────────────────────────────────
+  applyState(loadState());
+})();
+</script>
+</body>
+</html>
