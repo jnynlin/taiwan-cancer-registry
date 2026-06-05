@@ -33,7 +33,7 @@ TOTAL  = 8
 
 def footer(fig, page):
     fig.text(0.5, 0.01,
-             f"Taiwan Cancer Registry — Three-Axis Cancer Taxonomy  |  Page {page}/{TOTAL}  |  Draft 2026-06-03",
+             f"Taiwan Cancer Registry — Three-Axis Cancer Taxonomy  |  Page {page}/{TOTAL}  |  Draft 2026-06-05",
              ha="center", fontsize=7, color="#888888")
 
 
@@ -64,13 +64,15 @@ def load_stats():
     cov      = pd.read_csv(R09 / "axis_covariate_stats.csv")
     sil      = pd.read_csv(R10 / "silhouette_scores.csv")
     surv_tbl = pd.read_csv(R10 / "cluster_survival_table.csv", index_col="pid")
-    return meta, interp, clust, cov, sil, surv_tbl
+    ph_df    = pd.read_csv(R10 / "ph_test_results.csv", index_col=0)
+    split_df = pd.read_csv(R10 / "cox_timesplit_results.csv", index_col=0)
+    return meta, interp, clust, cov, sil, surv_tbl, ph_df, split_df
 
 
 def main():
     print("=== Registry DL — 11: Taxonomy Draft PDF ===")
 
-    meta, interp, clust, cov, sil, surv_tbl = load_stats()
+    meta, interp, clust, cov, sil, surv_tbl, ph_df, split_df = load_stats()
 
     n_pts   = len(meta)
     n_multi = int(meta["multi_cancer"].sum())
@@ -98,13 +100,16 @@ def main():
 
         ax_s = fig.add_axes([0.10, 0.12, 0.80, 0.38])
         ax_s.axis("off")
+        n_ph_violated = int((~ph_df["PH_OK"]).sum())
         txt = (
             f"Cohort: {n_pts:,} patients  ·  Multi-cancer: {n_multi:,} ({n_multi/n_pts*100:.1f}%)\n\n"
             f"VAE latent space: 12 dimensions → {n_active} active axes (highest max |loading|)\n"
             f"KMeans clustering: k={n_clust}, silhouette={sil_k5:.3f}\n\n"
             "Key finding: Cancer co-occurrence in Taiwan is explained by three latent axes,\n"
-            "corresponding to distinct carcinogenic exposures. Cluster membership independently\n"
-            "predicts overall survival after adjustment for age and sex."
+            "corresponding to distinct carcinogenic exposures (UADT/field-cancerization,\n"
+            "hormonal/gynecologic ×2). Cluster survival differs significantly (log-rank p<0.001).\n"
+            f"NOTE: proportional hazards violated for {n_ph_violated}/6 model terms; time-split\n"
+            "Cox (landmark=2yr) used as primary analysis — full-follow-up HRs are invalid."
         )
         ax_s.text(0.5, 0.6, txt, ha="center", va="center", fontsize=11,
                   color=NAVY, transform=ax_s.transAxes,
@@ -210,52 +215,89 @@ def main():
         footer(fig, 7)
         pdf.savefig(fig, bbox_inches="tight"); plt.close()
 
-        # ── Page 8: Cox HRs + limitations ────────────────────────────────
+        # ── Page 8: Time-split Cox + PH test + interpretation ────────────
         fig = plt.figure(figsize=(11, 8.5))
-        ax_cox = fig.add_axes([0.05, 0.45, 0.55, 0.47])
-        img(ax_cox, R10 / "fig_cox_hr.png",
-            "Fig 7: Cox HR forest plot — cluster vs largest cluster (ref),\nadjusted for age + sex")
 
-        ax_lim = fig.add_axes([0.62, 0.45, 0.36, 0.47])
+        # Left: time-split forest plot (primary result)
+        ax_split = fig.add_axes([0.03, 0.42, 0.58, 0.50])
+        img(ax_split, R10 / "fig_cox_timesplit.png",
+            "Fig 7 (PRIMARY): Time-split Cox — landmark 2yr\n"
+            "PH assumption violated for C1/C3/C4/age/sex — full-FU model invalid")
+
+        # Right: interpretation
+        ax_lim = fig.add_axes([0.63, 0.42, 0.35, 0.50])
+        # Build time-split summary from data
+        ts_lines = []
+        for idx_name, row in split_df.iterrows():
+            ts_lines.append(
+                f"{idx_name.replace('_vs_C2','').replace('_',' ')}: "
+                f"HR={row['HR_early']:.2f} early / {row['HR_late']:.2f} late")
+        ts_txt = "\n".join(ts_lines)
+
         lim = (
+            "Time-split Cox (landmark=2yr):\n"
+            f"{ts_txt}\n\n"
             "Interpretation:\n"
-            "• Three latent axes capture the dominant axes of\n"
-            "  cancer co-occurrence in Taiwan.\n"
-            "• Axes reflect shared exposures, not genetics:\n"
-            "  (i) hormonal/gynecologic, (ii) lifestyle/UADT,\n"
-            "  (iii) novel (GI/systemic — possibly HBV).\n"
-            "• Cluster survival differences likely reflect\n"
-            "  case-mix (e.g. UADT field cluster has higher\n"
-            "  multi-cancer burden) rather than latent biology.\n\n"
+            "• C3 (Mixed-GI/gynecologic) HR=44 in full model\n"
+            "  is ARTIFACTUAL — PH violation confirmed\n"
+            "  (χ²=177.6, p=10⁻⁴⁰). Time-split shows C3\n"
+            "  is PROTECTIVE vs C2 in both periods.\n"
+            "• C0 (Hormonal) satisfies PH — strongly protective\n"
+            "  vs reference throughout follow-up.\n"
+            "• C1/C4 show time-varying attenuation (early\n"
+            "  excess hazard diminishes over time).\n\n"
             "Limitations:\n"
-            "① No molecular/treatment/exposure data in registry.\n"
-            "② k=5 chosen; silhouette analysis presented.\n"
-            "③ Survival time approximated from diag_yr.\n"
+            "① PH violated for 5/6 terms — time-split Cox\n"
+            "   used as primary; full-FU HRs not reported.\n"
+            "② k=5 pre-specified; silhouette monotone → k=8.\n"
+            "③ Survival time approximated from diag_yr Jan 1.\n"
             "④ Cluster labels require manual ICD-O annotation.\n"
-            "⑤ β=1; higher β may improve disentanglement."
+            "⑤ No molecular/treatment data in registry."
         )
         ax_lim.axis("off")
-        ax_lim.text(0.03, 0.97, lim, transform=ax_lim.transAxes,
-                    fontsize=8.5, va="top", color=NAVY,
+        ax_lim.text(0.03, 0.98, lim, transform=ax_lim.transAxes,
+                    fontsize=7.8, va="top", color=NAVY,
                     bbox=dict(facecolor="#f0f4f8", edgecolor=ACCENT,
                               boxstyle="round,pad=0.5"))
 
-        ax_next = fig.add_axes([0.05, 0.05, 0.90, 0.33])
+        # Bottom: full-FU Cox labelled as invalid + next steps
+        ax_bot = fig.add_axes([0.03, 0.03, 0.94, 0.35])
+        ax_bot.axis("off")
+        # PH test summary table
+        ph_show = ph_df[["test_statistic", "p", "PH_OK"]].copy()
+        ph_show["test_statistic"] = ph_show["test_statistic"].map(lambda x: f"{x:.1f}")
+        ph_show["p"]    = ph_show["p"].map(lambda x: f"{x:.1e}")
+        ph_show["PH_OK"] = ph_show["PH_OK"].map({True: "✓ Yes", False: "✗ No"})
+        ph_show.index   = [i.replace("_vs_", " vs ") for i in ph_show.index]
+        tbl = ax_bot.table(
+            cellText=ph_show.values, rowLabels=ph_show.index,
+            colLabels=["χ²", "p", "PH OK"],
+            loc="upper left", cellLoc="center", bbox=[0.0, 0.0, 0.38, 1.0])
+        tbl.auto_set_font_size(False); tbl.set_fontsize(7.5)
+        for (r, c), cell in tbl.get_celld().items():
+            if r == 0:
+                cell.set_facecolor("#2C3E50"); cell.set_text_props(color="white")
+            elif c == 2 and "No" in str(cell.get_text().get_text()):
+                cell.set_facecolor("#FDECEA")
+            elif c == 2 and "Yes" in str(cell.get_text().get_text()):
+                cell.set_facecolor("#E8F5E9")
+        ax_bot.set_title("Schoenfeld PH test  |  Next steps: ICD-O cluster annotation; β sensitivity; held-out validation",
+                         fontsize=8, loc="left", pad=4)
+
         next_txt = (
-            "Next steps toward publication:\n"
-            "① Manual ICD-O annotation of Novel-1 (C34/C61/C71/C22/C67) and Novel-2 (C20/C77/C44) "
-            "clusters — confirm GI-systemic vs haematological split.\n"
-            "② Test HBV hypothesis: partition patients by era (pre/post 1986 HBV vaccination) "
-            "and compare novel-cluster enrichment — expected to track with HBV seroprevalence cohort.\n"
-            "③ Increase β (β=2, 4) and compare active dimension count — tests whether low-dimensional "
-            "structure is robust or a β=1 artifact.\n"
-            "④ Validate cluster-survival finding in a held-out 20% test split (currently fit on all N).\n"
-            "⑤ Consider cluster membership as a feature in the Cancer Sequence Transformer (Script 07) "
-            "— does cluster-aware conditioning improve R@1?"
+            "Next steps: "
+            "① Manual ICD-O annotation of Novel-1/Novel-2.  "
+            "② HBV era-split (pre/post 1986).  "
+            "③ β sensitivity (β=2,4).  "
+            "④ Held-out 20% validation.  "
+            "⑤ Cluster-conditioned Transformer (Script 07)."
         )
-        flow(ax_next, next_txt, fontsize=9)
-        fig.suptitle("Cox Results + Limitations + Next Steps", fontsize=13,
-                     color=NAVY, fontweight="bold")
+        ax_bot.text(0.42, 0.5, next_txt, transform=ax_bot.transAxes,
+                    fontsize=8, va="center", color=NAVY,
+                    bbox=dict(facecolor="#f0f4f8", edgecolor=ACCENT, boxstyle="round,pad=0.4"))
+
+        fig.suptitle("Survival Analysis — Time-Split Cox (Primary) + PH Test",
+                     fontsize=13, color=NAVY, fontweight="bold")
         footer(fig, 8)
         pdf.savefig(fig, bbox_inches="tight"); plt.close()
 
