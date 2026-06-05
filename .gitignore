@@ -59,3 +59,10 @@ dl_vae/data/
 dl_vae/models/
 # DeepHit model weights (large binary)
 uadt_field/data/deephit_weights.pt
+
+# Patient-level result files (contain registry PIDs — never publish)
+coexist_cancers/results/03_nmf/patient_nmf_loadings.csv
+coexist_cancers/results/03_nmf/patient_nmf_loadings_multiprimary.csv
+dl_vae/results/05_anomaly/anomaly_scores.csv
+dl_vae/results/06_syndrome/syndrome_candidates.csv
+dl_vae/results/25_multihistory/multihistory_calendar.csv
