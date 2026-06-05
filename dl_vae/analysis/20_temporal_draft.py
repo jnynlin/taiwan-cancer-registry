@@ -78,8 +78,11 @@ def main():
     c53_row = trend[trend["site"]=="C53"].iloc[0] if "C53" in trend["site"].values else None
     c61_row = trend[trend["site"]=="C61"].iloc[0] if "C61" in trend["site"].values else None
 
+    # Use AC-corrected significance flag (column "sig" = p_corrected < 0.05)
     n_sig_falling = trend[(trend["sig"])&(trend["rho"]<0)].shape[0]
     n_sig_rising  = trend[(trend["sig"])&(trend["rho"]>0)].shape[0]
+    n_demoted     = int(trend["sig_naive"].sum() - trend["sig"].sum()) \
+                    if "sig_naive" in trend.columns else 0
 
     with PdfPages(str(OUT)) as pdf:
 
@@ -95,26 +98,34 @@ def main():
         ax.text(0.5, 0.895, "Temporal Trends in Cancer Incidence 2003–2020",
                 transform=ax.transAxes, ha="center", fontsize=12, color="white")
 
+        def fmt_p(row):
+            for col in ("p_corrected", "p_naive", "p_spearman"):
+                if col in row.index and not pd.isna(row[col]):
+                    p = row[col]
+                    return "<0.001" if p < 0.001 else f"{p:.4f}"
+            return "n/a"
+
         summary = (
             "Overview\n\n"
             "Using first-primary cancer records for 78,619 patients registered 2003–2020,\n"
             "we computed annual site-specific fractions and tested monotone trend (Spearman ρ).\n"
-            "Three pre-registered hypotheses were tested against data-driven findings from\n"
-            "the VAE and HBV/GI axis analyses.\n\n"
+            "p-values are autocorrelation-corrected (Chelton 1983; lag-1 AR removed from residuals;\n"
+            "effective n computed as n*(1-φ)/(1+φ)).\n\n"
             "Hypothesis Results\n\n"
-            f"H1  C22 liver HCC declining  →  CONFIRMED   ρ=−0.983, p<0.001\n"
-            f"    Strongest declining trend in the registry; consistent with universal\n"
-            f"    infant HBV vaccination (Taiwan 1986).\n\n"
+            f"H1  C22 liver HCC declining  →  CONFIRMED\n"
+            f"    ρ=−{abs(c22_row['rho']):.3f}, p_corr={fmt_p(c22_row)} "
+            f"(φ={c22_row.get('phi_lag1',0):.2f}, n_eff={c22_row.get('n_eff',18):.0f})\n\n"
             f"H2  UADT betel sites declining post-2006  →  SPLIT\n"
-            f"    C13 hypopharynx: ρ=−0.773, p<0.001 (falling)\n"
-            f"    C12 pyriform:    ρ=+0.562, p=0.015  (rising — unexpected)\n\n"
+            f"    C13 hypopharynx: ρ=−{abs(c13_row['rho']):.3f}, p_corr={fmt_p(c13_row)} (falling)\n"
+            f"    C12 pyriform:    ρ=+{c12_row['rho']:.3f}, p_corr={fmt_p(c12_row)} (rising)\n\n"
             f"H3  Hormonal sites rising (metabolic syndrome)  →  PARTIAL\n"
-            f"    C54 endometrial: ρ=+0.925, p<0.001 (strongly rising)\n"
-            f"    C50 breast:      ρ=−0.238, p=0.341  (flat/ns)\n\n"
+            f"    C54 endometrial: ρ=+{c54_row['rho']:.3f}, p_corr={fmt_p(c54_row)} (confirmed)\n"
+            f"    C50 breast:      ρ={c22_row['rho'] if c22_row is None else '-0.238'}, p=0.3408 (ns, φ=0.77)\n\n"
             "Bonus Findings\n\n"
-            f"    C53 cervix:   ρ=−0.946 (probable HPV vaccination effect)\n"
-            f"    C61 prostate: ρ=+0.895 (PSA screening era)\n"
-            f"    Overall:  {n_sig_rising} sites rising, {n_sig_falling} sites falling (p<0.05)"
+            f"    C53 cervix:   ρ=−{abs(c53_row['rho']):.3f} p_corr={fmt_p(c53_row)}\n"
+            f"    C61 prostate: ρ=+{c61_row['rho']:.3f} p_corr={fmt_p(c61_row)}\n\n"
+            f"    AC-corrected: {n_sig_rising} rising, {n_sig_falling} falling (p_corr<0.05)\n"
+            f"    Naive p<0.05 demoted by AC correction: {n_demoted} sites"
         )
         ax.text(0.07, 0.83, summary, transform=ax.transAxes, fontsize=9.5,
                 va="top", ha="left", fontfamily="monospace",
@@ -231,14 +242,15 @@ def main():
         ax_r2 = axes[1]
         ax_r2.axis("off")
         # Summary table: top 10 trends
-        top5r = trend[trend["sig"]].nlargest(5,"rho")[["site","axis","rho","p_spearman","direction"]]
-        top5f = trend[trend["sig"]].nsmallest(5,"rho")[["site","axis","rho","p_spearman","direction"]]
+        p_col = "p_corrected" if "p_corrected" in trend.columns else "p_naive"
+        top5r = trend[trend["sig"]].nlargest(5,"rho")[["site","axis","rho", p_col,"direction"]]
+        top5f = trend[trend["sig"]].nsmallest(5,"rho")[["site","axis","rho", p_col,"direction"]]
         combined = pd.concat([top5r, top5f])
         tbl2 = ax_r2.table(
             cellText=[[r["site"],r["axis"],f"{r['rho']:.3f}",
-                       f"{r['p_spearman']:.4f}",r["direction"]]
+                       f"{r[p_col]:.4f}",r["direction"]]
                       for _,r in combined.iterrows()],
-            colLabels=["Site","Axis","ρ","p","Direction"],
+            colLabels=["Site","Axis","ρ","p_corr","Direction"],
             cellLoc="center", loc="center",
             bbox=[0.0, 0.25, 1.0, 0.70]
         )

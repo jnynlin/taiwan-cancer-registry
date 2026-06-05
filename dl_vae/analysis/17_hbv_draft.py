@@ -68,9 +68,21 @@ def main():
     n_c22   = 12635
     axis_summary = sir_df.groupby("axis")["SIR"].agg(median="median", count="count")
     trend_valid  = trend[trend["diag_yr"].between(2003, 2020)]
+    # Load AC-corrected stats if available; fall back to naive spearmanr
     from scipy import stats as sp_stats
-    r_trend, p_trend = sp_stats.spearmanr(trend_valid["diag_yr"],
-                                          trend_valid["c22_rate_pct"])
+    ac_stats_path = R15 / "c22_trend_ac_stats.csv"
+    if ac_stats_path.exists():
+        ac_stats = pd.read_csv(ac_stats_path)
+        row_all  = ac_stats[ac_stats["stratum"]=="All ages"].iloc[0]
+        r_trend  = row_all["rho"]
+        p_trend  = row_all["p_corrected"]
+        phi_trend = row_all["phi_lag1"]
+        neff_trend = row_all["n_eff"]
+        ac_note  = f"φ={phi_trend:.2f}, n_eff={neff_trend:.0f}, AC-corrected"
+    else:
+        r_trend, p_trend = sp_stats.spearmanr(trend_valid["diag_yr"],
+                                              trend_valid["c22_rate_pct"])
+        ac_note = "naive"
     pct_2003 = trend_valid[trend_valid["diag_yr"]==2003]["c22_rate_pct"].iloc[0]
     pct_2020 = trend_valid[trend_valid["diag_yr"]==2020]["c22_rate_pct"].iloc[0]
 
@@ -96,7 +108,7 @@ def main():
         txt = (
             f"C22 liver HCC: {n_c22:,} patients (16% of registry) — Taiwan's HBV-endemic cancer burden\n\n"
             f"Incidence trend: C22 declining {pct_2003:.1f}% → {pct_2020:.1f}% of first primaries\n"
-            f"(Spearman ρ={r_trend:.3f}, p<0.001) — HBV vaccination cohort effect visible by 2020\n\n"
+            f"(Spearman ρ={r_trend:.3f}, p={'<0.001' if p_trend<0.001 else f'{p_trend:.4f}'}, {ac_note}) — HBV vaccination cohort effect visible by 2020\n\n"
             "Key finding: Two non-overlapping carcinogenic axes:\n"
             "  • HBV/GI-systemic axis: C22 ↔ C18/C16/C20/C34/C61/C67\n"
             "  • Betel/tobacco UADT axis: C12 ↔ C13 ↔ C15 ↔ C06/C02\n\n"
@@ -115,7 +127,7 @@ def main():
         fig, ax = plt.subplots(figsize=(11, 6.5))
         img(ax, R15 / "fig_c22_trend.png",
             f"Fig 1: C22 liver HCC incidence trend 2003–2020\n"
-            f"(Spearman ρ={r_trend:.3f}, p<0.001; consistent with HBV vaccination cohort effect)")
+            f"(Spearman ρ={r_trend:.3f}, p={'<0.001' if p_trend<0.001 else f'{p_trend:.4f}'}, {ac_note}; consistent with HBV vaccination cohort effect)")
         ax_note = fig.add_axes([0.05, 0.02, 0.90, 0.13])
         flow(ax_note,
              "HBV vaccination: Taiwan introduced universal infant HBV vaccination in 1986. "

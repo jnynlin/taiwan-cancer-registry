@@ -1,0 +1,5 @@
+stratum,rho,p_naive,phi_lag1,n_eff,p_corrected,sig_corrected
+All ages,-0.983,0.0,0.431,7.2,0.0001,True
+Age<50,-0.961,0.0,0.309,9.5,0.0,True
+Age 50-64,-0.99,0.0,0.272,10.3,0.0,True
+Age≥65,-0.938,0.0,0.436,7.1,0.0016,True
