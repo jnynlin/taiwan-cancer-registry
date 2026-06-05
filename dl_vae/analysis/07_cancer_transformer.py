@@ -356,7 +356,8 @@ def main():
         if vl_loss < best_val - 1e-5:
             best_val, patience_ctr = vl_loss, 0
             torch.save({"model": model.state_dict(), "vocab": vocab,
-                        "vocab_size": vocab_size},
+                        "vocab_size": vocab_size,
+                        "age_mean": float(age_mean), "age_std": float(age_std)},
                        MOUT / "transformer_weights.pt")
         else:
             patience_ctr += 1

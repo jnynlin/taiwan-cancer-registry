@@ -84,7 +84,8 @@ class CancerTransformer(nn.Module):
         self.time_enc   = TimeEncoding(d_model)
         self.input_norm = nn.LayerNorm(d_model)
         enc_layer       = nn.TransformerEncoderLayer(d_model, nhead, ff_dim,
-                                                     dropout, batch_first=True)
+                                                     dropout, batch_first=True,
+                                                     norm_first=True)
         self.encoder    = nn.TransformerEncoder(enc_layer, num_layers=num_layers)
         self.mlm_head   = nn.Sequential(
             nn.Linear(d_model, d_model), nn.GELU(),
@@ -116,23 +117,34 @@ def build_val_sequences():
     """Reconstruct val sequences with dates. Same logic + SEED as Scripts 07/12."""
     df = pd.read_csv(RAW, low_memory=False)
     df.columns = df.columns.str.strip().str.lstrip("﻿")
-    df["pid"]  = df["病歷號(2)"].astype(str).str.strip()
-    df["site"] = df["腫瘤部位(47)"].astype(str).str[:3].str.upper()
-    df["age"]  = pd.to_numeric(df["診斷年齡(33)"], errors="coerce")
-    df["sex"]  = df["性別(5)"].map({1:"M",2:"F","1":"M","2":"F"})
+    df["pid"]   = df["病歷號(2)"].astype(str).str.strip()
+    df["site"]  = df["腫瘤部位(47)"].astype(str).str[:3].str.upper()
+    df["age"]   = pd.to_numeric(df["診斷年齡(33)"], errors="coerce")
+    df["sex"]   = df["性別(5)"].map({1:"M",2:"F","1":"M","2":"F"})
     df["dx_ts"] = df["最初診斷日(45)"].apply(roc_to_ts)
     df = df.dropna(subset=["dx_ts","age","sex"])
 
-    vocab_df = pd.read_csv(DOUT / "transformer_site_vocab.csv")
-    vocab    = {row["site"]: row["token_idx"] for _, row in vocab_df.iterrows()}
+    vocab_df  = pd.read_csv(DOUT / "transformer_site_vocab.csv")
+    vocab     = {row["site"]: row["token_idx"] for _, row in vocab_df.iterrows()}
     inv_vocab = {v: k for k, v in vocab.items()}
     df = df[df["site"].isin(vocab.keys())]
 
+    # Bug fix 1: deduplicate per (pid, site) — same as Scripts 07/12
+    first = (df.sort_values("dx_ts")
+               .groupby(["pid","site"], as_index=False)
+               .agg(dx_ts=("dx_ts","first"), age=("age","first"), sex=("sex","first")))
+    first = first.sort_values(["pid","dx_ts"])
+
+    # Bug fix 2: normalize ages using checkpoint's saved age_mean/age_std
+    ck = torch.load(CKPT, map_location="cpu", weights_only=False)
+    age_mean = ck.get("age_mean", first["age"].mean())
+    age_std  = ck.get("age_std",  first["age"].std() + 1e-6)
+
     seqs = []
-    for pid, grp in df.groupby("pid"):
-        grp = grp.sort_values("dx_ts")
+    for pid, grp in first.groupby("pid"):
+        grp    = grp.sort_values("dx_ts")
         tokens = [vocab[s] for s in grp["site"]]
-        ages   = grp["age"].tolist()
+        ages   = [(a - age_mean) / age_std for a in grp["age"]]
         sex_b  = 1 if grp["sex"].iloc[0] == "M" else 0
         dates  = grp["dx_ts"].tolist()
         sites  = grp["site"].tolist()
