@@ -144,6 +144,76 @@ cph_mice = CoxPHFitter(penalizer=0.1)
 cph_mice.fit(feat_mice, duration_col="os_months", event_col="event")
 print(f"MICE Cox C-index: {cph_mice.concordance_index_:.4f}")
 
+# ── Schoenfeld PH test (primary MICE model) ───────────────────────────────────
+from lifelines.statistics import proportional_hazard_test
+
+print("\n[PH test] Schoenfeld residuals — primary MICE Cox:")
+ph_mice = proportional_hazard_test(cph_mice, feat_mice, time_transform="rank")
+ph_out = ph_mice.summary[["test_statistic","p"]].copy()
+ph_out["PH_OK"] = ph_out["p"] >= 0.05
+ph_out.to_csv(OUT / "ph_test_mice.csv")
+print(ph_out.to_string())
+
+violated_mice = ph_out[~ph_out["PH_OK"]].index.tolist()
+print(f"\nPH violations: {violated_mice if violated_mice else 'none'}")
+
+# ── Time-split Cox at 12 months if violations detected ────────────────────────
+SPLIT_MO = 12.0   # months — natural landmark for ESCC: early mortality vs survivors
+
+if violated_mice:
+    print(f"\n[Time-split Cox] landmark={SPLIT_MO}mo")
+
+    fit_cols_mice = [c for c in feat_mice.columns if c not in ("os_months","event")]
+
+    # Early period: 0 → SPLIT_MO
+    early = feat_mice.copy()
+    early["os_months_e"] = early["os_months"].clip(upper=SPLIT_MO)
+    early["event_e"]     = ((early["event"] == 1) &
+                            (early["os_months"] <= SPLIT_MO)).astype(int)
+    early = early[early["os_months_e"] > 0]
+
+    # Late period: SPLIT_MO → end (patients who survived past split)
+    late = feat_mice[feat_mice["os_months"] > SPLIT_MO].copy()
+    late["os_months_l"] = late["os_months"] - SPLIT_MO
+
+    cph_early = CoxPHFitter(penalizer=0.1)
+    cph_late  = CoxPHFitter(penalizer=0.1)
+
+    cph_early.fit(early[["os_months_e","event_e"] + fit_cols_mice],
+                  duration_col="os_months_e", event_col="event_e")
+    cph_late.fit(late[["os_months_l","event"] + fit_cols_mice],
+                 duration_col="os_months_l", event_col="event")
+
+    print(f"\n  Early (≤{SPLIT_MO}mo): n={len(early)}, events={int(early['event_e'].sum())}, "
+          f"C-index={cph_early.concordance_index_:.4f}")
+    print(f"  Late  (>{SPLIT_MO}mo): n={len(late)},  events={int(late['event'].sum())},  "
+          f"C-index={cph_late.concordance_index_:.4f}")
+
+    key_ts = ["margin_R0","ccrt","surg_Endoscopic_resection",
+              "surg_Radical_esophagectomy","stage_II","stage_III","stage_IV"]
+    ts_rows = []
+    print(f"\n  {'Variable':<35} {'HR_early':>9} {'HR_late':>9}  {'Direction'}")
+    print("  " + "-"*70)
+    for v in key_ts:
+        hr_e = cph_early.summary["exp(coef)"].get(v, np.nan)
+        hr_l = cph_late.summary["exp(coef)"].get(v, np.nan)
+        p_e  = cph_early.summary["p"].get(v, np.nan)
+        p_l  = cph_late.summary["p"].get(v, np.nan)
+        if not (np.isnan(hr_e) or np.isnan(hr_l)):
+            ratio = hr_l / hr_e
+            direction = ("attenuates" if ratio < 0.85 else
+                         "amplifies"  if ratio > 1.15 else "stable")
+        else:
+            ratio, direction = np.nan, "n/a"
+        print(f"  {v:<35} {hr_e:9.3f} {hr_l:9.3f}  {direction}")
+        ts_rows.append(dict(variable=v,
+                            HR_early=round(hr_e,3), p_early=round(p_e,4),
+                            HR_late=round(hr_l,3),  p_late=round(p_l,4),
+                            late_vs_early=round(ratio,3) if not np.isnan(ratio) else np.nan,
+                            direction=direction))
+    pd.DataFrame(ts_rows).to_csv(OUT / "cox_timesplit_mice.csv", index=False)
+    print(f"\n  Saved: cox_timesplit_mice.csv")
+
 # ── Cox model — zero-coded (comparison) ───────────────────────────────────────
 feat_zero = pd.DataFrame({
     "os_months":  df["os_months"],

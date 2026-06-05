@@ -1,0 +1,8 @@
+variable,HR_early,p_early,HR_late,p_late,late_vs_early,direction
+margin_R0,0.517,0.0,0.724,0.0002,1.401,amplifies
+ccrt,0.846,0.0171,1.221,0.0275,1.444,amplifies
+surg_Endoscopic_resection,0.426,0.0,0.614,0.0003,1.442,amplifies
+surg_Radical_esophagectomy,0.535,0.0,0.704,0.0006,1.316,amplifies
+stage_II,0.876,0.2234,1.278,0.0175,1.459,amplifies
+stage_III,1.132,0.1355,1.268,0.0115,1.12,stable
+stage_IV,1.708,0.0,1.329,0.0056,0.778,attenuates

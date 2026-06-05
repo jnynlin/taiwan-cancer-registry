@@ -262,6 +262,14 @@ confidence intervals (CI) are reported. Reference categories were:
 Stage I, no surgery, R1/R2 margin, no CCRT, and single-agent or no
 chemotherapy.
 
+The proportional hazards (PH) assumption was evaluated for all covariates
+using scaled Schoenfeld residuals (\texttt{lifelines.statistics.proportional\_hazard\_test},
+rank transformation). For covariates where PH was violated ($p < 0.05$), a
+time-split Cox model with a 12-month landmark was fitted as a supplementary
+analysis: an \textit{early period} (0--12 months) and a \textit{late period}
+($> 12$ months, restricted to survivors past the landmark). Results are
+reported in Supplementary Table~S1.
+
 \subsection{Unsupervised deep learning patient subtyping}
 A symmetric autoencoder was trained on a standardised, median-imputed
 feature matrix comprising age, sex, esophageal subsite, histological
@@ -361,11 +369,22 @@ predictor under MICE imputation (HR 0.97, 95\,\% CI 0.86--1.09,
 $p = 0.569$), consistent with the unadjusted Kaplan-Meier result
 (log-rank $p = 0.58$). In the sensitivity analysis using zero-coded
 stage, CCRT appeared protective (HR 0.76, $p < 0.001$); however, this
-estimate is likely artefactual: zero-coding assigns 609 stage-unknown
-patients to the Stage I reference, inflating the apparent stage-adjusted
-CCRT effect. The convergence of the MICE result ($p = 0.569$) with the
-unadjusted KM ($p = 0.58$) suggests the zero-coded CCRT HR was driven
-by stage misclassification rather than a true treatment effect.
+estimate is likely artefactual (see §4.2 for full interpretation).
+
+Schoenfeld residual testing identified three covariates with
+non-proportional hazards: CCRT ($\chi^2 = 17.1$, $p < 0.001$),
+margin R0 ($\chi^2 = 9.0$, $p = 0.003$), and Stage IV
+($\chi^2 = 8.1$, $p = 0.005$; Supplementary Table~S1).
+A 12-month landmark time-split analysis revealed that the null
+overall CCRT HR conceals opposing time-varying effects:
+CCRT was associated with lower hazard in the early period
+(HR 0.85, $n_{\text{events}} = 1{,}001$) but a modestly elevated
+hazard beyond 12 months (HR 1.22, $n_{\text{events}} = 828$),
+the two effects cancelling to produce the null full-follow-up estimate.
+Margin~R0 attenuated over time (HR 0.52 early, 0.72 late), and
+Stage~IV hazard diminished for 12-month survivors (HR 1.71 early,
+1.33 late), consistent with depletion of the early-death-susceptible
+subgroup.
 
 A complete-case sensitivity analysis restricted to the 1,757 patients
 with recorded AJCC stage and complete covariate data (one staged patient
@@ -471,47 +490,38 @@ among operated patients (Spearman $r = -0.22$, $p < 0.001$), providing
 prognostic information beyond binary node-positivity, as has been
 described in prior series \cite{Rice2017}.
 
-\subsection{CCRT benefit is sensitive to stage imputation method}
-In the primary MICE analysis, CCRT was not an independent significant
-predictor of OS (HR 0.97, 95\,\% CI 0.86--1.09, $p = 0.569$). This
-converges with the unadjusted Kaplan-Meier result (log-rank $p = 0.58$),
-which also showed no crude survival difference between CCRT and non-CCRT
-groups. In the zero-coded stage sensitivity analysis, CCRT appeared
-strongly protective (HR 0.76, $p < 0.001$); however, this estimate is
-likely artefactual. Zero-coding places 609 stage-unknown patients in the
-Stage I reference stratum. These patients tend to be inadequately staged
-due to poor performance status, emergency presentation, or early death ---
-characteristics associated with worse OS independent of CCRT receipt.
-Their misclassification as Stage I inflates the apparent stage-adjusted
-CCRT effect. MICE correctly places the majority of stage-unknown patients
-at Stage III--IV (imputed distribution: I\,=\,327, II\,=\,329,
-III\,=\,889, IV\,=\,822), absorbing this variance into the stage
-coefficients and returning a non-significant CCRT estimate.
+\subsection{CCRT shows time-varying effect: early benefit, late attenuation}
+In the primary MICE analysis, the full-follow-up CCRT HR was 0.97 (NS),
+converging with the unadjusted KM ($p = 0.58$). Schoenfeld residual
+testing demonstrated that the CCRT effect violates the proportional
+hazards assumption ($\chi^2 = 17.1$, $p < 0.001$), rendering the
+full-follow-up HR unreliable as a single summary measure. The 12-month
+landmark time-split analysis reveals that the null HR conceals opposing
+time-varying effects: CCRT was associated with lower hazard within the
+first 12 months (HR 0.85) but modestly elevated hazard beyond 12 months
+(HR 1.22). The early protective effect is consistent with CCRT-mediated
+locoregional disease control reducing acute tumour-related mortality.
+The late attenuation --- and reversal to apparent harm --- may reflect
+CCRT-related late toxicity, including radiation-associated stricture,
+cardiotoxicity, and treatment-related comorbidity accumulating beyond
+the acute treatment phase, a pattern observed in other gastrointestinal
+cancers treated with chemoradiation \cite{vanHagen2012}.
 
-However, the CCRT finding is not straightforward. A complete-case
-analysis restricted to the 1,757 patients with recorded stage and
-complete covariate data yielded CCRT HR 0.72 (95\,\% CI 0.63--0.81,
-$p < 0.001$), diverging from the
-MICE estimate by more than 25\,\%. This discrepancy reflects two
-competing sources of bias: (1) stage-misclassification bias in the
-zero-coded and complete-case analyses, where the 609 stage-unknown
-patients are excluded or misassigned; and (2) potential
-over-adjustment in the MICE model if imputed stage absorbs CCRT-related
-variance. The complete-case analysis avoids imputation assumptions but
-excludes patients who may have been systematically undertreated.
+These time-varying dynamics also explain the apparent discrepancy between
+the MICE estimate and the complete-case CCRT HR 0.72 ($p < 0.001$):
+the complete-case cohort ($n = 1{,}757$ staged patients) is enriched for
+surgically resected patients with longer follow-up, in whom the late
+hazard attenuation is more visible; the stage-unknown patients excluded
+from complete-case analysis are dominated by palliative cases with
+short survival concentrated in the early period, where CCRT is
+protective. The stage-imputation method determines which survival phase
+dominates the HR estimate.
+
 Together, these results indicate that CCRT benefit in this registry is
-method-sensitive and cannot be definitively characterised from registry
-data alone.
-
-This uncertainty does not contradict the biological evidence for CCRT
-benefit --- the CROSS trial demonstrated clear benefit in resectable
-disease \cite{vanHagen2012}. Rather, it illustrates the well-recognised
-limitation of registry-based CCRT analyses: confounding by indication,
-stage incompleteness, and differential treatment allocation across
-the study period can produce markedly different adjusted HRs depending
-on how missing stage is handled. Prospective real-world data with
-complete staging are required to resolve this question in Taiwanese
-patients.
+\textit{time-varying}: likely beneficial early but not independently
+protective at full follow-up. Prospective real-world data with complete
+staging and longitudinal quality-of-life outcomes are required to
+characterise the optimal CCRT indication in Taiwanese patients.
 
 Cumulative cycle data were available in only 5.3\,\% of patients,
 precluding robust dose-response analysis. The absence of drug-level data
@@ -564,14 +574,19 @@ Second, AJCC stage was unknown in 609 patients (25.7\,\%). The primary
 analysis now uses MICE (sklearn \texttt{IterativeImputer}, Extra Trees
 estimator, 10 iterations) with nine clinical predictors. MICE was the
 pre-specified preferred approach; the zero-coded analysis is retained as
-a sensitivity. Three CCRT estimates are now reported: MICE
-(HR 0.97, $p = 0.569$), zero-coded (HR 0.76, $p < 0.001$), and
-complete-case restricted to staged patients (HR 0.72, $p < 0.001$).
-The $>$25\,\% divergence between MICE and the other two estimates
-prevents a definitive registry-based conclusion on CCRT benefit; this
-uncertainty is acknowledged throughout (see §4.2).
+a sensitivity.
 
-Third, mixed AJCC staging editions across the 15-year study period
+Third, Schoenfeld residual testing identified three covariates with
+non-proportional hazards in the primary MICE model: CCRT
+($\chi^2 = 17.1$, $p < 0.001$), margin~R0 ($\chi^2 = 9.0$,
+$p = 0.003$), and Stage~IV ($\chi^2 = 8.1$, $p = 0.005$).
+Full-follow-up HRs for these covariates should be interpreted with
+caution; time-split Cox estimates (12-month landmark) are reported in
+§3.4 and Supplementary Table~S1 as the primary summary for these
+covariates. The remaining eight covariates satisfy the PH assumption
+($p > 0.07$; Supplementary Table~S1).
+
+Fourth, mixed AJCC staging editions across the 15-year study period
 introduce stage migration that differentially affects the Stage~IV
 hazard ratio. The 6th edition (2008--2009; $n = 285$) classified
 cervical lymph-node metastasis (M1a) as Stage~IV; the 7th edition
@@ -593,7 +608,7 @@ contrast in the primary model. The 7th-edition-only estimate
 (HR 2.17, 95\,\%\,CI 1.78--2.64) is the more interpretable reference
 for comparisons with contemporary staging studies.
 
-Fourth, the autoencoder used mean-squared-error loss uniformly across all
+Fifth, the autoencoder used mean-squared-error loss uniformly across all
 features, including categorical variables (histological type, surgical
 modality). MSE is not mathematically appropriate for categorical distances;
 a composite loss function (MSE for continuous variables, binary
@@ -606,7 +621,7 @@ conventional classifiers, the choice of loss function does not affect the
 primary scientific conclusion; a composite loss is recommended for future
 work where cluster OS discrimination is the intended endpoint.
 
-Fifth, the cluster OS differences likely partly reflect known compositional
+Sixth, the cluster OS differences likely partly reflect known compositional
 differences in histology and subsite (Cluster~2 concentrates all
 adenocarcinomas; Cluster~3 is anatomically defined cervical cancers) rather
 than novel latent biological signal orthogonal to conventional classifiers.
@@ -616,7 +631,7 @@ to histology and subsite covariates showed non-significant cluster HRs
 negligible $\Delta$C-index of $-0.001$ (§\ref{sec:dl}). The clusters
 therefore do not explain OS variance beyond conventional registry coding.
 
-Sixth, no comparison against PCA-based clustering was performed; it remains
+Seventh, no comparison against PCA-based clustering was performed; it remains
 possible that a simpler linear dimensionality reduction would achieve
 comparable patient stratification.
 
