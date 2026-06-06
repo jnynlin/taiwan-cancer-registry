@@ -1,4 +1,4 @@
-"""CMUH Cancer Registry — Interactive Q&A Web App."""
+"""CMUH Cancer Registry — Interactive Q&A (v2)."""
 import streamlit as st
 
 st.set_page_config(
@@ -8,203 +8,298 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
+# ── custom CSS ────────────────────────────────────────────────────────────────
+st.markdown("""
+<style>
+#MainMenu, footer, header { visibility: hidden; }
+.block-container { padding-top: 0.8rem; padding-bottom: 1rem; }
+
+/* metric cards */
+div[data-testid="metric-container"] {
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 10px 18px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    border: 1px solid #e2e8f0;
+}
+
+/* answer highlight */
+.ans-box {
+    background: #f0f9ff;
+    border-left: 4px solid #0ea5e9;
+    border-radius: 0 8px 8px 0;
+    padding: 12px 16px;
+    margin: 6px 0 10px 0;
+    line-height: 1.6;
+}
+
+/* privacy/suppression notice */
+.suppress-box {
+    background: #fffbeb;
+    border-left: 4px solid #f59e0b;
+    border-radius: 0 8px 8px 0;
+    padding: 8px 14px;
+    margin: 4px 0 8px 0;
+    font-size: 0.85rem;
+}
+
+/* sidebar site buttons — tighter */
+section[data-testid="stSidebar"] div[data-testid="stButton"] > button {
+    font-size: 0.82rem;
+    padding: 4px 10px;
+    margin: 1px 0;
+    border-radius: 6px;
+}
+</style>
+""", unsafe_allow_html=True)
+
 import pandas as pd
 
 from db import get_db
 from query_engine import QueryEngine
 from charts import auto_chart
-from site_labels import QUICK_SITES, label as site_label
+from site_labels import QUICK_SITES
 
 # ── cached resources ──────────────────────────────────────────────────────────
-
-@st.cache_resource(show_spinner="Loading registry database...")
+@st.cache_resource(show_spinner="Loading registry database…")
 def load_db():
     return get_db()
-
 
 @st.cache_resource(show_spinner=False)
 def load_engine(_db):
     return QueryEngine(_db)
 
-
-db = load_db()
+db     = load_db()
 engine = load_engine(db)
 
 # ── session state ─────────────────────────────────────────────────────────────
-if "history" not in st.session_state:
-    st.session_state.history = []   # list of QueryResult
-if "pending_question" not in st.session_state:
-    st.session_state.pending_question = ""
+if "history"  not in st.session_state: st.session_state.history  = []
+if "pending"  not in st.session_state: st.session_state.pending  = ""
+
+# ── topic catalogue ───────────────────────────────────────────────────────────
+TOPICS = [
+    ("📈", "Survival & OS",
+     "Median OS by stage, treatment, sex, histology",
+     "Median OS by stage for esophageal cancer"),
+    ("📉", "Temporal Trends",
+     "Rising / falling incidence trends 2003–2020",
+     "Which cancer sites are rising in incidence?"),
+    ("⚥",  "Sex Differences",
+     "Male : female odds ratios across all 46 sites",
+     "Sex differences male female odds ratios across all sites"),
+    ("🔗", "Second Primary SIR",
+     "Standardised incidence ratios after index cancer",
+     "SIR for second primaries after esophageal cancer C15"),
+    ("🔀", "Co-occurrence",
+     "Cancer co-occurrence association rules and liver axis",
+     "Top cancer co-occurrence association rules"),
+    ("💊", "Treatment & Cox",
+     "Hazard ratios, CCRT vs surgery, chemo regimens",
+     "Hazard ratios for esophageal cancer treatment"),
+    ("🤖", "Deep Learning",
+     "Transformer R@k, SHAP importance, VAE clusters",
+     "Deep learning transformer model performance R@1"),
+    ("🏔", "UADT Field",
+     "Field cancerization SIR, trajectories, Cox TV",
+     "UADT field cancerization SIR pairs"),
+    ("🔬", "ESCC Detailed",
+     "CMUH chart-review cohort n=344, 2007–2010",
+     "CMUH ESCC survival summary by group"),
+]
 
 # ── sidebar ───────────────────────────────────────────────────────────────────
 with st.sidebar:
     st.markdown("## 🏥 CMUH Registry Q&A")
-    st.caption("China Medical University Hospital  \nn=84,161 patients · 46 sites · 2003–2020")
+    st.caption(
+        "China Medical University Hospital  \n"
+        "n = 84,161 · 46 sites · 2003–2020  \n"
+        "Single-centre, hospital-based"
+    )
+
     st.divider()
 
-    # API key
     api_key = st.text_input(
-        "Anthropic API key (optional)",
+        "🔑 Anthropic API key",
         type="password",
-        placeholder="sk-ant-...",
-        help="Required only for complex queries not matched by built-in patterns.",
+        placeholder="sk-ant-…  (optional, for complex queries)",
     )
     if api_key:
         engine.set_api_key(api_key)
 
     st.divider()
-    st.markdown("**Quick access — cancer sites**")
-    cols = st.columns(2)
-    for i, (code, name) in enumerate(QUICK_SITES):
-        if cols[i % 2].button(f"{code} {name}", use_container_width=True):
-            st.session_state.pending_question = f"Show survival outcomes for {code} {name}"
+    st.markdown("**🎯 Quick cancer sites**")
+
+    pairs = list(QUICK_SITES)
+    for i in range(0, len(pairs), 2):
+        c1, c2 = st.columns(2)
+        code1, name1 = pairs[i]
+        if c1.button(f"{code1} {name1}", key=f"qs_{code1}", use_container_width=True):
+            st.session_state.pending = f"Show survival outcomes for {code1} {name1}"
+        if i + 1 < len(pairs):
+            code2, name2 = pairs[i + 1]
+            if c2.button(f"{code2} {name2}", key=f"qs_{code2}", use_container_width=True):
+                st.session_state.pending = f"Show survival outcomes for {code2} {name2}"
 
     st.divider()
-    st.markdown("**Example questions**")
-    examples = [
-        "Median OS by stage for esophageal cancer",
-        "Which cancer sites are rising in incidence?",
-        "Sex differences across all cancer sites",
-        "SIR for second primaries after liver cancer",
-        "CCRT vs no CCRT survival in C15",
-        "Top cancer co-occurrence association rules",
-        "Hazard ratios for esophageal cancer treatment",
-        "Transformer vs MLP model performance",
-    ]
-    for ex in examples:
-        if st.button(ex, use_container_width=True, key=f"ex_{ex[:20]}"):
-            st.session_state.pending_question = ex
-
-    st.divider()
-    st.markdown("**Loaded tables**")
-    st.caption(f"{len(db.tables)} aggregated result tables")
-    with st.expander("View table list"):
+    with st.expander("📋 All loaded tables"):
         for t in db.tables:
-            st.text(f"• {t}  ({db.table_row_count(t)} rows)")
+            st.caption(f"• {t}  ({db.table_row_count(t)} rows)")
 
     st.divider()
     st.caption(
-        "Privacy: All data shown is pre-aggregated (group-level statistics only). "
-        "Groups with n<5 are suppressed. No individual patient records are accessible."
+        "🔒 **Privacy**: all data is pre-aggregated. "
+        "Groups with n < 5 are suppressed. "
+        "No individual patient records are accessible."
     )
 
-# ── main area ─────────────────────────────────────────────────────────────────
-tab_query, tab_explorer = st.tabs(["💬 Q&A", "🗂 Data Explorer"])
+# ── header ────────────────────────────────────────────────────────────────────
+st.markdown("# 🏥 CMUH Cancer Registry — Interactive Q&A")
+st.caption("Hospital-based institutional registry · China Medical University Hospital, Taichung, Taiwan")
 
-# ── Q&A tab ───────────────────────────────────────────────────────────────────
-with tab_query:
-    st.markdown("### Ask anything about CMUH cancer registry data")
-    st.caption(
-        "Survival, incidence, hazard ratios, SIR, sex differences, co-occurrence, temporal trends…"
+m1, m2, m3, m4 = st.columns(4)
+m1.metric("Patients", "84,161")
+m2.metric("Cancer sites", "46")
+m3.metric("Study period", "2003 – 2020")
+m4.metric("Result tables", str(len(db.tables)))
+
+st.divider()
+
+# ── tabs ──────────────────────────────────────────────────────────────────────
+tab_qa, tab_explore = st.tabs(["💬  Ask a Question", "🗂  Data Explorer"])
+
+# ══════════════════════════════════════════════════════════════════════════════
+with tab_qa:
+
+    # ── topic grid (empty-state landing page) ─────────────────────────────────
+    if not st.session_state.history:
+        st.markdown("### Where would you like to start?")
+        st.caption("Click a topic or type your own question below.")
+
+        for row in range(0, len(TOPICS), 3):
+            cols = st.columns(3, gap="medium")
+            for col, (icon, title, desc, question) in zip(cols, TOPICS[row:row + 3]):
+                with col:
+                    with st.container(border=True):
+                        label = f"{icon}  {title}"
+                        if st.button(label, key=f"topic_{title}", use_container_width=True):
+                            st.session_state.pending = question
+                        st.caption(desc)
+
+        st.markdown("")  # spacing before chat input
+
+    # ── chat input ────────────────────────────────────────────────────────────
+    user_input = st.chat_input(
+        "Ask anything… e.g. 'Median OS by stage for esophageal cancer'"
     )
 
-    # Chat input
-    user_input = st.chat_input("e.g. 'What is the median OS for esophageal cancer by stage?'")
-
-    # Honour sidebar quick-buttons
-    if st.session_state.pending_question and not user_input:
-        user_input = st.session_state.pending_question
-        st.session_state.pending_question = ""
+    # honour sidebar / topic card clicks
+    if st.session_state.pending and not user_input:
+        user_input = st.session_state.pending
+        st.session_state.pending = ""
 
     if user_input:
         with st.spinner("Querying registry…"):
             result = engine.answer(user_input)
         st.session_state.history.insert(0, result)
+        st.rerun()
 
-    # Display history
+    # ── conversation history ──────────────────────────────────────────────────
     for result in st.session_state.history:
-        with st.chat_message("user"):
-            st.markdown(result.question)
 
-        with st.chat_message("assistant"):
+        with st.chat_message("user", avatar="🧑‍⚕️"):
+            st.markdown(f"**{result.question}**")
+
+        with st.chat_message("assistant", avatar="🏥"):
+
             if result.error:
                 st.error(f"Could not answer: {result.error}")
                 continue
 
             if result.suppressed:
-                st.warning(
-                    "Some groups were suppressed because n < 5 (privacy threshold). "
-                    "Suppressed rows are excluded from the chart and table."
+                st.markdown(
+                    '<div class="suppress-box">'
+                    "⚠️ Some groups suppressed — n&lt;5 privacy threshold"
+                    "</div>",
+                    unsafe_allow_html=True,
                 )
 
-            # Answer text
-            st.markdown(result.answer)
+            if result.answer:
+                st.markdown(
+                    f'<div class="ans-box">{result.answer}</div>',
+                    unsafe_allow_html=True,
+                )
 
-            # Chart + table side-by-side
             if not result.df.empty:
-                col_chart, col_table = st.columns([3, 2])
-                with col_chart:
+                chart_col, table_col = st.columns([3, 2], gap="medium")
+
+                with chart_col:
                     try:
                         fig = auto_chart(result.df, result.chart_type, result.chart_title)
                         st.plotly_chart(fig, use_container_width=True)
                     except Exception as e:
-                        st.warning(f"Chart rendering failed: {e}")
+                        st.warning(f"Chart could not render: {e}")
 
-                with col_table:
+                with table_col:
                     st.dataframe(
-                        result.df.head(30),
+                        result.df.head(25),
                         use_container_width=True,
                         hide_index=True,
                     )
 
-            # SQL expander
-            with st.expander("View SQL & source"):
+            with st.expander("🔍 SQL & source"):
                 st.code(result.sql, language="sql")
                 st.caption(f"Source table: `{result.source}`")
 
-    if not st.session_state.history:
-        st.info(
-            "No questions yet. Try clicking a quick-access button in the sidebar, "
-            "or type a question above."
-        )
-
-    # Clear history button
     if st.session_state.history:
-        if st.button("Clear history", key="clear"):
+        st.markdown("")
+        if st.button("🗑  Clear conversation"):
             st.session_state.history = []
             st.rerun()
 
-# ── Data Explorer tab ─────────────────────────────────────────────────────────
-with tab_explorer:
-    st.markdown("### Browse aggregated result tables directly")
+# ══════════════════════════════════════════════════════════════════════════════
+with tab_explore:
+    st.markdown("### Browse pre-aggregated result tables directly")
+    st.caption("All tables contain group-level statistics only — no individual patient records.")
 
-    col1, col2 = st.columns([1, 3])
-    with col1:
+    c1, c2 = st.columns([1, 3], gap="medium")
+
+    with c1:
         selected = st.selectbox("Select table", db.tables)
-        n_rows = st.slider("Rows to show", 5, 200, 30)
-        show_schema = st.checkbox("Show column types")
+        n_rows   = st.slider("Rows to preview", 5, 200, 30)
+        show_dtypes = st.checkbox("Show column types")
 
-    with col2:
+        if selected:
+            st.metric("Total rows", db.table_row_count(selected))
+
+    with c2:
         if selected:
             try:
                 df_preview = db.execute(f"SELECT * FROM {selected} LIMIT {n_rows}")
-                st.caption(f"**{selected}** — {db.table_row_count(selected)} total rows")
                 st.dataframe(df_preview, use_container_width=True, hide_index=True)
 
-                if show_schema:
+                if show_dtypes:
                     types = df_preview.dtypes.reset_index()
                     types.columns = ["column", "dtype"]
                     st.dataframe(types, use_container_width=True, hide_index=True)
 
-                # Auto-chart preview
-                with st.expander("Quick chart preview"):
+                with st.expander("📊 Quick chart preview"):
                     os_col = next(
-                        (c for c in df_preview.columns if "median_os" in c or "sir" in c
-                         or "hr" in c or "rho" in c),
-                        None
+                        (c for c in df_preview.columns
+                         if any(k in c for k in ("median_os", "sir", "rho", "or", "lift"))),
+                        None,
                     )
                     if os_col and len(df_preview) > 1:
-                        chart_type = (
-                            "km_bar" if "os" in os_col else
-                            "sir_bar" if "sir" in os_col else
-                            "forest" if "hr" in os_col else
-                            "bar"
-                        )
+                        ct = ("km_bar"    if "os"   in os_col else
+                              "sir_bar"   if "sir"  in os_col else
+                              "forest"    if os_col in ("or", "hr") else
+                              "bar")
                         try:
-                            fig = auto_chart(df_preview, chart_type, selected)
+                            fig = auto_chart(df_preview, ct, selected)
                             st.plotly_chart(fig, use_container_width=True)
                         except Exception:
-                            st.caption("Chart not available for this table.")
+                            st.caption("No automatic chart for this table.")
+                    else:
+                        st.caption("No automatic chart for this table.")
 
             except Exception as e:
                 st.error(f"Could not load table: {e}")
@@ -212,6 +307,9 @@ with tab_explorer:
 # ── footer ────────────────────────────────────────────────────────────────────
 st.divider()
 st.caption(
-    "CMUH Cancer Registry Q&A · Data: China Medical University Hospital institutional registry · "
-    "Single-centre hospital-based, 2003–2020 · For research use only"
+    "CMUH Cancer Registry Q&A · "
+    "Data: China Medical University Hospital institutional cancer registry · "
+    "Single-centre hospital-based, 2003–2020 · "
+    "For research use only · "
+    "n < 5 groups suppressed"
 )

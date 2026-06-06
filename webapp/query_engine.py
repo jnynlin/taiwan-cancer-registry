@@ -121,7 +121,7 @@ def _build_sql(intent: str, site: str | None, question: str) -> tuple[str, str, 
             return ("SELECT * FROM escc_cox LIMIT 20", "forest",
                     "CMUH ESCC Detailed Cox Hazard Ratios", "escc_cox")
         if "uadt" in q or "field" in q:
-            tv = "tv" in q or "time.vary" in q
+            tv = bool(re.search(r"\btv\b|time.?var", q))
             tbl = "uadt_cox_tv" if tv else "uadt_cox"
             return (f"SELECT * FROM {tbl}", "forest",
                     f"UADT Field Cox HR ({'time-varying' if tv else 'standard'})", tbl)
@@ -156,6 +156,12 @@ def _build_sql(intent: str, site: str | None, question: str) -> tuple[str, str, 
         )
 
     if intent == "trend":
+        if site == "C22":
+            return (
+                "SELECT diag_yr, c22_rate_pct, rate_age_50, rate_age_50_64, rate_age_65 "
+                "FROM c22_trend ORDER BY diag_yr",
+                "line", "Liver Cancer (C22) Annual Incidence Rate 2003–2020", "c22_trend",
+            )
         if site:
             return (
                 f"SELECT * FROM site_trends WHERE site = '{site}'",
@@ -192,6 +198,13 @@ def _build_sql(intent: str, site: str | None, question: str) -> tuple[str, str, 
         )
 
     if intent == "association":
+        if site == "C22" or (site is None and any(w in q for w in ("liver", "hbv", "hepat", "c22"))):
+            # Liver co-occurrence is best captured by the dedicated SIR axis table
+            return (
+                "SELECT * FROM sir_c22_by_index ORDER BY sir DESC LIMIT 20",
+                "sir_bar", "Cancer Co-occurrence with Liver (C22) — SIR by Index Site",
+                "sir_c22_by_index",
+            )
         if site:
             return (
                 f"SELECT * FROM assoc_rules WHERE antecedent = '{site}' OR consequent = '{site}' "

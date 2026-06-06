@@ -4,6 +4,17 @@ from __future__ import annotations
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
+import plotly.io as pio
+
+# consistent clean theme across all charts
+pio.templates.default = "plotly_white"
+
+PALETTE  = px.colors.qualitative.Set2
+BLUE     = "#2563EB"
+NAVY     = "#1e3a5f"
+RED      = "#dc2626"
+GREEN    = "#16a34a"
+GREY     = "#94a3b8"
 
 
 def _find_col(df: pd.DataFrame, candidates: list[str]) -> str | None:
@@ -34,11 +45,20 @@ def km_bar(df: pd.DataFrame, title: str = "Median Overall Survival") -> go.Figur
         color=y_col,
         labels={x_col: label, y_col: "Group"},
         title=title,
-        color_discrete_sequence=px.colors.qualitative.Set2,
+        color_discrete_sequence=PALETTE,
     )
-    fig.update_traces(texttemplate="n=%{text}", textposition="outside")
-    fig.update_layout(showlegend=False, height=max(300, len(df) * 60 + 80),
-                      margin=dict(l=160, r=40, t=50, b=40))
+    fig.update_traces(
+        texttemplate="n=%{text}", textposition="outside",
+        marker_line_width=0,
+    )
+    fig.update_layout(
+        showlegend=False,
+        height=max(320, len(df) * 60 + 80),
+        margin=dict(l=160, r=60, t=50, b=40),
+        font=dict(family="Inter, sans-serif", size=13),
+        title_font=dict(size=15),
+        plot_bgcolor="white",
+    )
     return fig
 
 
@@ -76,13 +96,16 @@ def forest_plot(df: pd.DataFrame, title: str = "Hazard Ratios") -> go.Figure:
         ) if lo_col and hi_col else None,
         name="Estimate",
     ))
-    fig.add_vline(x=1, line_dash="dash", line_color="grey", opacity=0.6)
-    fig.update_xaxes(type="log", title=hr_col.upper().replace("_", " "))
+    fig.add_vline(x=1, line_dash="dash", line_color=GREY, opacity=0.7)
+    fig.update_xaxes(type="log", title=hr_col.upper().replace("_", " "),
+                     showgrid=True, gridcolor="#f1f5f9")
     fig.update_layout(
         title=title,
-        height=max(300, len(df) * 45 + 80),
-        margin=dict(l=180, r=40, t=50, b=40),
+        height=max(320, len(df) * 45 + 80),
+        margin=dict(l=180, r=50, t=50, b=40),
         yaxis=dict(autorange="reversed"),
+        font=dict(family="Inter, sans-serif", size=13),
+        title_font_size=15,
     )
     return fig
 
@@ -115,12 +138,14 @@ def sir_bar(df: pd.DataFrame, title: str = "Standardised Incidence Ratios") -> g
             "crimson" if v > 1 else "steelblue" for v in df[sir_col]
         ],
     ))
-    fig.add_vline(x=1, line_dash="dash", line_color="grey", opacity=0.6)
+    fig.add_vline(x=1, line_dash="dash", line_color=GREY, opacity=0.7)
     fig.update_layout(
         title=title,
-        xaxis_title="SIR (reference = 1)",
-        height=max(300, len(df) * 30 + 80),
-        margin=dict(l=180, r=40, t=50, b=40),
+        xaxis_title="SIR (reference line = 1)",
+        height=max(320, len(df) * 30 + 100),
+        margin=dict(l=190, r=50, t=50, b=40),
+        font=dict(family="Inter, sans-serif", size=12),
+        title_font_size=15,
     )
     return fig
 
@@ -136,7 +161,13 @@ def line_chart(df: pd.DataFrame, x_col: str, y_col: str,
     fig = px.line(df, x=x_col, y=y_col, color=color_col,
                   title=title, markers=True,
                   color_discrete_sequence=px.colors.qualitative.Set1)
-    fig.update_layout(height=400, margin=dict(l=60, r=40, t=50, b=40))
+    fig.update_traces(line_width=2.5)
+    fig.update_layout(
+        height=420, margin=dict(l=60, r=40, t=50, b=40),
+        font=dict(family="Inter, sans-serif", size=13),
+        title_font_size=15,
+        legend=dict(orientation="h", yanchor="bottom", y=1.02),
+    )
     return fig
 
 
@@ -159,8 +190,14 @@ def ranked_bar(df: pd.DataFrame, x_col: str, y_col: str,
     df[x_col] = pd.to_numeric(df[x_col], errors="coerce")
     df = df.dropna(subset=[x_col]).sort_values(x_col, ascending=False).head(top_n)
     fig = px.bar(df, x=y_col, y=x_col, title=title,
-                 color_discrete_sequence=["steelblue"])
-    fig.update_layout(height=400, margin=dict(l=60, r=40, t=50, b=40))
+                 color_discrete_sequence=[BLUE])
+    fig.update_traces(marker_line_width=0)
+    fig.update_layout(
+        height=420, margin=dict(l=80, r=40, t=50, b=80),
+        font=dict(family="Inter, sans-serif", size=12),
+        title_font_size=15,
+        xaxis_tickangle=-35,
+    )
     return fig
 
 
