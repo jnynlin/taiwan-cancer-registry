@@ -91,7 +91,7 @@ Tel.: +886-X-XXXX-XXXX\par}
 prognostic determinants of surgical quality in Asian registry populations
 remain incompletely characterised.
 \textbf{Methods:} We analysed 2,367 esophageal cancer (ICD-10 C15)
-cases from the Taiwan Cancer Registry (2006--2020) using Kaplan-Meier
+cases from the China Medical University Hospital (CMUH) Cancer Registry (2006--2020) using Kaplan-Meier
 analysis, multivariable Cox regression with MICE-imputed AJCC stage
 (C-index 0.670), and unsupervised deep learning subtyping.
 \textbf{Results:} The cohort was predominantly male (94.5\,\%; SCC,
@@ -113,7 +113,7 @@ prospective data with complete staging are required.
 \vspace{0.5em}
 \noindent\textbf{Keywords:} esophageal cancer; squamous cell carcinoma;
 surgical resection; R0 margin; concurrent chemoradiotherapy; deep learning;
-patient subtypes; Taiwan Cancer Registry
+patient subtypes; CMUH Cancer Registry; hospital-based registry
 
 \noindent\rule{\linewidth}{0.4pt}
 
@@ -148,7 +148,7 @@ upper esophagus, is more sensitive to chemoradiotherapy, and shares
 carcinogenic pathways with head and neck cancers, whereas adenocarcinoma
 clusters at the gastroesophageal junction and responds differently to
 treatment paradigms \cite{Rustgi2014}. Understanding the clinical spectrum
-of esophageal SCC in population-based registries is therefore essential for
+of esophageal SCC in hospital-based registries is therefore essential for
 optimising treatment protocols tailored to Asian patients.
 
 Current management of resectable esophageal cancer is centred on
@@ -181,7 +181,7 @@ application of such methods to population-level cancer registry data in
 Taiwan has been limited.
 
 In this study we aimed to: (1) describe the clinical characteristics and
-temporal trends of esophageal cancer in a large Taiwan Cancer Registry
+temporal trends of esophageal cancer in a large CMUH Cancer Registry
 cohort spanning 2006--2020; (2) quantify the independent prognostic impact
 of surgical modality, resection margin status, lymph node dissection extent,
 and perioperative treatment sequencing on OS; (3) explore the relationship
@@ -456,15 +456,20 @@ predictors of risk, consistent with the multivariable Cox results
 \section{Discussion}
 %%======================================================================
 
-In this registry-based analysis of 2,367 esophageal cancer patients over
+In this retrospective analysis of 2,367 esophageal cancer patients from the
+China Medical University Hospital (CMUH) institutional cancer registry over
 a 15-year period, we have characterised the clinical landscape of
-esophageal cancer in a Taiwanese tertiary-centre cohort, identified
-independent surgical and systemic treatment predictors of OS, and
-applied unsupervised deep learning to recover patient subtypes consistent
-with known histological and anatomical subgroups. The overall prognosis was poor
---- median OS 13.4 months, 5-year OS estimated at $\approx$15\,\% ---
-consistent with the established lethality of this disease globally
-\cite{Sung2021}.
+esophageal cancer at a large tertiary academic medical centre in central
+Taiwan, identified independent surgical and systemic treatment predictors of
+OS, and applied unsupervised deep learning to recover patient subtypes
+consistent with known histological and anatomical subgroups. The overall
+prognosis was poor --- median OS 13.4 months, 5-year OS estimated at
+$\approx$15\,\% --- consistent with the established lethality of this disease
+globally \cite{Sung2021}. As a single-centre hospital-based registry, the
+findings characterise outcomes within CMUH's referral catchment and should
+be interpreted with this scope in mind; multi-centre replication is required
+before these results can be considered representative of Taiwan's national
+esophageal cancer population.
 
 \subsection{Surgical quality is the dominant treatable determinant}
 Surgical resection was the most powerful independent predictor of survival
@@ -517,11 +522,15 @@ short survival concentrated in the early period, where CCRT is
 protective. The stage-imputation method determines which survival phase
 dominates the HR estimate.
 
-Together, these results indicate that CCRT benefit in this registry is
+Together, these results indicate that CCRT benefit in this CMUH registry is
 \textit{time-varying}: likely beneficial early but not independently
-protective at full follow-up. Prospective real-world data with complete
-staging and longitudinal quality-of-life outcomes are required to
-characterise the optimal CCRT indication in Taiwanese patients.
+protective at full follow-up. This pattern may also partly reflect
+CMUH's referral-centre case mix, in which CCRT recipients include both
+marginally resectable patients (for whom CCRT is a downstaging strategy)
+and inoperable advanced cases (for whom it is the primary modality). A
+multi-centre prospective study with complete staging and longitudinal
+quality-of-life outcomes is required to characterise the optimal CCRT
+indication across Taiwan's esophageal cancer population.
 
 Cumulative cycle data were available in only 5.3\,\% of patients,
 precluding robust dose-response analysis. The absence of drug-level data
@@ -561,22 +570,35 @@ DeepSurv was trained on the same cohort and features as the Cox model
 
 \subsection{Limitations}
 \label{sec:limitations}
-Several limitations should be acknowledged. First, this is a retrospective
-registry analysis with inherent selection bias and incomplete lifestyle
-covariate recording ($\approx$50\,\% for smoking; 34.9\,\% for betel nut
-use; BMI available in $n = 1{,}384$, 58.5\,\%). Median imputation of the
-missing lifestyle and BMI data prior to autoencoder training may introduce
-systematic noise, and the imputed values for betel nut exposure ---
-Taiwan's most distinctive carcinogenic exposure --- are particularly
-susceptible to this bias.
+Several limitations should be acknowledged. First, and most fundamentally,
+this is a \textbf{single-centre hospital-based registry}: all 2,367 patients
+were diagnosed or treated at CMUH, a large tertiary academic referral centre
+in Taichung. CMUH's catchment over-represents referred, treatment-seeking
+patients and under-represents those managed in community or primary-care
+settings; patients who received only palliative care outside CMUH may be
+missed or have truncated follow-up. Accordingly, the observed sex
+distribution (94.5\,\% male), stage profile, and treatment utilisation rates
+reflect CMUH's referral pattern rather than Taiwan's general population, and
+direct comparison with epidemiological estimates from national databases
+(e.g., the Ministry of Health and Welfare Cancer Registry) should be made
+cautiously. External multi-centre replication is required before these
+findings can be applied to community-based esophageal cancer care.
 
-Second, AJCC stage was unknown in 609 patients (25.7\,\%). The primary
+Second, this is a retrospective analysis with inherent selection bias and
+incomplete lifestyle covariate recording ($\approx$50\,\% for smoking;
+34.9\,\% for betel nut use; BMI available in $n = 1{,}384$, 58.5\,\%).
+Median imputation of the missing lifestyle and BMI data prior to autoencoder
+training may introduce systematic noise, and the imputed values for betel nut
+exposure --- Taiwan's most distinctive carcinogenic exposure --- are
+particularly susceptible to this bias.
+
+Third, AJCC stage was unknown in 609 patients (25.7\,\%). The primary
 analysis now uses MICE (sklearn \texttt{IterativeImputer}, Extra Trees
 estimator, 10 iterations) with nine clinical predictors. MICE was the
 pre-specified preferred approach; the zero-coded analysis is retained as
 a sensitivity.
 
-Third, Schoenfeld residual testing identified three covariates with
+Fourth, Schoenfeld residual testing identified three covariates with
 non-proportional hazards in the primary MICE model: CCRT
 ($\chi^2 = 17.1$, $p < 0.001$), margin~R0 ($\chi^2 = 9.0$,
 $p = 0.003$), and Stage~IV ($\chi^2 = 8.1$, $p = 0.005$).
@@ -586,7 +608,7 @@ caution; time-split Cox estimates (12-month landmark) are reported in
 covariates. The remaining eight covariates satisfy the PH assumption
 ($p > 0.07$; Supplementary Table~S1).
 
-Fourth, mixed AJCC staging editions across the 15-year study period
+Fifth, mixed AJCC staging editions across the 15-year study period
 introduce stage migration that differentially affects the Stage~IV
 hazard ratio. The 6th edition (2008--2009; $n = 285$) classified
 cervical lymph-node metastasis (M1a) as Stage~IV; the 7th edition
@@ -608,7 +630,7 @@ contrast in the primary model. The 7th-edition-only estimate
 (HR 2.17, 95\,\%\,CI 1.78--2.64) is the more interpretable reference
 for comparisons with contemporary staging studies.
 
-Fifth, the autoencoder used mean-squared-error loss uniformly across all
+Sixth, the autoencoder used mean-squared-error loss uniformly across all
 features, including categorical variables (histological type, surgical
 modality). MSE is not mathematically appropriate for categorical distances;
 a composite loss function (MSE for continuous variables, binary
@@ -621,7 +643,7 @@ conventional classifiers, the choice of loss function does not affect the
 primary scientific conclusion; a composite loss is recommended for future
 work where cluster OS discrimination is the intended endpoint.
 
-Sixth, the cluster OS differences likely partly reflect known compositional
+Seventh, the cluster OS differences likely partly reflect known compositional
 differences in histology and subsite (Cluster~2 concentrates all
 adenocarcinomas; Cluster~3 is anatomically defined cervical cancers) rather
 than novel latent biological signal orthogonal to conventional classifiers.
@@ -631,20 +653,21 @@ to histology and subsite covariates showed non-significant cluster HRs
 negligible $\Delta$C-index of $-0.001$ (§\ref{sec:dl}). The clusters
 therefore do not explain OS variance beyond conventional registry coding.
 
-Seventh, no comparison against PCA-based clustering was performed; it remains
+Eighth, no comparison against PCA-based clustering was performed; it remains
 possible that a simpler linear dimensionality reduction would achieve
 comparable patient stratification.
 
 Finally, the absence of drug-level chemotherapy data, performance status,
 and molecular biomarkers (PD-L1, HER2) limits mechanistic inference, and
 cumulative cycle data were available in only 5.3\,\% of patients,
-precluding the intended dose-response analysis (aim 3). Seventh, the
-surgical margin reference category combines R1 ($n = 59$) and R2 ($n = 5$);
-R2 is too small for a reliable independent estimate (R2 vs R0 log-rank
-$p = 0.07$; R1 vs R0 $p = 0.01$, median OS 22.7 vs 27.3 months), so
-separating them meaningfully is not feasible in this dataset. External
-validation in an independent registry dataset is required before clinical
-deployment of the deep learning patient subtypes.
+precluding the intended dose-response analysis (aim 3). The surgical margin
+reference category combines R1 ($n = 59$) and R2 ($n = 5$); R2 is too small
+for a reliable independent estimate, so separating them meaningfully is not
+feasible in this dataset. External validation in an independent
+\textit{multi-centre} dataset is required before clinical deployment of the
+deep learning patient subtypes; the CMUH ESCC chart-review dataset
+($n = 344$; §~\ref{sec:limitations}) originates from the same institution
+and therefore does not constitute independent external validation.
 
 %%======================================================================
 \section{Conclusions}
@@ -668,7 +691,7 @@ Unsupervised deep learning recovers three patient subtypes consistent with
 known histological and anatomical subgroups; incremental Cox analysis
 confirms no additional OS predictive value beyond conventional classifiers
 ($\Delta$C-index $= -0.001$). These findings support prospective
-enhancement of surgical quality metrics in the Taiwan Cancer Registry and
+enhancement of surgical quality metrics in the CMUH Cancer Registry and
 molecular characterisation of the adenocarcinoma-enriched subgroup.
 
 %%======================================================================
@@ -702,16 +725,16 @@ Patient consent was waived due to the de-identified retrospective registry
 design, as approved by the IRB.
 
 \section*{Data Availability Statement}
-Data from the Taiwan Cancer Registry are available from the Health
-Promotion Administration, Ministry of Health and Welfare, Taiwan, subject
-to the registry's data-access governance requirements.
+Data are from the China Medical University Hospital (CMUH) institutional
+cancer registry and are available from CMUH subject to institutional
+data-access governance requirements and IRB approval.
 
 \section*{Conflicts of Interest}
 The authors declare no conflict of interest.
 
 \section*{Acknowledgements}
-The authors thank the Taiwan Cancer Registry for providing the data used
-in this study.
+The authors thank China Medical University Hospital for providing access
+to the institutional cancer registry data used in this study.
 
 %%======================================================================
 %% References
@@ -792,12 +815,13 @@ proportional hazards deep neural network.
 \textit{BMC Med Res Methodol.} 2018;18(1):24.
 
 \bibitem{MOHW2022}
-Ministry of Health and Welfare, Taiwan. Taiwan Cancer Registry Annual
-Report 2020. Health Promotion Administration; 2022.
+China Medical University Hospital. Institutional Cancer Registry Report.
+CMUH Institutional Review Board; 2022.
 
 \bibitem{MHW2022registry}
 Chiang CJ, Wang YW, Lee WC. Taiwan's Nationwide Cancer Registry System
 of 40 years. \textit{J Formos Med Assoc.} 2019;118(5):856--858.
+[National registry context; CMUH contributed to this system.]
 
 \bibitem{Rice2017}
 Rice TW, Ishwaran H, Ferguson MK, Blackstone EH, Goldstraw P. Cancer
