@@ -58,12 +58,12 @@ yet the patterns by which specific cancers co-occur within a patient --- and
 the shared carcinogenic mechanisms they imply --- remain poorly characterised in
 Asian populations, where betel quid chewing, tobacco smoking, and alcohol
 consumption create a distinctive mucosal field-cancerization risk. We aimed to
-characterise the landscape of cancer co-occurrence in a large national registry
-using convergent unsupervised machine-learning methods.
+characterise the landscape of cancer co-occurrence in a large hospital-based
+institutional registry using convergent unsupervised machine-learning methods.
 
 \textbf{Methods:}
-We analysed 78,578 patients (84,157 primary cancers) from the Taiwan Cancer
-Registry (2006--2020). Three independent unsupervised methods were applied to
+We analysed 78,578 patients (84,157 primary cancers) from the China Medical
+University Hospital (CMUH) Cancer Registry (2006--2020). Three independent unsupervised methods were applied to
 a binary patient $\times$ cancer-site matrix: pairwise association rule mining
 (lift, odds ratio), non-negative matrix factorisation (NMF, $k = 7$), and a
 deep binary-cross-entropy autoencoder followed by UMAP and $k$-means clustering
@@ -157,7 +157,7 @@ operating under different modelling assumptions converge on the same structure,
 confidence that this structure reflects genuine biological signal --- rather than
 analytic artefact --- is substantially strengthened.
 
-In this study we applied all three approaches to the full Taiwan Cancer Registry
+In this study we applied all three approaches to the full CMUH Cancer Registry
 cohort (2006--2020; $n = 78,578$) and corroborated the findings with
 standardised incidence ratios (SIR) and directional disease-trajectory mining
 \cite{Jensen2014}. Our specific aims were: (1) to characterise the landscape of
@@ -172,10 +172,10 @@ temporal dynamics of the identified second-primary risks.
 %%======================================================================
 
 \subsection{Data source and cohort}
-De-identified records were obtained from the Taiwan Cancer Registry long-form
-dataset, covering the period 2006--2020. The registry captures all newly
-diagnosed cancers at hospitals in Taiwan and has been described previously
-\cite{Chiang2019}. Each record encodes the ICD-O topography code (third
+De-identified records were obtained from the China Medical University Hospital
+(CMUH) institutional cancer registry, covering the period 2006--2020. The
+registry captures all newly diagnosed cancers at CMUH and follows the structure
+of the national reporting standard~\cite{Chiang2019}. Each record encodes the ICD-O topography code (third
 edition), morphology, date of diagnosis (Republic of China calendar, converted
 to Gregorian), sequence number within the patient, and vital status at last
 follow-up. Tumour sites were collapsed to three-character ICD-O C-codes; sites
@@ -413,8 +413,8 @@ with esophageal cancer faced a 12-fold elevated risk of a subsequent laryngeal o
 hypopharyngeal primary relative to the background rate in the same registry ---
 an excess that persists even after excluding synchronous diagnoses from the
 person-year denominator. To our knowledge, this is one of the highest
-site-specific second-primary SIR values reported in a population-based registry
-setting \cite{Chuang2008, Morris2011}.
+site-specific second-primary SIR values reported in a hospital-based institutional
+registry setting \cite{Chuang2008, Morris2011}.
 
 \subsection{Two temporal modes of upper aerodigestive co-occurrence}
 Trajectory analysis revealed that the upper aerodigestive co-occurrences are
@@ -533,13 +533,13 @@ All authors have read and approved the final manuscript.
 The authors declare no competing interests.
 
 \section*{Data availability}
-Data from the Taiwan Cancer Registry are available from the Health Promotion
-Administration, Ministry of Health and Welfare, Taiwan, subject to the
-registry's data-access governance requirements.
+Data are from the China Medical University Hospital (CMUH) institutional
+cancer registry and are available from CMUH subject to institutional
+data-access governance requirements and IRB approval.
 
 \section*{Acknowledgements}
-The authors thank the Taiwan Cancer Registry for providing the data used in
-this study.
+The authors thank China Medical University Hospital for providing access
+to the institutional cancer registry data used in this study.
 
 %%======================================================================
 %% References
