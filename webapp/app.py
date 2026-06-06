@@ -462,7 +462,7 @@ with tab_rag:
 
     if run_query and rag_question.strip():
         with st.spinner("Starting RAG server and retrieving…  (first query may take ~60 s)"):
-            result = rag.query(rag_question.strip(), top_k=top_k)
+            result = rag.query(rag_question.strip(), top_k=top_k, api_key=api_key)
         st.session_state.rag_history.insert(0, (rag_question.strip(), result))
         st.rerun()
 

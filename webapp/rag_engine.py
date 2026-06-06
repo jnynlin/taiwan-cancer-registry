@@ -94,13 +94,13 @@ class RAGEngine:
         except Exception:
             return []
 
-    def query(self, question: str, top_k: int = 6) -> RAGResult:
+    def query(self, question: str, top_k: int = 6, api_key: str = "") -> RAGResult:
         if not self.ensure_server():
             return RAGResult(answer="", error="RAG server failed to start.")
         try:
             resp = self._client.post(
                 "/query",
-                json={"question": question, "top_k": top_k},
+                json={"question": question, "top_k": top_k, "api_key": api_key},
                 timeout=120.0,
             )
             resp.raise_for_status()
