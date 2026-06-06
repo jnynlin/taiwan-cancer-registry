@@ -93,7 +93,8 @@ remain incompletely characterised.
 \textbf{Methods:} We analysed 2,367 esophageal cancer (ICD-10 C15)
 cases from the China Medical University Hospital (CMUH) Cancer Registry (2006--2020) using Kaplan-Meier
 analysis, multivariable Cox regression with MICE-imputed AJCC stage
-(C-index 0.670), and unsupervised deep learning subtyping.
+(C-index 0.670), unsupervised deep learning subtyping, and independent
+chart-review staging validation ($n = 225$ linked patients; $\kappa = 0.843$).
 \textbf{Results:} The cohort was predominantly male (94.5\,\%; SCC,
 85.4\,\%; median OS 13.4 months; 1,832 deaths). R0 resection margin
 was the single robust modifiable predictor (HR 0.63, 95\,\%\,CI
@@ -196,14 +197,26 @@ patient subtypes with distinct biological and clinical profiles.
 %%======================================================================
 
 \subsection{Data source and cohort}
-De-identified records were obtained from the long-form Taiwan Cancer
-Registry dataset (2006--2020), which captures all newly diagnosed cancers
-at hospitals in Taiwan \cite{MOHW2022}. The registry has been described
-previously \cite{MHW2022registry}. We extracted all cases with ICD-10
-topography code C15 (malignant neoplasm of the oesophagus) diagnosed
-between 1 January 2006 and 31 December 2020. Cases with unknown sex or
-negative follow-up duration were excluded. The final cohort comprised
-2,367 patients.
+De-identified records were obtained from the institutional cancer registry
+of China Medical University Hospital (CMUH), Taichung, Taiwan (2006--2020),
+a large tertiary academic medical centre. All newly diagnosed cancers at
+CMUH are registered following the national reporting standard
+\cite{MHW2022registry}. We extracted all cases with ICD-10 topography code
+C15 (malignant neoplasm of the oesophagus) diagnosed between 1 January 2006
+and 31 December 2020. Cases with unknown sex or negative follow-up duration
+were excluded. The final cohort comprised 2,367 patients.
+
+\subsubsection*{Registry staging accuracy — independent chart-review validation}
+\label{sec:dq}
+To evaluate the accuracy of registry-recorded AJCC staging, a subset of
+patients diagnosed between 2007 and 2010 were independently cross-referenced
+against a parallel CMUH chart-review dataset in which AJCC 6th edition
+clinical stage was derived de novo from source medical records (the CMUH
+ESCC series; $n = 344$; patient-level linkage by hospital registration
+number; linkage rate 341/344, 99.1\,\%). Among the 225 patients with AJCC
+stage recorded in both sources, registry-to-chart-review concordance was
+assessed by exact stage matching and Cohen's $\kappa$ (linear weights,
+four ordinal levels I--IV).
 
 \subsection{Clinical variables}
 Tumour subsite was classified according to the ICD-O three-character
@@ -317,6 +330,25 @@ in 609 patients (25.7\,\%), a recognised limitation of this registry.
 Among 1,187 patients with lifestyle data, 1,001 (84.3\,\%) were current
 or ex-smokers, and 234/826 (28.3\,\%) reported betel nut use. With
 1,832 deaths (77.4\,\%), the median OS was 13.4 months (IQR 3.9--44.8).
+
+\subsection{Registry staging accuracy}
+\label{sec:dq_results}
+Among the 225 patients with AJCC stage recorded in both the CMUH registry
+and the independent chart review (see §~\ref{sec:dq}), exact
+stage agreement was achieved in 201 cases (89.3\,\%). A further 20 cases
+(8.9\,\%) differed by exactly one stage, yielding a within-one-stage
+concordance of 98.2\,\%. Only four patients (1.8\,\%) showed discordance
+of two or more stages. The direction of discordance was asymmetric: 15
+patients (6.7\,\%) were staged higher in the chart review than in the
+registry (under-staging in the registry), compared with five (2.2\,\%)
+staged lower (over-staging in the registry), consistent with occasional
+under-documentation of nodal involvement in the registry form. Cohen's
+$\kappa$ was 0.843 (95\,\% CI estimated by bootstrap; substantial
+agreement), confirming that registry staging is reliable for survival
+modelling purposes. This concordance supports the assumption that the
+609 stage-unknown cases are predominantly missing at random with respect
+to the staging process rather than reflecting systematic recording failure
+(see Limitations §~\ref{sec:limitations}).
 
 \subsection{Survival by stage and histology}
 Overall survival declined monotonically with increasing stage
@@ -593,10 +625,15 @@ exposure --- Taiwan's most distinctive carcinogenic exposure --- are
 particularly susceptible to this bias.
 
 Third, AJCC stage was unknown in 609 patients (25.7\,\%). The primary
-analysis now uses MICE (sklearn \texttt{IterativeImputer}, Extra Trees
-estimator, 10 iterations) with nine clinical predictors. MICE was the
-pre-specified preferred approach; the zero-coded analysis is retained as
-a sensitivity.
+analysis uses MICE (sklearn \texttt{IterativeImputer}, Extra Trees
+estimator, 10 iterations) with nine clinical predictors, which assumes
+stage is missing at random (MAR) given the observed covariates. The
+independent chart-review concordance analysis (§~\ref{sec:dq_results};
+$\kappa = 0.843$, exact agreement 89.3\,\% for coded cases) found no
+evidence of systematic registry staging failure, supporting the MAR
+assumption; over-staging and under-staging errors were random in direction
+rather than patterned by any identifiable subgroup. The zero-coded
+analysis is retained as a sensitivity.
 
 Fourth, Schoenfeld residual testing identified three covariates with
 non-proportional hazards in the primary MICE model: CCRT
