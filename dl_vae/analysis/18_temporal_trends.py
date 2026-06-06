@@ -54,6 +54,42 @@ AXIS_PALETTE = {
 MIN_FIRST_PX = 30   # minimum first-primary patients ever to report a trend
 
 
+def spearmanr_ac_corrected(years, y):
+    """Spearman ρ with autocorrelation-corrected p-value.
+
+    Annual time-series are autocorrelated → naive Spearman p-values
+    underestimate the true p (effective df < n-2).
+
+    Method (Chelton 1983 / Trenberth 1984):
+      1. Remove linear trend to get detrended residuals
+      2. Estimate lag-1 autocorrelation φ from residuals
+      3. Effective n: n_eff = n * (1-φ) / (1+φ)
+      4. t = ρ * sqrt(n_eff-2) / sqrt(1-ρ²); p from t-distribution
+
+    Returns: rho, p_naive, phi, n_eff, p_corrected
+    """
+    n = len(y)
+    rho, p_naive = stats.spearmanr(years, y)
+    if n < 4:
+        return rho, p_naive, np.nan, float(n), p_naive
+
+    # Detrend before measuring autocorrelation
+    slope, intercept = np.polyfit(years, y, 1)
+    resid = y - (slope * np.asarray(years) + intercept)
+
+    phi = float(np.corrcoef(resid[:-1], resid[1:])[0, 1])
+    phi = max(-0.999, min(0.999, phi))        # numerical clamp
+    n_eff = max(3.0, n * (1.0 - phi) / (1.0 + phi))
+
+    if abs(rho) >= 1.0:
+        p_corrected = 0.0
+    else:
+        t_stat = rho * np.sqrt(n_eff - 2.0) / np.sqrt(1.0 - rho ** 2)
+        p_corrected = float(2.0 * (1.0 - stats.t.cdf(abs(t_stat), df=n_eff - 2.0)))
+
+    return rho, p_naive, phi, n_eff, p_corrected
+
+
 def roc_to_ts(x):
     s = str(x).split(".")[0].zfill(7)
     if not s.isdigit() or len(s) != 7: return pd.NaT
@@ -112,30 +148,42 @@ def main():
     years = pivot.index.values
     site_totals = first.groupby("site").size()
 
-    # ── Spearman ρ per site ────────────────────────────────────────────────────
+    # ── Spearman ρ per site (with AC-corrected p) ─────────────────────────────
     rows = []
     for site in pivot.columns:
         if site_totals.get(site, 0) < MIN_FIRST_PX:
             continue
         y = pivot[site].values
-        rho, pval = stats.spearmanr(years, y)
+        rho, p_naive, phi, n_eff, p_corr = spearmanr_ac_corrected(years, y)
         rows.append({
-            "site":      site,
-            "axis":      axis_label(site),
-            "n_first":   int(site_totals.get(site, 0)),
-            "rho":       round(rho, 3),
-            "p_spearman": round(pval, 4),
-            "direction": "rising" if rho > 0 else "falling",
-            "sig":       pval < 0.05,
+            "site":        site,
+            "axis":        axis_label(site),
+            "n_first":     int(site_totals.get(site, 0)),
+            "rho":         round(rho, 3),
+            "p_naive":     round(p_naive, 4),
+            "phi_lag1":    round(phi, 3) if not np.isnan(phi) else np.nan,
+            "n_eff":       round(n_eff, 1),
+            "p_corrected": round(p_corr, 4),
+            "direction":   "rising" if rho > 0 else "falling",
+            "sig_naive":   p_naive < 0.05,
+            "sig":         p_corr  < 0.05,   # primary significance flag
         })
     trend_df = pd.DataFrame(rows).sort_values("rho", ascending=False)
     trend_df.to_csv(OUT / "trend_by_site.csv", index=False)
-    print("\n  Spearman trend — top 8 rising:")
-    print(trend_df.head(8)[["site","axis","rho","p_spearman"]].to_string(index=False))
-    print("\n  Spearman trend — top 8 falling:")
-    print(trend_df.tail(8)[["site","axis","rho","p_spearman"]].to_string(index=False))
+
+    n_naive = trend_df["sig_naive"].sum()
+    n_corr  = trend_df["sig"].sum()
+    n_demoted = n_naive - n_corr
+    print(f"\n  n={len(years)} annual points | "
+          f"naive sig: {n_naive} sites | AC-corrected sig: {n_corr} sites | "
+          f"demoted by correction: {n_demoted}")
+    print("\n  Spearman trend — top 8 rising (AC-corrected p):")
+    print(trend_df.head(8)[["site","axis","rho","p_naive","phi_lag1","n_eff","p_corrected","sig"]].to_string(index=False))
+    print("\n  Spearman trend — top 8 falling (AC-corrected p):")
+    print(trend_df.tail(8)[["site","axis","rho","p_naive","phi_lag1","n_eff","p_corrected","sig"]].to_string(index=False))
 
     # ── Hypothesis check ─────────────────────────────────────────────────────
+    print("\n  Pre-registered hypothesis results (AC-corrected):")
     for site, label, h in [
         ("C22", "C22 liver HCC", "H1"),
         ("C12", "C12 pyriform", "H2"),
@@ -146,7 +194,10 @@ def main():
         r = trend_df[trend_df["site"]==site]
         if not r.empty:
             row = r.iloc[0]
-            print(f"  {h} [{label}]: ρ={row['rho']:.3f} p={row['p_spearman']:.4f} → {row['direction'].upper()}")
+            status = "CONFIRMED" if row["sig"] else ("NAIVE-ONLY" if row["sig_naive"] else "NOT SIG")
+            print(f"  {h} [{label}]: ρ={row['rho']:.3f} "
+                  f"p_naive={row['p_naive']:.4f} φ={row['phi_lag1']:.3f} "
+                  f"n_eff={row['n_eff']:.1f} p_corr={row['p_corrected']:.4f} → {status}")
         else:
             print(f"  {h} [{label}]: insufficient data")
 
@@ -181,7 +232,8 @@ def main():
     bars = ax.barh(sig["site"], sig["rho"], color=colors, alpha=0.8)
     ax.axvline(0, color="gray", lw=1)
     ax.set_xlabel("Spearman ρ (annual fraction vs year, 2003–2020)")
-    ax.set_title("Cancer site temporal trends\n(significant sites only, p<0.05)")
+    ax.set_title(f"Cancer site temporal trends\n"
+                 f"(AC-corrected p<0.05; n={n_corr} sites; {n_demoted} demoted vs naive)")
     for axis_name, color in AXIS_PALETTE.items():
         if any(r["axis"] == axis_name for _, r in sig.iterrows()):
             ax.barh([], [], color=color, label=axis_name, alpha=0.8)
@@ -224,8 +276,10 @@ def main():
         row = trend_df[trend_df["site"].isin(sites)]
         if not row.empty:
             rho_mean = row["rho"].mean()
-            p_min    = row["p_spearman"].min()
-            ax.set_title(f"{label}\nρ≈{rho_mean:.2f} p={p_min:.4f}", fontsize=9)
+            p_corr   = row["p_corrected"].min()
+            p_naive  = row["p_naive"].min()
+            sig_str  = "✓" if p_corr < 0.05 else "✗ (naive only)" if p_naive < 0.05 else "✗"
+            ax.set_title(f"{label}\nρ≈{rho_mean:.2f} p_corr={p_corr:.4f} {sig_str}", fontsize=9)
         else:
             ax.set_title(label, fontsize=9)
         ax.set_xlabel("Year")

@@ -42,6 +42,25 @@ TARGET    = "C22"
 
 UADT_SITES = {"C02","C03","C04","C05","C06","C09","C10","C12","C13","C15"}
 GI_SITES   = {"C16","C17","C18","C19","C20","C22","C23","C24","C25"}
+
+
+def spearmanr_ac_corrected(years, y):
+    """Spearman ρ with autocorrelation-corrected p-value (Chelton 1983)."""
+    n = len(y)
+    rho, p_naive = stats.spearmanr(years, y)
+    if n < 4:
+        return rho, p_naive, np.nan, float(n), p_naive
+    slope, intercept = np.polyfit(years, y, 1)
+    resid = y - (slope * np.asarray(years, dtype=float) + intercept)
+    phi = float(np.corrcoef(resid[:-1], resid[1:])[0, 1])
+    phi = max(-0.999, min(0.999, phi))
+    n_eff = max(3.0, n * (1.0 - phi) / (1.0 + phi))
+    if abs(rho) >= 1.0:
+        p_corrected = 0.0
+    else:
+        t_stat = rho * np.sqrt(n_eff - 2.0) / np.sqrt(1.0 - rho ** 2)
+        p_corrected = float(2.0 * (1.0 - stats.t.cdf(abs(t_stat), df=n_eff - 2.0)))
+    return rho, p_naive, phi, n_eff, p_corrected
 AXIS_COLOR = {"UADT":"#2e7fbf", "GI":"#e05c2e", "Other":"#888888",
               "Hormonal":"#9467bd", "Lung/prostate":"#2ca02c"}
 
@@ -294,14 +313,30 @@ def main():
 
     trend.to_csv(OUT / "c22_trend.csv", index=False)
 
-    # Spearman trend tests
+    # Spearman trend tests — with autocorrelation correction
     valid = trend[trend["diag_yr"].between(2003, 2020)]
-    r_all, p_all = stats.spearmanr(valid["diag_yr"], valid["c22_rate_pct"])
-    print(f"  C22 overall trend ρ={r_all:.3f} p={p_all:.3f}")
+    r_all, p_naive_all, phi_all, neff_all, p_corr_all = spearmanr_ac_corrected(
+        valid["diag_yr"].values, valid["c22_rate_pct"].values)
+    print(f"  C22 overall trend ρ={r_all:.3f} "
+          f"p_naive={p_naive_all:.4f} φ={phi_all:.3f} "
+          f"n_eff={neff_all:.1f} p_corrected={p_corr_all:.4f}")
+
+    # Save trend stats
+    trend_stats = pd.DataFrame([{
+        "stratum": "All ages",
+        "rho": round(r_all, 3),
+        "p_naive": round(p_naive_all, 4),
+        "phi_lag1": round(phi_all, 3),
+        "n_eff": round(neff_all, 1),
+        "p_corrected": round(p_corr_all, 4),
+        "sig_corrected": p_corr_all < 0.05,
+    }])
 
     fig, ax = plt.subplots(figsize=(10, 5))
+    sig_str = f"p_corr={p_corr_all:.4f} {'✓' if p_corr_all<0.05 else '✗'}"
     ax.plot(trend["diag_yr"], trend["c22_rate_pct"], "o-",
-            color="#e05c2e", lw=2.5, label=f"All ages (ρ={r_all:.2f}, p={p_all:.3f})")
+            color="#e05c2e", lw=2.5,
+            label=f"All ages ρ={r_all:.2f}, {sig_str} (φ={phi_all:.2f}, n_eff={neff_all:.0f})")
     for label, color, ls in [
         ("Age<50",  "#2ca02c",  "--"),
         ("Age 50-64","#2e7fbf", "--"),
@@ -310,9 +345,20 @@ def main():
         col = f"rate_{label}"
         if col in trend.columns:
             sub = trend[trend[col].notna()]
-            rv, pv = stats.spearmanr(sub["diag_yr"], sub[col])
+            rv, pnv, phiv, neffv, pcrv = spearmanr_ac_corrected(
+                sub["diag_yr"].values, sub[col].values)
+            trend_stats = pd.concat([trend_stats, pd.DataFrame([{
+                "stratum": label,
+                "rho": round(rv, 3), "p_naive": round(pnv, 4),
+                "phi_lag1": round(phiv, 3), "n_eff": round(neffv, 1),
+                "p_corrected": round(pcrv, 4), "sig_corrected": pcrv < 0.05,
+            }])], ignore_index=True)
+            sig_s = f"p_corr={pcrv:.3f} {'✓' if pcrv<0.05 else '✗'}"
             ax.plot(sub["diag_yr"], sub[col], ls, color=color, lw=1.5,
-                    label=f"{label} (ρ={rv:.2f}, p={pv:.3f})")
+                    label=f"{label} ρ={rv:.2f}, {sig_s}")
+
+    trend_stats.to_csv(OUT / "c22_trend_ac_stats.csv", index=False)
+    print(f"  Saved: c22_trend_ac_stats.csv")
     ax.axvline(2010, color="gray", lw=1, ls=":", alpha=0.5,
                label="~HBV vaccination cohort enters adulthood")
     ax.set_xlabel("Diagnosis year")
