@@ -145,6 +145,7 @@ from db import get_db
 from query_engine import QueryEngine
 from charts import auto_chart
 from site_labels import QUICK_SITES
+from rag_engine import RAGEngine
 
 # ── cached resources ──────────────────────────────────────────────────────────
 @st.cache_resource(show_spinner="Loading registry database…")
@@ -155,8 +156,13 @@ def load_db():
 def load_engine(_db):
     return QueryEngine(_db)
 
+@st.cache_resource(show_spinner=False)
+def load_rag() -> RAGEngine:
+    return RAGEngine()
+
 db     = load_db()
 engine = load_engine(db)
+rag    = load_rag()
 
 # ── session state ─────────────────────────────────────────────────────────────
 if "history"  not in st.session_state: st.session_state.history  = []
@@ -251,7 +257,11 @@ m4.metric("Result tables", str(len(db.tables)))
 st.divider()
 
 # ── tabs ──────────────────────────────────────────────────────────────────────
-tab_qa, tab_explore = st.tabs(["💬  Ask a Question", "🗂  Data Explorer"])
+tab_qa, tab_explore, tab_rag = st.tabs([
+    "💬  Ask a Question",
+    "🗂  Data Explorer",
+    "📚  Search Manuscripts",
+])
 
 # ══════════════════════════════════════════════════════════════════════════════
 with tab_qa:
@@ -389,6 +399,109 @@ with tab_explore:
 
             except Exception as e:
                 st.error(f"Could not load table: {e}")
+
+# ══════════════════════════════════════════════════════════════════════════════
+with tab_rag:
+    st.markdown("### 📚 Search Manuscripts")
+    st.caption(
+        "Hybrid RAG (dense + BM25 + Claude synthesis) over ingested study drafts. "
+        "The RAG server starts automatically on first use — allow ~60 s for model warm-up."
+    )
+
+    # ── server status ──────────────────────────────────────────────────────────
+    with st.expander("🔧 Server & index status", expanded=False):
+        if st.button("Check server", key="rag_check"):
+            with st.spinner("Contacting RAG server…"):
+                info = rag.status()
+            if "error" in info:
+                st.error(f"Server not reachable: {info['error']}")
+            else:
+                st.success(
+                    f"RAG server online — "
+                    f"{info.get('vectors_count', '?')} vectors indexed, "
+                    f"status: {info.get('status', '?')}"
+                )
+            docs = rag.ingested_docs()
+            if docs:
+                st.markdown("**Ingested documents:**")
+                for d in docs:
+                    st.caption(f"• {d}")
+            else:
+                st.caption("No documents listed yet.")
+
+    st.divider()
+
+    # ── query interface ────────────────────────────────────────────────────────
+    rag_question = st.text_area(
+        "Research question",
+        placeholder=(
+            "e.g. What are the 5-year survival outcomes for stage III esophageal cancer?\n"
+            "e.g. How does BRAF V600E affect thyroid cancer prognosis?\n"
+            "e.g. What is the SIR for liver cancer after esophageal cancer?"
+        ),
+        height=100,
+        key="rag_question_input",
+    )
+
+    col_topk, col_btn, col_clear = st.columns([1, 2, 1], gap="small")
+    top_k = col_topk.slider("Chunks", min_value=2, max_value=12, value=6, key="rag_topk")
+
+    run_query = col_btn.button(
+        "🔍  Search & Synthesise",
+        type="primary",
+        disabled=not rag_question.strip(),
+        use_container_width=True,
+        key="rag_run",
+    )
+    if col_clear.button("🗑  Clear", use_container_width=True, key="rag_clear"):
+        st.session_state.rag_history = []
+        st.rerun()
+
+    if "rag_history" not in st.session_state:
+        st.session_state.rag_history = []
+
+    if run_query and rag_question.strip():
+        with st.spinner("Starting RAG server and retrieving…  (first query may take ~60 s)"):
+            result = rag.query(rag_question.strip(), top_k=top_k)
+        st.session_state.rag_history.insert(0, (rag_question.strip(), result))
+        st.rerun()
+
+    # ── history ────────────────────────────────────────────────────────────────
+    for q_text, res in st.session_state.rag_history:
+        with st.chat_message("user", avatar="🧑‍⚕️"):
+            st.markdown(f"**{q_text}**")
+
+        with st.chat_message("assistant", avatar="📚"):
+            if res.error:
+                st.error(f"Error: {res.error}")
+                continue
+
+            st.markdown(
+                f'<div class="ans-box">{res.answer}</div>',
+                unsafe_allow_html=True,
+            )
+
+            if res.sources:
+                with st.expander(f"📎 {len(res.sources)} source chunk(s)"):
+                    import pandas as pd
+                    src_df = pd.DataFrame(res.sources)
+                    display_cols = [c for c in ("index", "source", "section", "page") if c in src_df.columns]
+                    st.dataframe(
+                        src_df[display_cols] if display_cols else src_df,
+                        use_container_width=True,
+                        hide_index=True,
+                    )
+
+    if not st.session_state.rag_history:
+        st.markdown("")
+        st.info(
+            "💡 **Example questions**\n\n"
+            "- What are the co-occurrence patterns between UADT cancers?\n"
+            "- How does BRAF V600E status affect survival in papillary thyroid carcinoma?\n"
+            "- What is the effect of CCRT vs surgery on esophageal cancer survival?\n"
+            "- What clusters emerge from VAE latent space analysis of the cancer registry?\n"
+            "- What is the HBV-related incidence trend for liver cancer in Taiwan?"
+        )
 
 # ── footer ────────────────────────────────────────────────────────────────────
 st.divider()
