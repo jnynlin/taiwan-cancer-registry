@@ -1,0 +1,2 @@
+n_val_patients,r_at_1,r_at_3,r_at_5,median_gap_days,p25_gap_days,p75_gap_days,pct_within_6mo,n_timing_pairs
+810,0.2321,0.4975,0.6642,681,48,1813,0.316,519

@@ -31,12 +31,17 @@ C15_esophageal/data/
 *.aux
 *.log
 *.out
+*.bbl
+*.blg
 *.synctex.gz
 *.toc
 *.fls
 *.fdb_latexmk
 *.spl
 **/manuscript/*.pdf
+
+# R session history
+.Rhistory
 
 # Python cache
 __pycache__/
@@ -65,6 +70,8 @@ coexist_cancers/results/03_nmf/patient_nmf_loadings.csv
 coexist_cancers/results/03_nmf/patient_nmf_loadings_multiprimary.csv
 dl_vae/results/05_anomaly/anomaly_scores.csv
 dl_vae/results/06_syndrome/syndrome_candidates.csv
+dl_vae/results/12_surveillance/surveillance_calendar.csv
+dl_vae/results/21_syndrome/refined_candidates.csv
 dl_vae/results/25_multihistory/multihistory_calendar.csv
 dl_vae/results/10_cluster_survival/cluster_survival_table.csv
 webapp/.venv/
