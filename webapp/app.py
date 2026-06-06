@@ -5,14 +5,20 @@ st.set_page_config(
     page_title="CMUH Cancer Registry Q&A",
     page_icon="🏥",
     layout="wide",
-    initial_sidebar_state="expanded",
+    initial_sidebar_state="auto",   # collapsed on narrow viewports automatically
 )
 
-# ── custom CSS ────────────────────────────────────────────────────────────────
+# ── custom CSS (desktop + RWD) ────────────────────────────────────────────────
 st.markdown("""
 <style>
+/* ── base ───────────────────────────────────────────────────────────────── */
 #MainMenu, footer, header { visibility: hidden; }
-.block-container { padding-top: 0.8rem; padding-bottom: 1rem; }
+.block-container {
+    padding-top: 0.8rem;
+    padding-bottom: 1rem;
+    padding-left: 2rem;
+    padding-right: 2rem;
+}
 
 /* metric cards */
 div[data-testid="metric-container"] {
@@ -33,7 +39,7 @@ div[data-testid="metric-container"] {
     line-height: 1.6;
 }
 
-/* privacy/suppression notice */
+/* suppression notice */
 .suppress-box {
     background: #fffbeb;
     border-left: 4px solid #f59e0b;
@@ -43,12 +49,92 @@ div[data-testid="metric-container"] {
     font-size: 0.85rem;
 }
 
-/* sidebar site buttons — tighter */
+/* sidebar site buttons — compact */
 section[data-testid="stSidebar"] div[data-testid="stButton"] > button {
     font-size: 0.82rem;
     padding: 4px 10px;
     margin: 1px 0;
     border-radius: 6px;
+}
+
+/* ── tablet  (640 – 1023 px) ────────────────────────────────────────────── */
+@media screen and (max-width: 1023px) {
+    .block-container {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+    }
+
+    /* wrap columns → 2-per-row */
+    div[data-testid="stHorizontalBlock"] {
+        flex-wrap: wrap !important;
+        gap: 0.5rem !important;
+    }
+    div[data-testid="column"] {
+        min-width: calc(50% - 0.5rem) !important;
+        flex: 0 1 calc(50% - 0.5rem) !important;
+    }
+
+    /* plotly chart – full width when stacked */
+    div[data-testid="stPlotlyChart"] {
+        width: 100% !important;
+    }
+}
+
+/* ── mobile  (< 640 px) ──────────────────────────────────────────────────── */
+@media screen and (max-width: 639px) {
+    .block-container {
+        padding-left: 0.5rem !important;
+        padding-right: 0.5rem !important;
+    }
+
+    /* single-column everything */
+    div[data-testid="stHorizontalBlock"] {
+        flex-wrap: wrap !important;
+    }
+    div[data-testid="column"] {
+        min-width: 100% !important;
+        flex: 0 1 100% !important;
+    }
+
+    /* smaller heading on phone */
+    h1 { font-size: 1.4rem !important; }
+    h2 { font-size: 1.1rem !important; }
+    h3 { font-size: 1rem !important;   }
+
+    /* metric label/value tighter */
+    div[data-testid="metric-container"] {
+        padding: 8px 12px !important;
+    }
+    div[data-testid="stMetricValue"] > div {
+        font-size: 1.2rem !important;
+    }
+
+    /* ans-box narrower padding */
+    .ans-box {
+        padding: 10px 12px !important;
+        font-size: 0.9rem !important;
+    }
+
+    /* chat messages full width */
+    div[data-testid="stChatMessage"] {
+        padding: 4px 0 !important;
+    }
+
+    /* topic card description text smaller */
+    div[data-testid="stCaptionContainer"] p {
+        font-size: 0.78rem !important;
+    }
+
+    /* buttons: larger touch targets */
+    div[data-testid="stButton"] > button {
+        min-height: 44px !important;
+        font-size: 0.9rem !important;
+    }
+
+    /* hide "All loaded tables" expander in sidebar on phone */
+    section[data-testid="stSidebar"] div[data-testid="stExpander"] {
+        display: none !important;
+    }
 }
 </style>
 """, unsafe_allow_html=True)
