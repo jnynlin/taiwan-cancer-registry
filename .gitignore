@@ -67,3 +67,6 @@ dl_vae/results/05_anomaly/anomaly_scores.csv
 dl_vae/results/06_syndrome/syndrome_candidates.csv
 dl_vae/results/25_multihistory/multihistory_calendar.csv
 dl_vae/results/10_cluster_survival/cluster_survival_table.csv
+webapp/.venv/
+__pycache__/
+*.pyc
