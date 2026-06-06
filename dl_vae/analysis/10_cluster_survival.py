@@ -167,17 +167,21 @@ def main():
     fig.savefig(OUT / "fig_km_clusters.png", dpi=150)
     plt.close()
 
-    # ── Fig C: Cox HR ────────────────────────────────────────────────────────
+    # ── Fig C: Cox HR + Schoenfeld PH test + time-split if violated ──────────
     if LIFELINES_OK:
+        from lifelines.statistics import proportional_hazard_test
+
         cox_df = surv[["duration", "dead", "age_first", "is_male", "cluster"]].copy()
         for k in range(N_CLUSTERS):
             if k != ref_k:
                 cox_df[f"C{k}_vs_C{ref_k}"] = (surv["cluster"] == k).astype(int)
 
         dummy_cols = [c for c in cox_df.columns if c.startswith("C") and "vs" in c]
+        fit_cols   = ["duration", "dead", "age_first", "is_male"] + dummy_cols
+
         cph = CoxPHFitter()
-        cph.fit(cox_df[["duration", "dead", "age_first", "is_male"] + dummy_cols],
-                duration_col="duration", event_col="dead", show_progress=False)
+        cph.fit(cox_df[fit_cols], duration_col="duration", event_col="dead",
+                show_progress=False)
         cph.summary.to_csv(OUT / "cox_cluster_results.csv")
 
         cluster_rows = cph.summary[[
@@ -187,23 +191,142 @@ def main():
         print("\n  Cox cluster HRs (vs C" + str(ref_k) + "):")
         print(cluster_rows.to_string())
 
-        fig, ax = plt.subplots(figsize=(7, max(3, len(dummy_cols) * 0.9 + 1.5)))
+        # ── Schoenfeld PH test ───────────────────────────────────────────────
+        print("\n  Schoenfeld proportional-hazards test:")
+        ph = proportional_hazard_test(cph, cox_df[fit_cols], time_transform="rank")
+        ph_df = ph.summary.copy()
+        ph_df["PH_OK"] = ph_df["p"] >= 0.05
+        ph_df.to_csv(OUT / "ph_test_results.csv")
+        print(ph_df[["test_statistic", "p", "PH_OK"]].to_string())
+
+        violated = ph_df[~ph_df["PH_OK"]].index.tolist()
+        print(f"\n  PH violations: {violated if violated else 'none'}")
+
+        # ── Time-split Cox at 2yr landmark if any violation ──────────────────
+        SPLIT_YR   = 2.0
+        SPLIT_DAYS = SPLIT_YR * 365.25
+
+        if violated:
+            print(f"\n  Running time-split Cox (landmark={SPLIT_YR}yr)…")
+            # Early period: 0 → SPLIT_DAYS
+            early = cox_df[cox_df["duration"] > 0].copy()
+            early["duration_e"] = early["duration"].clip(upper=SPLIT_DAYS)
+            early["dead_e"]     = ((early["dead"] == 1) &
+                                   (early["duration"] <= SPLIT_DAYS)).astype(int)
+            early = early[early["duration_e"] > 0]
+
+            # Late period: SPLIT_DAYS → end (only patients who survived past split)
+            late = cox_df[cox_df["duration"] > SPLIT_DAYS].copy()
+            late["duration_l"] = late["duration"] - SPLIT_DAYS
+
+            cph_early = CoxPHFitter()
+            cph_late  = CoxPHFitter()
+
+            fit_e = ["duration_e","dead_e","age_first","is_male"] + dummy_cols
+            fit_l = ["duration_l","dead","age_first","is_male"]   + dummy_cols
+
+            cph_early.fit(early[fit_e], duration_col="duration_e", event_col="dead_e",
+                          show_progress=False)
+            cph_late.fit(late[fit_l],   duration_col="duration_l", event_col="dead",
+                         show_progress=False)
+
+            early_rows = cph_early.summary[
+                ["exp(coef)","exp(coef) lower 95%","exp(coef) upper 95%","p"]
+            ].loc[dummy_cols]
+            late_rows  = cph_late.summary[
+                ["exp(coef)","exp(coef) lower 95%","exp(coef) upper 95%","p"]
+            ].loc[dummy_cols]
+
+            split_df = pd.DataFrame({
+                "HR_early":    early_rows["exp(coef)"].round(3),
+                "CI_lo_early": early_rows["exp(coef) lower 95%"].round(3),
+                "CI_hi_early": early_rows["exp(coef) upper 95%"].round(3),
+                "p_early":     early_rows["p"].round(6),
+                "HR_late":     late_rows["exp(coef)"].round(3),
+                "CI_lo_late":  late_rows["exp(coef) lower 95%"].round(3),
+                "CI_hi_late":  late_rows["exp(coef) upper 95%"].round(3),
+                "p_late":      late_rows["p"].round(6),
+            })
+            split_df.to_csv(OUT / "cox_timesplit_results.csv")
+            print(f"\n  Time-split Cox (early ≤{SPLIT_YR}yr | late >{SPLIT_YR}yr):")
+            print(split_df.to_string())
+
+            # Figure: side-by-side early/late forest plot
+            fig, axes = plt.subplots(1, 2, figsize=(14, max(3, len(dummy_cols)*0.9+2)),
+                                     sharey=True)
+            for ax, rows, period in zip(axes,
+                                        [early_rows, late_rows],
+                                        [f"Early (≤{SPLIT_YR}yr)", f"Late (>{SPLIT_YR}yr)"]):
+                y   = range(len(dummy_cols))
+                hrs = rows["exp(coef)"].values
+                lo  = rows["exp(coef) lower 95%"].values
+                hi  = rows["exp(coef) upper 95%"].values
+                ps  = rows["p"].values
+                ax.scatter(hrs, list(y), color="#2e7fbf", zorder=5, s=60)
+                ax.hlines(list(y), lo, hi, color="#2e7fbf", lw=2)
+                ax.axvline(1.0, color="gray", lw=1, ls="--")
+                ax.set_yticks(list(y))
+                ax.set_yticklabels(dummy_cols, fontsize=9)
+                ax.set_xlabel("Hazard ratio (95% CI)")
+                ax.set_title(f"{period}")
+                for i, (hr, hi_i, p) in enumerate(zip(hrs, hi, ps)):
+                    sig = "**" if p < 0.01 else ("*" if p < 0.05 else "ns")
+                    ax.text(hi_i * 1.05, i, f"{hr:.2f}{sig}", va="center", fontsize=8)
+            fig.suptitle(
+                f"Time-split Cox — landmark {SPLIT_YR}yr (PH violated: {', '.join(violated)})\n"
+                f"Adjusted for age + sex  |  ref=C{ref_k}", fontsize=11)
+            fig.tight_layout()
+            fig.savefig(OUT / "fig_cox_timesplit.png", dpi=150)
+            plt.close()
+            print(f"  Saved: fig_cox_timesplit.png")
+
+        # ── Standard forest plot (full follow-up) ────────────────────────────
+        fig, axes = plt.subplots(1, 2, figsize=(14, max(3, len(dummy_cols)*0.9+2)),
+                                 gridspec_kw={"width_ratios": [2, 1]})
+        ax = axes[0]
         y   = range(len(dummy_cols))
         hrs = cluster_rows["exp(coef)"].values
         lo  = cluster_rows["exp(coef) lower 95%"].values
         hi  = cluster_rows["exp(coef) upper 95%"].values
         ps  = cluster_rows["p"].values
-
         ax.scatter(hrs, list(y), color="#2e7fbf", zorder=5, s=60)
         ax.hlines(list(y), lo, hi, color="#2e7fbf", lw=2)
         ax.axvline(1.0, color="gray", lw=1, ls="--")
         ax.set_yticks(list(y))
         ax.set_yticklabels(dummy_cols, fontsize=9)
         ax.set_xlabel("Hazard ratio (95% CI) — Cox adjusted for age + sex")
-        ax.set_title(f"Cluster survival HRs vs C{ref_k} (ref)")
+        ax.set_title(f"Full follow-up  |  ref=C{ref_k}")
         for i, (hr, hi_i, p) in enumerate(zip(hrs, hi, ps)):
             sig = "**" if p < 0.01 else ("*" if p < 0.05 else "ns")
-            ax.text(hi_i + 0.02, i, f"{hr:.2f} {sig}", va="center", fontsize=8)
+            ax.text(hi_i * 1.05, i, f"{hr:.2f}{sig}", va="center", fontsize=8)
+
+        # PH test summary panel
+        ax2 = axes[1]
+        ax2.axis("off")
+        ph_display = ph_df[["test_statistic","p","PH_OK"]].copy()
+        ph_display.index = [i.replace("_vs_", " vs ") for i in ph_display.index]
+        ph_display["test_statistic"] = ph_display["test_statistic"].map(lambda x: f"{x:.1f}")
+        ph_display["p"]    = ph_display["p"].map(lambda x: f"{x:.2e}")
+        ph_display["PH_OK"] = ph_display["PH_OK"].map({True: "✓", False: "⚠"})
+        col_labels = ["χ²", "p", "OK"]
+        cell_text  = [[str(v) for v in row] for row in ph_display.values.tolist()]
+        row_labels = list(ph_display.index)
+        t = ax2.table(cellText=cell_text, rowLabels=row_labels,
+                      colLabels=col_labels, loc="center", cellLoc="center")
+        t.auto_set_font_size(False); t.set_fontsize(8)
+        for (r, c), cell in t.get_celld().items():
+            if r == 0:
+                cell.set_facecolor("#2C3E50"); cell.set_text_props(color="white")
+            elif "FAIL" in str(cell.get_text().get_text()):
+                cell.set_facecolor("#FDECEA")
+            elif "✓" in str(cell.get_text().get_text()):
+                cell.set_facecolor("#E8F5E9")
+        ax2.set_title("Schoenfeld PH test", fontsize=9, pad=4)
+
+        fig.suptitle(
+            f"Cluster survival HRs vs C{ref_k} (ref)\n"
+            f"PH {'satisfied — full-FU HRs valid' if not violated else 'violated for: ' + str(violated)}",
+            fontsize=11)
         fig.tight_layout()
         fig.savefig(OUT / "fig_cox_hr.png", dpi=150)
         plt.close()
