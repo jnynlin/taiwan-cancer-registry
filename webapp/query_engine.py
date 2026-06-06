@@ -37,6 +37,7 @@ _INTENT_MAP = [
     (r"\bsilhouette\b", "cluster"),
     (r"\bcluster\b.{0,30}\b(survival|cox|hazard|hr|os)\b|\b(survival|cox|hazard|hr|os)\b.{0,30}\bcluster\b", "cluster"),
     (r"\bcluster\b.{0,30}\b(era|over time|trend|year|annual)\b|\b(era|over time|trend|year|annual)\b.{0,30}\bcluster\b", "cluster"),
+    (r"\b(vae|latent|axis)\b.{0,30}\b(axis|latent|dim|covariate|interpret)\b", "cluster"),
     (r"\bmulti.?histor\w+\b|\bcontext.len\w*\b|\badditional cancer histor\w*\b", "model"),
     (r"\btransformer\b.{0,20}\b(temporal|gap|day|timing)\b", "model"),
     # (regex pattern, intent_key)
@@ -467,6 +468,16 @@ def _narrate(df: pd.DataFrame, chart_type: str, title: str, site: str | None) ->
 
     if chart_type in ("forest", "sir_bar"):
         hr_col = next((c for c in df.columns if c in ("hr", "sir", "or_", "exp_coef", "exp_coef_")), None)
+        # time-split Cox has hr_early / hr_late instead of hr
+        if hr_col is None and "hr_early" in df.columns:
+            lbl_col = next((c for c in df.columns if "label" in c or c == "covariate"), None)
+            if lbl_col:
+                worst = df.loc[pd.to_numeric(df["hr_early"], errors="coerce").idxmax()]
+                return (
+                    f"**{title}** — {n} clusters vs reference. "
+                    f"Worst early-period prognosis: **{worst[lbl_col]}** "
+                    f"(HR_early={worst['hr_early']:.2f}, HR_late={worst['hr_late']:.2f})."
+                )
         lbl_col = next((c for c in df.columns if "label" in c or c == "covariate"), None)
         if hr_col and lbl_col:
             top = df.loc[pd.to_numeric(df[hr_col], errors="coerce").idxmax()]
