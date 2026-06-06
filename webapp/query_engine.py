@@ -102,11 +102,24 @@ def _build_sql(intent: str, site: str | None, question: str) -> tuple[str, str, 
             return ("SELECT * FROM escc_survival", "km_bar",
                     "CMUH ESCC Detailed Dataset — Survival Summary", "escc_survival")
         strat = _survival_strat(question)
+        # Generic site survival: route to pre-computed tables if available
         if site and site != "C15":
-            return (
-                f"SELECT * FROM sex_age_by_site WHERE site = '{site}'",
-                "table", f"Demographics for {site} {site_label(site)}", "sex_age_by_site"
-            )
+            site_lc = site.lower()
+            strat_map = {
+                "stage":    (f"{site_lc}_km_stage_medians", "km_bar",  f"{site} {site_label(site)} — Median OS by Stage"),
+                "sex":      (f"{site_lc}_km_sex_medians",   "km_bar",  f"{site} {site_label(site)} — Median OS by Sex"),
+                "cox":      (f"{site_lc}_cox_summary",      "forest",  f"{site} {site_label(site)} — Cox Hazard Ratios"),
+            }
+            # pick strat
+            if re.search(r"\bcox\b|\bhazard\b|\bhr\b", q):
+                pick = "cox"
+            elif re.search(r"\bsex\b|\bmale\b|\bfemale\b", q):
+                pick = "sex"
+            else:
+                pick = "stage"
+            tbl, ct, ttl = strat_map[pick]
+            # Fall back to demographics if table not loaded
+            return (f"SELECT * FROM {tbl}", ct, ttl, tbl)
         table_map = {
             "stage":          ("c15_km_stage",          "km_bar",  "C15 Median OS by AJCC Stage"),
             "histology":      ("c15_km_histology",       "km_bar",  "C15 Median OS by Histology"),
@@ -127,6 +140,10 @@ def _build_sql(intent: str, site: str | None, question: str) -> tuple[str, str, 
         if "escc" in q or "cmuh" in q:
             return ("SELECT * FROM escc_cox LIMIT 20", "forest",
                     "CMUH ESCC Detailed Cox Hazard Ratios", "escc_cox")
+        if site and site != "C15":
+            tbl = f"{site.lower()}_cox_summary"
+            return (f"SELECT * FROM {tbl}", "forest",
+                    f"{site} {site_label(site)} — Cox Hazard Ratios", tbl)
         if "uadt" in q or "field" in q:
             tv = bool(re.search(r"\btv\b|time.?var", q))
             tbl = "uadt_cox_tv" if tv else "uadt_cox"

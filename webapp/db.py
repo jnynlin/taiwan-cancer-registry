@@ -168,6 +168,22 @@ class RegistryDB:
 
         self._register("annual_proportions", _load_annual_proportions())
         self._register("nmf_weights", _load_nmf_weights())
+        self._load_site_survival()
+
+    def _load_site_survival(self) -> None:
+        """Auto-scan results/site_survival/{SITE}/ and register KM + Cox tables."""
+        base = REGISTRY_ROOT / "results" / "site_survival"
+        if not base.exists():
+            return
+        for site_dir in sorted(base.iterdir()):
+            if not site_dir.is_dir():
+                continue
+            site = site_dir.name.upper()   # e.g. "C34"
+            for csv_name in ("km_stage_medians", "km_sex_medians",
+                             "km_age_medians", "cox_summary", "site_summary"):
+                path = site_dir / f"{csv_name}.csv"
+                tbl  = f"{site.lower()}_{csv_name}"   # e.g. "c34_km_stage_medians"
+                self._register(tbl, _load_csv(path))
 
     # ── public API ────────────────────────────────────────────────────────────
 
