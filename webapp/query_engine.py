@@ -33,6 +33,12 @@ class QueryResult:
 # ── intent patterns ───────────────────────────────────────────────────────────
 
 _INTENT_MAP = [
+    # compound patterns first (prevent early-exit misrouting)
+    (r"\bsilhouette\b", "cluster"),
+    (r"\bcluster\b.{0,30}\b(survival|cox|hazard|hr|os)\b|\b(survival|cox|hazard|hr|os)\b.{0,30}\bcluster\b", "cluster"),
+    (r"\bcluster\b.{0,30}\b(era|over time|trend|year|annual)\b|\b(era|over time|trend|year|annual)\b.{0,30}\bcluster\b", "cluster"),
+    (r"\bmulti.?histor\w+\b|\bcontext.len\w*\b|\badditional cancer histor\w*\b", "model"),
+    (r"\btransformer\b.{0,20}\b(temporal|gap|day|timing)\b", "model"),
     # (regex pattern, intent_key)
     (r"\b(survival|median os|prognosis|die|death|os\b|overall survival|outcomes?|km\b)\b", "survival"),
     (r"\b(hazard ratios?|hr\b|cox|risk factor[s]?|covariate[s]?)\b", "cox"),
@@ -156,6 +162,9 @@ def _build_sql(intent: str, site: str | None, question: str) -> tuple[str, str, 
         )
 
     if intent == "trend":
+        if re.search(r"\bmulti.?primary\b|\bmultiple primary\b|\bsecond.*over time\b", q):
+            return ("SELECT diag_yr, pct_multi FROM era_multi_primary ORDER BY diag_yr",
+                    "line", "Multiple Primary Cancer Rate Over Time (2003–2020)", "era_multi_primary")
         if site == "C22":
             return (
                 "SELECT diag_yr, c22_rate_pct, rate_age_50, rate_age_50_64, rate_age_65 "
@@ -235,6 +244,18 @@ def _build_sql(intent: str, site: str | None, question: str) -> tuple[str, str, 
         if "escc" in q or "cmuh" in q:
             return ("SELECT * FROM escc_dl_cindex", "table",
                     "CMUH ESCC Deep Learning C-index Summary", "escc_dl_cindex")
+        if re.search(r"\bsurvival\b|\bcox\b|\bhr\b|\bhazard\b|\bos\b", q):
+            return ("SELECT * FROM cluster_cox_timesplit", "forest",
+                    "Cluster Survival — Time-Split Cox HR (landmark 2 yr)", "cluster_cox_timesplit")
+        if re.search(r"\bera\b|\bover time\b|\btrend\b|\byear\b|\bannual\b", q):
+            return ("SELECT diag_yr, cluster_name, pct FROM era_clusters ORDER BY diag_yr",
+                    "line", "Cluster Composition Over Time (2003–2020)", "era_clusters")
+        if re.search(r"\bsilhouette\b|\bk=\b|\boptimal k\b|\bselect.*k\b", q):
+            return ("SELECT * FROM cluster_silhouette ORDER BY k", "bar",
+                    "Cluster Silhouette Scores (k=2–8)", "cluster_silhouette")
+        if re.search(r"\baxis\b|\blatent\b|\bdim\b|z\d", q):
+            return ("SELECT * FROM axis_covariate", "table",
+                    "VAE Latent Axis Biological Interpretation", "axis_covariate")
         return ("SELECT * FROM vae_clusters", "table",
                 "VAE Latent-Space Cluster Profiles", "vae_clusters")
 
@@ -276,6 +297,12 @@ def _build_sql(intent: str, site: str | None, question: str) -> tuple[str, str, 
         if "surveillance" in q or "predict" in q or "timing" in q:
             return ("SELECT * FROM surveillance_summary", "table",
                     "Surveillance Calendar Validation Summary", "surveillance_summary")
+        if re.search(r"\bmulti.?history\b|\bcontext\b|\bk=\d\b|additional.*cancer|multi.*cancer.*history", q):
+            return ("SELECT context_len, n, r_at_1, r_at_3, r_at_5 FROM multihistory_accuracy ORDER BY context_len",
+                    "bar", "Transformer R@k by Cancer History Context Length", "multihistory_accuracy")
+        if re.search(r"\btemporal\b|\btiming\b|\bgap\b|\bdays?\b", q):
+            return ("SELECT * FROM transformer_sensitivity LIMIT 50", "line",
+                    "Transformer Prediction Sensitivity to Diagnosis Gap", "transformer_sensitivity")
         return ("SELECT * FROM model_performance", "table",
                 "Deep Learning Model Performance (R@k)", "model_performance")
 
@@ -294,6 +321,12 @@ def _build_sql(intent: str, site: str | None, question: str) -> tuple[str, str, 
         )
 
     if intent == "hbv":
+        if re.search(r"\bbirth cohort\b|\bage.period\b|\bcohort effect\b|\bborn\b", q):
+            return ("SELECT diag_yr, cohort, c22_pct FROM birth_cohort_c22 ORDER BY diag_yr",
+                    "line", "Liver Cancer (C22) by Birth Cohort 2003–2020", "birth_cohort_c22")
+        if re.search(r"\bco.?occur\b|\bassoc\b|\baxis\b|\bgi\b|gastric|colon", q):
+            return ("SELECT * FROM c22_cooccurrence ORDER BY or DESC LIMIT 20",
+                    "bar", "C22 Liver Cancer Co-occurrence by GI/UADT Axis", "c22_cooccurrence")
         return ("SELECT diag_yr, c22_rate_pct FROM c22_trend ORDER BY diag_yr",
                 "line", "Liver Cancer (C22) Annual Rate 2003–2020", "c22_trend")
 

@@ -68,6 +68,24 @@ _SIMPLE = {
     "escc_validation":       ESCC_ROOT / "results/04_validation/validation_vs_C15.csv",
     "escc_shap":             ESCC_ROOT / "results/05_dl/method2_shap_summary.csv",
     "escc_dl_cindex":        ESCC_ROOT / "results/05_dl/dl_summary_cindex.csv",
+    # Taxonomy cluster survival (time-split Cox is the valid analysis)
+    "cluster_cox_timesplit": REGISTRY_ROOT / "dl_vae/results/10_cluster_survival/cox_timesplit_results.csv",
+    "cluster_ph_test":       REGISTRY_ROOT / "dl_vae/results/10_cluster_survival/ph_test_results.csv",
+    "cluster_silhouette":    REGISTRY_ROOT / "dl_vae/results/10_cluster_survival/silhouette_scores.csv",
+    "cluster_cox_full":      REGISTRY_ROOT / "dl_vae/results/10_cluster_survival/cox_cluster_results.csv",
+    # Multi-history transformer (Script 25)
+    "multihistory_accuracy": REGISTRY_ROOT / "dl_vae/results/25_multihistory/accuracy_by_context.csv",
+    # VAE axis biological interpretation
+    "axis_covariate":        REGISTRY_ROOT / "dl_vae/results/09_axis_covariate/axis_covariate_stats.csv",
+    # Transformer temporal sensitivity
+    "transformer_sensitivity": REGISTRY_ROOT / "dl_vae/results/08_transformer_eval/temporal_sensitivity.csv",
+    # HBV / C22 analyses
+    "c22_cooccurrence":      REGISTRY_ROOT / "dl_vae/results/16_hbv/c22_cooccurrence.csv",
+    "birth_cohort_c22":      REGISTRY_ROOT / "dl_vae/results/19_era/birth_cohort_c22.csv",
+    # Era / temporal trends
+    "era_clusters":          REGISTRY_ROOT / "dl_vae/results/19_era/cluster_era.csv",
+    "era_multi_primary":     REGISTRY_ROOT / "dl_vae/results/19_era/multi_primary_era.csv",
+    "era_axis_share":        REGISTRY_ROOT / "dl_vae/results/19_era/axis_share_era.csv",
 }
 
 
