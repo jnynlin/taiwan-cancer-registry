@@ -33,7 +33,7 @@ TOTAL  = 8
 
 def footer(fig, page):
     fig.text(0.5, 0.01,
-             f"Taiwan Cancer Registry — Three-Axis Cancer Taxonomy  |  Page {page}/{TOTAL}  |  Draft 2026-06-05",
+             f"CMUH Institutional Registry — Three-Axis Cancer Taxonomy  |  Page {page}/{TOTAL}  |  Draft 2026-06-06",
              ha="center", fontsize=7, color="#888888")
 
 
@@ -90,7 +90,7 @@ def main():
         ax_t.set_facecolor(NAVY); ax_t.axis("off")
         ax_t.text(0.5, 0.65,
                   "A Three-Axis Taxonomy of Cancer Co-occurrence Patterns\n"
-                  "in a Population-Based Taiwanese Registry",
+                  "in a Hospital-Based Institutional Cancer Registry (CMUH)",
                   ha="center", va="center", fontsize=17, color="white",
                   fontweight="bold", transform=ax_t.transAxes)
         ax_t.text(0.5, 0.25,
@@ -102,14 +102,15 @@ def main():
         ax_s.axis("off")
         n_ph_violated = int((~ph_df["PH_OK"]).sum())
         txt = (
-            f"Cohort: {n_pts:,} patients  ·  Multi-cancer: {n_multi:,} ({n_multi/n_pts*100:.1f}%)\n\n"
+            f"Cohort: {n_pts:,} patients (CMUH hospital-based registry)  ·  Multi-cancer: {n_multi:,} ({n_multi/n_pts*100:.1f}%)\n\n"
             f"VAE latent space: 12 dimensions → {n_active} active axes (highest max |loading|)\n"
-            f"KMeans clustering: k={n_clust}, silhouette={sil_k5:.3f}\n\n"
-            "Key finding: Cancer co-occurrence in Taiwan is explained by three latent axes,\n"
+            f"KMeans clustering: k={n_clust} (pre-specified for consistency with upstream scripts), silhouette={sil_k5:.3f}\n\n"
+            "Key finding: Cancer co-occurrence in this CMUH cohort is explained by three latent axes,\n"
             "corresponding to distinct carcinogenic exposures (UADT/field-cancerization,\n"
-            "hormonal/gynecologic ×2). Cluster survival differs significantly (log-rank p<0.001).\n"
+            "hormonal/gynecologic ×2). Five clusters identified: Hormonal, Multi-solid,\n"
+            "Colorectal/Lymphatic, Gynaecologic-Oral, Hepatic/Rare.\n"
             f"NOTE: proportional hazards violated for {n_ph_violated}/6 model terms; time-split\n"
-            "Cox (landmark=2yr) used as primary analysis — full-follow-up HRs are invalid."
+            "Cox (landmark=2yr) is the primary analysis — full-follow-up HRs are invalid and not reported."
         )
         ax_s.text(0.5, 0.6, txt, ha="center", va="center", fontsize=11,
                   color=NAVY, transform=ax_s.transAxes,
@@ -200,8 +201,9 @@ def main():
         # ── Page 7: Cluster survival (KM) ────────────────────────────────
         fig, ax = plt.subplots(figsize=(11, 7))
         img(ax, R10 / "fig_km_clusters.png",
-            "Fig 6: Kaplan–Meier overall survival by VAE cluster\n"
-            "(global log-rank test; time from first diagnosis, approximate)")
+            "Fig 6: Kaplan–Meier overall survival by VAE cluster (log-rank test, approximate survival times)\n"
+            "⚠ Proportional hazards violated for 5/6 terms — KM curves are descriptive only.\n"
+            "See Page 8 (Fig 7) for time-split Cox as the primary survival analysis.")
         ax_note2 = fig.add_axes([0.05, 0.02, 0.90, 0.13])
         surv_summary = ""
         for k in range(n_clust):
