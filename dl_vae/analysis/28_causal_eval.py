@@ -201,8 +201,9 @@ def main():
 
     vocab      = bert_ckpt["vocab"]
     vocab_size = bert_ckpt["vocab_size"]
-    age_mean   = bert_ckpt["age_mean"]
-    age_std    = bert_ckpt["age_std"]
+    # BERT checkpoint predates age_mean/age_std saving; fall back to causal ckpt
+    age_mean   = bert_ckpt.get("age_mean", caus_ckpt["age_mean"])
+    age_std    = bert_ckpt.get("age_std",  caus_ckpt["age_std"])
     inv_vocab  = {v: k for k, v in vocab.items()}
 
     print("Loading BERT model…")

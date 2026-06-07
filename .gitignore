@@ -74,6 +74,7 @@ dl_vae/results/12_surveillance/surveillance_calendar.csv
 dl_vae/results/21_syndrome/refined_candidates.csv
 dl_vae/results/25_multihistory/multihistory_calendar.csv
 dl_vae/results/10_cluster_survival/cluster_survival_table.csv
+dl_vae/results/27_causal/val_predictions.csv
 webapp/.venv/
 __pycache__/
 *.pyc
