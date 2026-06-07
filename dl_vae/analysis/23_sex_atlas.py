@@ -42,9 +42,7 @@ R09  = BASE / "results/09_axis_covariate"
 OUT  = BASE / "results/23_sex"
 OUT.mkdir(parents=True, exist_ok=True)
 
-UADT     = {"C02","C03","C04","C05","C06","C09","C10","C11","C12","C13","C15","C32","C34"}
-GI_SYS   = {"C16","C17","C18","C19","C20","C22","C25","C67"}
-HORMONAL = {"C50","C53","C54","C56","C61"}
+from constants import UADT, GI_SYS, HORMONAL  # noqa: E402
 AXIS_PALETTE = {"UADT":"#2e7fbf","HBV/GI":"#2ca02c","Hormonal":"#9467bd","Other":"#aaaaaa"}
 
 ACTIVE_DIMS = {"z4": "UADT/field", "z0": "Hormonal/gynecologic", "z5": "Hormonal/gynecologic"}

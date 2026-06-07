@@ -33,9 +33,8 @@ OUT  = BASE / "results/16_hbv"
 OUT.mkdir(parents=True, exist_ok=True)
 
 TARGET   = "C22"
-UADT     = {"C02","C03","C04","C05","C06","C09","C10","C11","C12","C13","C15","C32","C34"}
-GI_SYS   = {"C16","C17","C18","C19","C20","C25","C67"}
-HORMONAL = {"C50","C53","C54","C56","C61"}
+from constants import UADT, GI_SYS as _GI_SYS, HORMONAL  # noqa: E402
+GI_SYS = _GI_SYS - {TARGET}   # C22 is the hub TARGET in this analysis; exclude from GI/systemic group
 
 AXIS_PALETTE = {
     "C22 hub": "#e05c2e",
