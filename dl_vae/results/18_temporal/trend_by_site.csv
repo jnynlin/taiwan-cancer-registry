@@ -16,7 +16,7 @@ C38,Other,62,0.567,0.0142,0.386,8.0,0.1435,rising,True,False
 C12,UADT,395,0.562,0.0153,-0.146,24.2,0.0042,rising,True,True
 C30,Other,35,0.556,0.0165,0.119,14.2,0.0374,rising,True,True
 C15,UADT,1923,0.521,0.0267,0.485,6.2,0.2739,rising,True,False
-C11,Other,1309,0.424,0.0792,0.67,3.6,0.6319,rising,False,False
+C11,UADT,1309,0.424,0.0792,0.67,3.6,0.6319,rising,False,False
 C16,HBV/GI,2377,0.354,0.1501,0.604,4.4,0.6045,rising,False,False
 C18,HBV/GI,7548,0.193,0.4429,0.464,6.6,0.6925,rising,False,False
 C20,HBV/GI,3572,0.038,0.8804,0.408,7.6,0.9314,rising,False,False
