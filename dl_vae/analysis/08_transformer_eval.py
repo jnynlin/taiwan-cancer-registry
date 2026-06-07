@@ -52,7 +52,7 @@ PAD_IDX = 0; MASK_IDX = 1; CLS_IDX = 2; SITE_OFFSET = 3
 D_MODEL = 64; N_HEAD = 4; N_LAYERS = 2; FF_DIM = 128; MAX_SEQ = 8; DROPOUT = 0.1
 NAVY = "#14304a"; ACCENT = "#2e7fbf"
 
-UADT_SITES = {'C02','C03','C04','C05','C06','C09','C10','C12','C13','C15'}
+UADT_SITES = {'C02','C03','C04','C05','C06','C09','C10','C11','C12','C13','C15','C32','C34'}
 
 # ── Rebuild model (must match 07 exactly) ─────────────────────────────────────
 

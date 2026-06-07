@@ -47,10 +47,9 @@ N_CLUSTERS = 5
 SEED       = 42
 
 # Known axis membership (from EDA)
-UADT_SITES      = {'C02','C03','C04','C05','C06','C09','C10','C12','C13','C15'}
-HORMONAL_SITES  = {'C50','C53','C54','C56'}
+UADT_SITES      = {'C02','C03','C04','C05','C06','C09','C10','C11','C12','C13','C15','C32','C34'}
+HORMONAL_SITES  = {'C50','C53','C54','C56','C61'}
 LIVER_GI_SITES  = {'C18','C20','C22','C25'}
-LUNG_SITES      = {'C34'}
 
 
 def axis_name(top_sites):

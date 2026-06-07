@@ -40,7 +40,7 @@ STUDY_END = pd.Timestamp("2020-12-31")
 MIN_OBS   = 5     # minimum observed C22 second primaries to report SIR
 TARGET    = "C22"
 
-UADT_SITES = {"C02","C03","C04","C05","C06","C09","C10","C12","C13","C15"}
+UADT_SITES = {"C02","C03","C04","C05","C06","C09","C10","C11","C12","C13","C15","C32","C34"}
 GI_SITES   = {"C16","C17","C18","C19","C20","C22","C23","C24","C25"}
 
 

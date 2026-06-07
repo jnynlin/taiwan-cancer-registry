@@ -34,9 +34,9 @@ from sklearn.cluster import KMeans
 KMEANS_K     = 5
 KMEANS_SEED  = 42
 KMEANS_INIT  = 20
-UADT         = {"C02","C03","C04","C05","C06","C09","C10","C12","C13","C15"}
-GI_SYS       = {"C16","C17","C18","C19","C20","C22","C25","C34","C61","C67"}
-HORMONAL     = {"C50","C53","C54","C56"}
+UADT         = {"C02","C03","C04","C05","C06","C09","C10","C11","C12","C13","C15","C32","C34"}
+GI_SYS       = {"C16","C17","C18","C19","C20","C22","C25","C67"}
+HORMONAL     = {"C50","C53","C54","C56","C61"}
 
 CLUSTER_NAMES = {0: "Hormonal", 1: "Novel-1", 2: "Novel-2", 3: "UADT-field", 4: "Novel-4"}
 CLUSTER_COLORS = {

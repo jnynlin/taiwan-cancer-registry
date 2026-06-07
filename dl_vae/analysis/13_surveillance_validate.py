@@ -33,7 +33,7 @@ R12  = BASE / "results/12_surveillance"
 OUT  = BASE / "results/13_surveillance"
 OUT.mkdir(parents=True, exist_ok=True)
 
-UADT  = {"C02","C03","C04","C05","C06","C09","C10","C12","C13","C15"}
+UADT  = {"C02","C03","C04","C05","C06","C09","C10","C11","C12","C13","C15","C32","C34"}
 HIGH_THRESH   = 0.15
 MEDIUM_THRESH = 0.07
 GUIDELINE_DAYS = 180   # 6-month endoscopy guideline
